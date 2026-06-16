@@ -10,7 +10,7 @@
 <meta name="keywords" content="音楽,アーティスト,J-POP,音楽発見,プレイリスト,おすすめ">
 <meta name="author" content="MUSIC VERSE">
 
-<!-- OGP (SNSシェア用) -->
+<!-- OGP -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="MUSIC VERSE — 音楽の宇宙を探検しよう">
 <meta property="og:description" content="好きなアーティストを星として宇宙に配置。関連アーティストが光の線でつながる音楽発見サービス。">
@@ -37,7 +37,7 @@
   "@type": "WebApplication",
   "name": "MUSIC VERSE",
   "description": "好きなアーティストを星として宇宙に配置。関連アーティストが光の線でつながり、無限に広がる音楽の銀河を探検できる音楽発見サービス。",
-  "url": "https://musicverse.app",
+  "url": "https://musicvarce.vercel.app",
   "applicationCategory": "EntertainmentApplication",
   "operatingSystem": "All",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
@@ -72,22 +72,80 @@ body {
 #canvas { display:block; cursor:grab; }
 #canvas.hover { cursor:pointer; }
 
-/* TOP BAR */
+/* ══ TOP BAR ══ */
 #topbar {
   position:fixed; top:0; left:0; right:0;
-  padding:18px 28px;
-  display:flex; align-items:center; justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(0,0,15,.85),transparent);
+  padding:14px 20px;
+  display:flex; align-items:center; gap:12px;
+  background:linear-gradient(to bottom,rgba(0,0,15,.88),transparent);
   pointer-events:none; z-index:100;
 }
 #logo {
-  font-size:18px; font-weight:800; letter-spacing:4px;
+  font-size:16px; font-weight:800; letter-spacing:3px; flex-shrink:0;
   background:linear-gradient(135deg,#88aaff,#bb66ff,#ff88cc);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-#fav-badge { font-size:12px; color:rgba(255,200,70,.8); letter-spacing:.5px; }
 
-/* INFO PANEL */
+/* 検索バー */
+#search-wrap {
+  position:relative; flex:1; max-width:260px;
+  pointer-events:auto;
+}
+#search-input {
+  width:100%;
+  background:rgba(12,18,60,.75);
+  border:1px solid rgba(100,140,255,.18);
+  border-radius:20px;
+  padding:7px 15px;
+  color:rgba(190,215,255,.9);
+  font-size:12px; outline:none;
+  backdrop-filter:blur(12px);
+  transition:border-color .2s, background .2s;
+}
+#search-input:focus { border-color:rgba(100,140,255,.55); background:rgba(16,24,80,.85); }
+#search-input::placeholder { color:rgba(120,155,255,.35); }
+#search-results {
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  background:rgba(4,8,32,.97);
+  border:1px solid rgba(80,120,255,.22);
+  border-radius:12px; overflow:hidden;
+  display:none; z-index:500;
+  box-shadow:0 8px 32px rgba(0,0,20,.6);
+}
+.s-result {
+  padding:9px 14px; cursor:pointer; font-size:12px;
+  display:flex; align-items:center; gap:9px;
+  transition:background .12s; border-bottom:1px solid rgba(80,120,255,.07);
+}
+.s-result:last-child { border-bottom:none; }
+.s-result:hover { background:rgba(60,100,200,.22); }
+.s-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.s-genre { font-size:10px; color:rgba(140,170,255,.4); }
+.s-rising { font-size:9px; color:#ff9966; margin-left:4px; }
+
+/* お気に入りバッジ */
+#fav-badge {
+  font-size:11px; color:rgba(255,200,70,.8); letter-spacing:.3px;
+  cursor:pointer; pointer-events:auto; flex-shrink:0;
+  padding:6px 12px; border-radius:16px;
+  background:rgba(80,50,0,.25); border:1px solid rgba(255,180,30,.18);
+  transition:all .18s; white-space:nowrap;
+}
+#fav-badge:hover { background:rgba(120,80,0,.35); border-color:rgba(255,180,30,.4); }
+
+/* シェアボタン */
+#share-btn {
+  background:rgba(30,50,130,.5);
+  border:1px solid rgba(100,140,255,.18);
+  border-radius:16px;
+  color:rgba(160,190,255,.75);
+  font-size:11px; padding:6px 13px;
+  cursor:pointer; pointer-events:auto; flex-shrink:0;
+  white-space:nowrap; transition:all .18s;
+}
+#share-btn:hover { background:rgba(60,100,200,.45); color:white; }
+
+/* ══ INFO PANEL ══ */
 #panel {
   position:fixed; right:-420px; top:50%;
   transform:translateY(-50%);
@@ -117,6 +175,9 @@ body {
   padding:3px 10px; border-radius:20px; margin:0 4px 4px 0;
   border:1px solid rgba(255,255,255,.12); color:rgba(180,210,255,.7);
 }
+.tag-rising {
+  background:rgba(255,80,30,.15); border-color:rgba(255,80,30,.35); color:#ff9966;
+}
 .pop-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
 .pop-lbl { font-size:10px; color:rgba(160,190,255,.45); width:46px; }
 .pop-bg  { flex:1; height:3px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden; }
@@ -133,7 +194,6 @@ body {
 #btn-reg.on { background:linear-gradient(135deg,#ff8800,#ff3344); }
 .btn-link { background:rgba(255,255,255,.07); color:rgba(190,215,255,.85); border:1px solid rgba(255,255,255,.1); }
 .btn-link:hover { background:rgba(255,255,255,.11); }
-/* ARTIST PHOTO */
 #p-photo-wrap {
   width:82px; height:82px; border-radius:50%;
   margin:0 auto 16px; overflow:hidden; position:relative;
@@ -173,7 +233,43 @@ body {
 .rel-name { font-size:13px; flex:1; }
 .rel-pop  { font-size:10px; color:rgba(140,170,255,.45); }
 
-/* CONTROLS (home reset + zoom) */
+/* ══ お気に入り一覧パネル ══ */
+#fav-panel {
+  position:fixed; left:-310px; top:50%;
+  transform:translateY(-50%);
+  width:280px; max-height:72vh; overflow-y:auto;
+  background:rgba(4,7,28,.93);
+  border:1px solid rgba(255,200,70,.16);
+  border-radius:20px; padding:20px;
+  backdrop-filter:blur(28px);
+  transition:left .4s cubic-bezier(.4,0,.2,1);
+  z-index:190;
+  box-shadow:0 0 60px rgba(255,170,20,.08);
+}
+#fav-panel.open { left:20px; }
+#fav-panel::-webkit-scrollbar { width:3px; }
+#fav-panel::-webkit-scrollbar-thumb { background:rgba(255,180,30,.18); border-radius:2px; }
+.fp-header {
+  font-size:10px; color:rgba(255,200,70,.55); letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;
+}
+.fp-close {
+  background:none; border:none; color:rgba(255,200,70,.38);
+  font-size:15px; cursor:pointer; line-height:1;
+}
+.fp-close:hover { color:rgba(255,200,70,.9); }
+.fp-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 8px; border-radius:10px; cursor:pointer;
+  transition:background .14s;
+}
+.fp-item:hover { background:rgba(255,200,70,.07); }
+.fp-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.fp-name { font-size:13px; flex:1; }
+.fp-genre { font-size:10px; color:rgba(180,200,255,.38); }
+.fp-empty { font-size:12px; color:rgba(180,200,255,.3); text-align:center; padding:24px 0; line-height:1.8; }
+
+/* ══ VIEW CONTROLS ══ */
 #controls {
   position:fixed; bottom:54px; right:20px;
   display:flex; flex-direction:column; gap:8px; z-index:100;
@@ -188,7 +284,7 @@ body {
 .ctrl-btn:hover { background:rgba(60,80,180,.4); color:white; border-color:rgba(100,140,255,.45); }
 .ctrl-btn:active { transform:scale(.92); }
 
-/* HINT */
+/* ══ HINT ══ */
 #hint {
   position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
   font-size:11px; color:rgba(130,165,255,.35);
@@ -196,7 +292,7 @@ body {
   transition:opacity .4s; white-space:nowrap;
 }
 
-/* MOBILE ── パネルをボトムシートに */
+/* ══ MOBILE ══ */
 @media (max-width:520px) {
   #panel {
     right:auto !important; top:auto !important; bottom:-100vh;
@@ -205,20 +301,29 @@ body {
     transition:bottom .42s cubic-bezier(.4,0,.2,1);
   }
   #panel.open { bottom:0; right:auto !important; }
+  #fav-panel {
+    left:auto !important; top:auto !important; bottom:-100vh;
+    right:0; width:100%; max-height:65vh;
+    transform:none; border-radius:22px 22px 0 0;
+    transition:bottom .4s cubic-bezier(.4,0,.2,1);
+  }
+  #fav-panel.open { bottom:0; left:auto !important; }
   #controls { bottom:20px; right:12px; }
   #hint { display:none; }
+  #search-wrap { max-width:130px; }
+  #logo { font-size:13px; letter-spacing:2px; }
 }
 
-/* WELCOME MODAL */
+/* ══ WELCOME MODAL ══ */
 #welcome {
   position:fixed; inset:0; z-index:8000;
   display:flex; align-items:center; justify-content:center;
-  background:rgba(0,0,10,.75); backdrop-filter:blur(10px);
+  background:rgba(0,0,10,.78); backdrop-filter:blur(10px);
   opacity:0; pointer-events:none; transition:opacity .4s;
 }
 #welcome.show { opacity:1; pointer-events:auto; }
 #welcome-box {
-  background:rgba(4,8,32,.95); border:1px solid rgba(80,120,255,.25);
+  background:rgba(4,8,32,.96); border:1px solid rgba(80,120,255,.25);
   border-radius:24px; padding:36px 32px; max-width:380px; width:calc(100vw - 40px);
   box-shadow:0 0 80px rgba(60,100,255,.2);
   transform:translateY(20px); transition:transform .4s;
@@ -230,20 +335,20 @@ body {
   background:linear-gradient(135deg,#88aaff,#bb66ff,#ff88cc);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
-#welcome .w-sub { text-align:center; font-size:11px; color:rgba(140,170,255,.4); letter-spacing:2px; margin-bottom:26px; }
-.w-tip { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
-.w-tip-icon { font-size:22px; width:40px; text-align:center; flex-shrink:0; }
-.w-tip-text { font-size:13px; color:rgba(190,215,255,.75); line-height:1.6; }
+#welcome .w-sub { text-align:center; font-size:11px; color:rgba(140,170,255,.4); letter-spacing:2px; margin-bottom:24px; }
+.w-tip { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.w-tip-icon { font-size:20px; width:36px; text-align:center; flex-shrink:0; }
+.w-tip-text { font-size:12px; color:rgba(190,215,255,.72); line-height:1.6; }
 .w-tip-text strong { color:rgba(200,225,255,.95); }
 #welcome-btn {
-  margin-top:24px; width:100%; padding:14px; border-radius:14px; border:none;
+  margin-top:22px; width:100%; padding:14px; border-radius:14px; border:none;
   background:linear-gradient(135deg,#3355ff,#8822ee); color:white;
   font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer;
   transition:opacity .15s;
 }
 #welcome-btn:hover { opacity:.88; }
 
-/* LOADING */
+/* ══ LOADING ══ */
 #loading {
   position:fixed; inset:0; background:#000008;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -276,7 +381,27 @@ body {
 
 <div id="topbar">
   <div id="logo">✦ MUSIC VERSE</div>
-  <div id="fav-badge">★ お気に入り: <span id="fav-count">1</span> アーティスト</div>
+
+  <!-- 検索バー -->
+  <div id="search-wrap">
+    <input id="search-input" type="text" placeholder="🔍 アーティスト検索..." autocomplete="off" />
+    <div id="search-results"></div>
+  </div>
+
+  <!-- お気に入りバッジ -->
+  <div id="fav-badge" onclick="toggleFavPanel()">★ <span id="fav-count">0</span></div>
+
+  <!-- SNSシェアボタン -->
+  <button id="share-btn" onclick="shareApp()">🐦 シェア</button>
+</div>
+
+<!-- お気に入り一覧パネル -->
+<div id="fav-panel">
+  <div class="fp-header">
+    <span>★ お気に入り</span>
+    <button class="fp-close" onclick="toggleFavPanel()">✕</button>
+  </div>
+  <div id="fav-list"></div>
 </div>
 
 <div id="panel">
@@ -299,6 +424,7 @@ body {
   </div>
   <div id="p-desc"></div>
   <button class="btn" id="btn-reg" onclick="toggleReg()">＋ お気に入りに登録</button>
+  <button class="btn btn-link" id="btn-share-artist" onclick="shareArtist()">🐦 このアーティストをシェア</button>
   <div class="songs-hd">人気曲 TOP 3</div>
   <div id="p-songs"></div>
   <button class="btn btn-link" onclick="openYT()">▶ YouTube で視聴</button>
@@ -325,15 +451,15 @@ body {
     </div>
     <div class="w-tip">
       <div class="w-tip-icon">🔍</div>
-      <div class="w-tip-text"><strong>スクロール / ピンチ</strong>でズームイン・アウト。宇宙のどこまでも探検できます。</div>
-    </div>
-    <div class="w-tip">
-      <div class="w-tip-icon">✋</div>
-      <div class="w-tip-text"><strong>余白をドラッグ</strong>して宇宙を移動。慣性でなめらかに流れます。</div>
+      <div class="w-tip-text"><strong>アーティスト検索</strong>で名前から素早く星を見つけられます。</div>
     </div>
     <div class="w-tip">
       <div class="w-tip-icon">★</div>
-      <div class="w-tip-text"><strong>お気に入りに登録</strong>すると、星の周りに彗星が飛び回ります。</div>
+      <div class="w-tip-text"><strong>お気に入り登録</strong>すると星に彗星が飛び回り、お気に入り同士が引き合います。</div>
+    </div>
+    <div class="w-tip">
+      <div class="w-tip-icon">🔥</div>
+      <div class="w-tip-text"><strong>赤く輝く星</strong>は急上昇中のアーティスト。新しい発見を楽しんで！</div>
     </div>
     <button id="welcome-btn" onclick="closeWelcome()">宇宙へ出発する　→</button>
   </div>
@@ -350,11 +476,8 @@ body {
 
 <script>
 // ════════════════ LAST.FM CONFIG ════════════════
-// 無料APIキーを取得 → https://www.last.fm/api/account/create
-// 取得したキーをここに貼り付けると、動的な関連アーティスト・人気度データが使えるようになります
 const LASTFM_KEY = '88f73a8552d2b43542d52e5878730bd5'
 
-// Last.fm 英語アーティスト名（APIクエリ用）
 const LF_NAMES = [
   'Kenshi Yonezu','King Gnu','YOASOBI','Official HIGE DANdism','Ado',
   'Fujii Kaze','Aimyon','Sakanaction','Hikaru Utada','Sheena Ringo',
@@ -363,10 +486,13 @@ const LF_NAMES = [
   'Vaundy','Creepy Nuts','Eve','Mr. Children','BUMP OF CHICKEN',
   'ONE OK ROCK','Asian Kung-Fu Generation','Spitz','Hitsujibungaku','Omoinotake',
   'SIRUP','Nulbarich','mol-74','tuki.','imase',
-  'Tempalay','CHAI','Awesome City Club','Never Young Beach','Soshi Sakiyama'
+  'Tempalay','CHAI','Awesome City Club','Never Young Beach','Soshi Sakiyama',
+  // 新規アーティスト (40-54)
+  'Ryokuoushoku Shakai','Kitani Tatsuya','PEOPLE 1','Ikuta Lilas','Awich',
+  'cero','Kinoko Teikoku','The Humbreaders','odol','Yuji Oda',
+  'chelmico','tricot','5lack','Yoru no Honki Dance','Hara Kosuke'
 ]
 
-// Last.fm JSONP ラッパー（file://・https:// 両対応）
 function lfJsonp(method, params, cb) {
   if(!LASTFM_KEY) return
   const fn='_lf'+Math.random().toString(36).slice(2)
@@ -379,7 +505,6 @@ function lfJsonp(method, params, cb) {
   document.head.appendChild(sc)
 }
 
-// アーティスト名（英語/日本語）→ ARTISTS インデックス
 function findArtistIdx(name) {
   const lower=name.toLowerCase()
   return ARTISTS.findIndex((a,i)=>
@@ -389,15 +514,12 @@ function findArtistIdx(name) {
   )
 }
 
-// Last.fm から動的に関連アーティスト・人気度を取得
 function initLastFm() {
   if(!LASTFM_KEY) return
   const connSet=new Set(CONNECTIONS.map(([a,b])=>`${Math.min(a,b)}-${Math.max(a,b)}`))
-
   LF_NAMES.forEach((lfName,i)=>{
     setTimeout(()=>{
-      // getSimilar → 接続グラフをリアルタイムに拡張
-      lfJsonp('artist.getSimilar',{artist:lfName,limit:10},data=>{
+      lfJsonp('artist.getSimilar',{artist:lfName,limit:8},data=>{
         ;(data?.similarartists?.artist||[]).forEach(sim=>{
           const idx=findArtistIdx(sim.name)
           if(idx<0||idx===i) return
@@ -405,145 +527,192 @@ function initLastFm() {
           if(!connSet.has(key)){ connSet.add(key); CONNECTIONS.push([Math.min(i,idx),Math.max(i,idx)]) }
         })
       })
-      // getInfo → リスナー数から人気度を更新
       lfJsonp('artist.getInfo',{artist:lfName,lang:'ja'},data=>{
         const l=parseInt(data?.artist?.stats?.listeners||0)
         if(l>0){
-          // 対数スケール: 1万→38, 10万→56, 100万→75, 500万→95
           const newPop=Math.min(99,Math.max(15,Math.round(Math.log10(l)/Math.log10(6000000)*100)))
           stars[i].pop=newPop
           stars[i].r=3+Math.pow(newPop/100,2)*30
         }
       })
-    }, i*350)
+    }, i*320)
   })
 }
 
 // ════════════════ DATA ════════════════
 const ARTISTS = [
-  { id:0,  name:'米津玄師',         pop:98, genre:'J-POP',       col:0x4499ff, fav:false,
+  // 既存 0-39
+  { id:0,  name:'米津玄師',         pop:98, genre:'J-POP',        col:0x4499ff, fav:false, rising:false,
     desc:'シンガーソングライター。ロック・ポップ・アニメなど多彩なジャンルを横断する国民的アーティスト。「Lemon」「KICK BACK」など代表曲多数。',
     songs:['Lemon','KICK BACK','Pale Blue'] },
-  { id:1,  name:'King Gnu',         pop:92, genre:'ロック',      col:0xff4466, fav:false,
+  { id:1,  name:'King Gnu',         pop:92, genre:'ロック',       col:0xff4466, fav:false, rising:false,
     desc:'東京出身4人組バンド。ジャズ・クラシック・R&Bを独自に融合。変拍子・転調を駆使した高度な楽曲が特徴。',
     songs:['白日','三文小説','Sympa'] },
-  { id:2,  name:'YOASOBI',          pop:97, genre:'エレクトロ',  col:0xaa44ff, fav:false,
+  { id:2,  name:'YOASOBI',          pop:97, genre:'エレクトロ',   col:0xaa44ff, fav:false, rising:false,
     desc:'「小説を音楽にする」コンセプトのユニット。「夜に駆ける」が世界的ヒット。ikura（Vo）とAyase（Prod）のデュオ。',
     songs:['夜に駆ける','アイドル','群青'] },
-  { id:3,  name:'Official髭男dism', pop:93, genre:'J-POP',       col:0x44ddaa, fav:false,
+  { id:3,  name:'Official髭男dism', pop:93, genre:'J-POP',        col:0x44ddaa, fav:false, rising:false,
     desc:'島根出身4人組バンド。ピアノポップを軸に洗練されたサウンドと圧倒的な歌唱力が強み。「Subtitle」「Pretender」などヒット多数。',
     songs:['Pretender','Subtitle','I LOVE...'] },
-  { id:4,  name:'Ado',              pop:95, genre:'J-POP',       col:0xff6644, fav:false,
+  { id:4,  name:'Ado',              pop:95, genre:'J-POP',        col:0xff6644, fav:false, rising:false,
     desc:'圧倒的な歌唱力を持つシンガー。顔出しなしで活動。「うっせぇわ」「新時代」「唱」など多数のヒット。',
     songs:['うっせぇわ','新時代','唱'] },
-  { id:5,  name:'藤井風',           pop:88, genre:'ソウル/R&B',  col:0xffcc44, fav:false,
+  { id:5,  name:'藤井風',           pop:88, genre:'ソウル/R&B',   col:0xffcc44, fav:false, rising:false,
     desc:'岡山出身のシンガーソングライター。R&B・ソウルを軸に英語・日本語・岡山弁を巧みに使う独自スタイル。',
     songs:['何なんw','きらり','帰ろう'] },
-  { id:6,  name:'あいみょん',       pop:87, genre:'J-POP',       col:0xff88bb, fav:false,
+  { id:6,  name:'あいみょん',       pop:87, genre:'J-POP',        col:0xff88bb, fav:false, rising:false,
     desc:'兵庫出身のシンガーソングライター。ストレートで鋭い言葉と耳に残るメロディが特徴。「マリーゴールド」など。',
     songs:['マリーゴールド','愛を伝えたいだとか','君はロックを聴かない'] },
-  { id:7,  name:'サカナクション',   pop:82, genre:'エレクトロ',  col:0x44aaff, fav:false,
+  { id:7,  name:'サカナクション',   pop:82, genre:'エレクトロ',   col:0x44aaff, fav:false, rising:false,
     desc:'北海道出身5人組バンド。テクノ・ニューウェーブとロックを融合させた独自サウンド。「新宝島」「アルクアラウンド」など。',
     songs:['新宝島','アルクアラウンド','ミュージック'] },
-  { id:8,  name:'宇多田ヒカル',     pop:91, genre:'ソウル/R&B',  col:0xffaa66, fav:false,
+  { id:8,  name:'宇多田ヒカル',     pop:91, genre:'ソウル/R&B',   col:0xffaa66, fav:false, rising:false,
     desc:'日本を代表するシンガーソングライター。デビューアルバム「First Love」は日本歴代最高売上。独自のR&B×J-POPスタイル。',
     songs:['First Love','Automatic','traveling'] },
-  { id:9,  name:'椎名林檎',         pop:88, genre:'ロック',      col:0xff3366, fav:false,
+  { id:9,  name:'椎名林檎',         pop:88, genre:'ロック',       col:0xff3366, fav:false, rising:false,
     desc:'東京事変のリーダー。アバンギャルドなスタイルと鋭いリリック・世界観で唯一無二の存在感。和の要素も独自に取り込む。',
     songs:['丸の内サディスティック','歌舞伎町の女王','ギャンブル'] },
-  { id:10, name:'星野源',           pop:89, genre:'J-POP',       col:0x66ffcc, fav:false,
+  { id:10, name:'星野源',           pop:89, genre:'J-POP',        col:0x66ffcc, fav:false, rising:false,
     desc:'シンガーソングライター・俳優・文筆家。「恋」「Pop Virus」など多彩な楽曲。ファンク・ソウルをJ-POPに昇華。',
     songs:['恋','うちで踊ろう','Family Song'] },
-  { id:11, name:'back number',      pop:84, genre:'ロック',      col:0x8866ff, fav:false,
+  { id:11, name:'back number',      pop:84, genre:'ロック',       col:0x8866ff, fav:false, rising:false,
     desc:'群馬出身3人組バンド。切ない恋愛を描いた歌詞と哀愁のあるメロディが特徴。「水平線」「クリスマスソング」など。',
     songs:['クリスマスソング','水平線','ハッピーエンド'] },
-  { id:12, name:'Mrs. GREEN APPLE', pop:90, genre:'J-POP',       col:0x44ff88, fav:false,
+  { id:12, name:'Mrs. GREEN APPLE', pop:90, genre:'J-POP',        col:0x44ff88, fav:false, rising:false,
     desc:'東京出身バンド。ポップ・ロックを軸に疾走感と多様性のある楽曲が人気。「ダンスホール」「青と夏」など。',
     songs:['ダンスホール','青と夏','ケセラセラ'] },
-  { id:13, name:'マカロニえんぴつ', pop:72, genre:'ロック',      col:0xffbb44, fav:false,
+  { id:13, name:'マカロニえんぴつ', pop:72, genre:'ロック',       col:0xffbb44, fav:false, rising:false,
     desc:'東京出身4人組バンド。日常を切り取った温かい歌詞とキャッチーなメロディが魅力。',
     songs:['なんでもないよ、','ブルーベリー ナイツ','星が泳ぐ'] },
-  { id:14, name:'iri',              pop:65, genre:'ソウル/R&B',  col:0xdd88ff, fav:false,
+  { id:14, name:'iri',              pop:65, genre:'ソウル/R&B',   col:0xdd88ff, fav:false, rising:false,
     desc:'沖縄出身のシンガーソングライター。R&B・ソウルをベースにした洗練されたサウンド。',
     songs:['Sparkle','Only One','Hello'] },
-  { id:15, name:'Aimer',            pop:80, genre:'J-POP',       col:0x88ccff, fav:false,
+  { id:15, name:'Aimer',            pop:80, genre:'J-POP',        col:0x88ccff, fav:false, rising:false,
     desc:'ハスキーで透明感のある独特の声が特徴のシンガー。アニメタイアップ多数。「花の唄」など。',
     songs:['蝶々結び','ref:rain','花の唄'] },
-  { id:16, name:'くるり',           pop:70, genre:'ロック',      col:0x99ff66, fav:false,
+  { id:16, name:'くるり',           pop:70, genre:'ロック',       col:0x99ff66, fav:false, rising:false,
     desc:'京都出身バンド。ギターロックからオーケストラまで多彩なスタイルを持つ実力派。「東京」「ばらの花」など名曲多数。',
     songs:['東京','ばらの花','琥珀色の街、上海蟹の朝'] },
-  { id:17, name:'ズーカラデル',     pop:45, genre:'インディー',  col:0xaaffdd, fav:false,
+  { id:17, name:'ズーカラデル',     pop:45, genre:'インディー',   col:0xaaffdd, fav:false, rising:false,
     desc:'北海道出身インディーバンド。温かみのあるギターポップと叙情的な歌詞が特徴。じわじわとファンを増やす注目株。',
     songs:['みらいのぼくらへ','海月','シアン'] },
-  { id:18, name:'ヨルシカ',         pop:83, genre:'ロック',      col:0x6688ff, fav:false,
+  { id:18, name:'ヨルシカ',         pop:83, genre:'ロック',       col:0x6688ff, fav:false, rising:false,
     desc:'n-bunaとsuisによるバンド。詩的な世界観と幻想的なサウンドスケープが特徴。アルバムコンセプトが高く評価される。',
     songs:['だから僕は音楽を辞めた','ただ君に晴れ','チノカテ'] },
-  { id:19, name:'RADWIMPS',         pop:88, genre:'ロック',      col:0xff9966, fav:false,
+  { id:19, name:'RADWIMPS',         pop:88, genre:'ロック',       col:0xff9966, fav:false, rising:false,
     desc:'映画「君の名は。」「天気の子」の音楽を担当。感情的なロックサウンドと叙情的な歌詞で世界的に評価。',
     songs:['前前前世','なんでもないや','スパークル'] },
-  { id:20, name:'Vaundy',           pop:89, genre:'J-POP',       col:0x55ddff, fav:false,
+  { id:20, name:'Vaundy',           pop:89, genre:'J-POP',        col:0x55ddff, fav:false, rising:false,
     desc:'マルチクリエイター。作詞・作曲・編曲・デザインを自ら手がける。「踊り子」「怪獣の花唄」など多彩なヒット。',
     songs:['踊り子','怪獣の花唄','タイムパラドックス'] },
-  { id:21, name:'Creepy Nuts',      pop:82, genre:'ヒップホップ', col:0xdd6644, fav:false,
-    desc:'DJ松永とR-指定によるヒップホップユニット。バトルDJ世界一・ラップ選手権日本一のスキルで話題。',
-    songs:['のびしろ','ビリケン','かつて天才だった俺たちへ'] },
-  { id:22, name:'Eve',              pop:78, genre:'J-POP',       col:0xcc88ff, fav:false,
+  { id:21, name:'Creepy Nuts',      pop:86, genre:'ヒップホップ',  col:0xdd6644, fav:false, rising:true,
+    desc:'DJ松永とR-指定によるヒップホップユニット。バトルDJ世界一・ラップ選手権日本一のスキルで話題。アニメ主題歌「Bling-Bang-Bang-Born」が世界的ヒット。',
+    songs:['Bling-Bang-Bang-Born','のびしろ','ビリケン'] },
+  { id:22, name:'Eve',              pop:78, genre:'J-POP',        col:0xcc88ff, fav:false, rising:false,
     desc:'ボカロP出身のシンガーソングライター。アニメ主題歌への楽曲提供も多く「廻廻奇譚」などで広く認知。',
     songs:['廻廻奇譚','お気に召すまま','アウトサイダー'] },
-  { id:23, name:'Mr.Children',      pop:93, genre:'ロック',      col:0x4488cc, fav:false,
+  { id:23, name:'Mr.Children',      pop:93, genre:'ロック',       col:0x4488cc, fav:false, rising:false,
     desc:'日本を代表するロックバンド。30年以上のキャリアで数々のミリオンヒット。「Tomorrow never knows」など。',
     songs:['HANABI','Tomorrow never knows','Sign'] },
-  { id:24, name:'BUMP OF CHICKEN',  pop:86, genre:'ロック',      col:0xaaccff, fav:false,
+  { id:24, name:'BUMP OF CHICKEN',  pop:86, genre:'ロック',       col:0xaaccff, fav:false, rising:false,
     desc:'千葉出身4人組バンド。詩的で深いリリックと繊細なサウンドが特徴。「天体観測」「ray」など名曲多数。',
     songs:['天体観測','ray','カルマ'] },
-  { id:25, name:'ONE OK ROCK',      pop:85, genre:'ロック',      col:0xff5533, fav:false,
+  { id:25, name:'ONE OK ROCK',      pop:85, genre:'ロック',       col:0xff5533, fav:false, rising:false,
     desc:'東京出身ロックバンド。英語詞も多用しアジアを中心に国際的な活躍。「Wherever you are」など。',
     songs:['Wherever you are','The Beginning','Re:make'] },
-  { id:26, name:'アジカン',          pop:80, genre:'ロック',      col:0x88ff99, fav:false,
+  { id:26, name:'アジカン',          pop:80, genre:'ロック',       col:0x88ff99, fav:false, rising:false,
     desc:'Asian Kung-Fu Generation。横浜出身ロックバンド。アニメタイアップと骨太なギターサウンドで支持を集める。',
     songs:['リライト','君という花','ソラニン'] },
-  { id:27, name:'スピッツ',          pop:84, genre:'ロック',      col:0xffffff, fav:false,
+  { id:27, name:'スピッツ',          pop:84, genre:'ロック',       col:0xffffff, fav:false, rising:false,
     desc:'東京出身4人組バンド。透明感のある草野マサムネの歌声とポップなメロディが特徴。「ロビンソン」など。',
     songs:['ロビンソン','チェリー','空も飛べるはず'] },
-  { id:28, name:'羊文学',            pop:68, genre:'インディー',  col:0xaaffee, fav:false,
+  { id:28, name:'羊文学',            pop:68, genre:'インディー',   col:0xaaffee, fav:false, rising:false,
     desc:'東京出身3人組バンド。轟音ギターと繊細な歌詞が共存するシューゲイザー/オルタナサウンド。',
     songs:['天気予報','gold','ざわめき'] },
-  { id:29, name:'Omoinotake',       pop:62, genre:'J-POP',       col:0x88aadd, fav:false,
+  { id:29, name:'Omoinotake',       pop:62, genre:'J-POP',        col:0x88aadd, fav:false, rising:false,
     desc:'島根出身3人組バンド。ピアノトリオを軸にR&Bとポップを融合。「彼方」などドラマタイアップで注目。',
     songs:['幾億光年','彼方','ANSWER'] },
-  { id:30, name:'SIRUP',            pop:58, genre:'ソウル/R&B',  col:0xff99cc, fav:false,
+  { id:30, name:'SIRUP',            pop:58, genre:'ソウル/R&B',   col:0xff99cc, fav:false, rising:false,
     desc:'大阪出身のシンガーソングライター。R&B・ソウルを軸にしたメロウなサウンドと繊細な歌声が特徴。',
     songs:['Do Well','わかりあえないこと','Synapse'] },
-  { id:31, name:'Nulbarich',        pop:60, genre:'ソウル/R&B',  col:0xffdd88, fav:false,
+  { id:31, name:'Nulbarich',        pop:60, genre:'ソウル/R&B',   col:0xffdd88, fav:false, rising:false,
     desc:'JQを中心とするバンドプロジェクト。シティポップ×R&Bの洗練されたサウンドでフェス常連。',
     songs:['Get Down','It\'s Who We Are','Bonus Track'] },
-  { id:32, name:'mol-74',           pop:50, genre:'インディー',  col:0x99ddaa, fav:false,
+  { id:32, name:'mol-74',           pop:50, genre:'インディー',   col:0x99ddaa, fav:false, rising:false,
     desc:'京都出身4人組バンド。透き通るような歌声と繊細なギターポップが特徴のインディーバンド。',
     songs:['フロム','凛','Sadie'] },
-  { id:33, name:'tuki.',            pop:72, genre:'J-POP',       col:0xffbbcc, fav:false,
+  { id:33, name:'tuki.',            pop:75, genre:'J-POP',        col:0xffbbcc, fav:false, rising:true,
     desc:'2004年生まれの若手シンガーソングライター。「晩餐歌」がTikTokで爆発的ヒット。Z世代の注目株。',
     songs:['晩餐歌','脳裏上のクラッカー','サクラマジック'] },
-  { id:34, name:'imase',            pop:74, genre:'J-POP',       col:0x66eebb, fav:false,
+  { id:34, name:'imase',            pop:76, genre:'J-POP',        col:0x66eebb, fav:false, rising:true,
     desc:'ネット発のシンガーソングライター。「NIGHT DANCER」が世界的にバイラルヒット。次世代J-POPを牽引。',
     songs:['NIGHT DANCER','しわあわせ','lost'] },
-  { id:35, name:'Tempalay',         pop:55, genre:'インディー',  col:0xbb88ff, fav:false,
+  { id:35, name:'Tempalay',         pop:55, genre:'インディー',   col:0xbb88ff, fav:false, rising:false,
     desc:'東京出身バンド。サイケデリックロックと歌謡曲を独自に融合した唯一無二のサウンドが特徴。',
     songs:['そなちね','どうせまた夢','I Need You'] },
-  { id:36, name:'CHAI',             pop:48, genre:'インディー',  col:0xffaa55, fav:false,
+  { id:36, name:'CHAI',             pop:48, genre:'インディー',   col:0xffaa55, fav:false, rising:false,
     desc:'名古屋出身4人組バンド。ポップパンク×ニューウェーブのスタイルで海外でも高評価。NEOかわいい哲学。',
     songs:['N.E.O.','GREAT JOB','Step Step'] },
-  { id:37, name:'Awesome City Club', pop:63, genre:'J-POP',      col:0x66ccff, fav:false,
+  { id:37, name:'Awesome City Club', pop:63, genre:'ソウル/R&B',  col:0x66ccff, fav:false, rising:false,
     desc:'東京出身バンド。シティポップの影響を受けたおしゃれなサウンド。「勿忘」が映画タイアップで大ヒット。',
     songs:['勿忘','Sundown','またたき'] },
-  { id:38, name:'Never Young Beach', pop:52, genre:'インディー', col:0xaaffaa, fav:false,
+  { id:38, name:'Never Young Beach', pop:52, genre:'インディー',  col:0xaaffaa, fav:false, rising:false,
     desc:'東京出身バンド。70年代の日本語ロックを現代に蘇らせた涼しげなサウンドが特徴。夏の定番。',
     songs:['お別れの歌','いのちの歌','この世界は思ってたよりずっとすごい'] },
-  { id:39, name:'崎山蒼志',          pop:42, genre:'インディー', col:0xddbbff, fav:false,
+  { id:39, name:'崎山蒼志',          pop:42, genre:'インディー',  col:0xddbbff, fav:false, rising:false,
     desc:'高校生でデビューした若手シンガーソングライター。複雑なギターと詩的な世界観で注目される。',
     songs:['五月雨よ','幸せについて本気出して考えてみた','from'] },
+
+  // ─────── 新規マイナーアーティスト 40-54 ───────
+  { id:40, name:'緑黄色社会',        pop:80, genre:'J-POP',        col:0x88ff55, fav:false, rising:true,
+    desc:'愛知出身4人組バンド。ドラマ主題歌やTikTok経由でZ世代を中心に急拡大。「Mela!」「Shout Baby」など疾走感あふれる楽曲が人気。',
+    songs:['Mela!','Shout Baby','sabotage'] },
+  { id:41, name:'キタニタツヤ',       pop:72, genre:'J-POP',        col:0xcc66ee, fav:false, rising:true,
+    desc:'ボカロP出身のシンガーソングライター。「青のすみか」など呪術廻戦主題歌で一躍有名に。繊細な声と映像的な歌詞が特徴。',
+    songs:['青のすみか','NITRO','悪魔の踊り方'] },
+  { id:42, name:'PEOPLE 1',          pop:62, genre:'エレクトロ',   col:0xff7733, fav:false, rising:true,
+    desc:'謎多きバンド。エレクトロポップとロックを融合した独自サウンドがSNSで拡散中。「Fragile」など中毒性の高い楽曲。',
+    songs:['Fragile','ミームになりたい','DOGMA'] },
+  { id:43, name:'幾田りら',           pop:74, genre:'J-POP',        col:0xffaadd, fav:false, rising:false,
+    desc:'YOASOBIのikuraとしても活動するシンガーソングライター。透明感のある歌声と繊細な楽曲で人気急上昇中。',
+    songs:['ポップスター','answer','きらきら'] },
+  { id:44, name:'Awich',             pop:70, genre:'ヒップホップ',  col:0xff4488, fav:false, rising:false,
+    desc:'沖縄出身の女性ラッパー。日本語ラップシーンを牽引する実力派。「Queendom」など力強いリリックで国際的にも注目。',
+    songs:['Queendom','RASEN','G.O.A.T.'] },
+  { id:45, name:'cero',              pop:55, genre:'インディー',   col:0x55ddbb, fav:false, rising:false,
+    desc:'東京出身バンド。アフロビート・ボサノバ・シティポップを独自に融合。知的でオルタナティブな音楽性で批評家から高評価。',
+    songs:['Summer Soul','Orphans','poly life multi soul'] },
+  { id:46, name:'きのこ帝国',         pop:58, genre:'インディー',   col:0x99aabb, fav:false, rising:false,
+    desc:'東京出身4人組。シューゲイザー・ドリームポップをベースにした繊細でノイジーなサウンド。「東京」など名曲が多い。',
+    songs:['東京','クロノスタシス','YOU'] },
+  { id:47, name:'ハンブレッダーズ',    pop:52, genre:'ロック',       col:0xff8833, fav:false, rising:false,
+    desc:'大阪出身4人組バンド。パンクロックに日本語の詩的な歌詞を乗せた青春感溢れるサウンド。ライブの熱量が高いことで有名。',
+    songs:['ヤバすぎる','真赤','ギター','どうせ'] },
+  { id:48, name:'odol',              pop:44, genre:'インディー',   col:0xaabbcc, fav:false, rising:false,
+    desc:'東京出身バンド。ピアノを中心とした繊細でポエティックなインディーポップ。「よすが」など感情に寄り添う楽曲が魅力。',
+    songs:['よすが','つくり囃子','息をする水'] },
+  { id:49, name:'諭吉佳作/men',       pop:58, genre:'インディー',   col:0xddbb44, fav:false, rising:true,
+    desc:'東京出身のシンガーソングライター。「ほら、また浮いてる」がTikTokで話題。独特の浮遊感と中毒性のある楽曲スタイル。',
+    songs:['ほら、また浮いてる','Veil','あのこの夢をみた'] },
+  { id:50, name:'chelmico',          pop:46, genre:'ヒップホップ',  col:0xff99ee, fav:false, rising:false,
+    desc:'RachelとMamikoによる女性2人組ラップユニット。脱力感と自由さが特徴のポップラップで唯一無二の世界観を持つ。',
+    songs:['Easy Breezy','Balloon','Rabbit!'] },
+  { id:51, name:'tricot',            pop:50, genre:'ロック',       col:0xee4477, fav:false, rising:false,
+    desc:'京都出身4人組バンド。複雑な変拍子とマスロック的なギターワークを持ちながらも親しみやすいポップさを兼ね備える。',
+    songs:['メロン・ソーダ','E','おやすみ'] },
+  { id:52, name:'5lack',             pop:40, genre:'ヒップホップ',  col:0x77aacc, fav:false, rising:false,
+    desc:'東京出身のラッパー/プロデューサー。アンダーグラウンドヒップホップの重鎮。洗練されたビートと独特のフロウが魅力。',
+    songs:['good morning','なにもない', 'YOKOHAMA'] },
+  { id:53, name:'夜の本気ダンス',      pop:56, genre:'ロック',       col:0x66bbff, fav:false, rising:false,
+    desc:'京都出身4人組バンド。ファンクやソウルの影響を受けたグルーヴィーなダンスロック。ライブバンドとして高い評価。',
+    songs:['TONIGHT','STUPID','熱狂アンセム'] },
+  { id:54, name:'原口沙輔',           pop:38, genre:'エレクトロ',   col:0x88eeff, fav:false, rising:true,
+    desc:'ネット発のプロデューサー/シンガー。「人マニア」がバイラルヒット。エレクトロとポップを融合した次世代サウンド。',
+    songs:['人マニア','新しいから','DISCO'] },
 ]
 
 const CONNECTIONS = [
+  // 既存のつながり
   [0,1],[0,2],[0,3],[0,10],[0,18],[0,4],[0,20],
   [1,12],[1,13],[1,7],[1,18],[1,9],[1,19],[1,25],
   [2,7],[2,4],[2,15],[2,3],[2,20],[2,22],
@@ -562,7 +731,6 @@ const CONNECTIONS = [
   [16,17],[16,19],[16,26],[16,38],
   [18,19],[18,15],[18,28],[18,24],
   [19,11],[19,1],[19,23],[19,24],
-  // 新規アーティストのつながり
   [20,0],[20,5],[20,33],[20,34],
   [21,4],[21,7],
   [22,2],[22,15],[22,18],
@@ -583,7 +751,33 @@ const CONNECTIONS = [
   [37,10],[37,29],[37,30],[37,31],[37,38],
   [38,16],[38,17],[38,32],[38,35],
   [39,17],[39,28],[39,32],
+  // 新規アーティストのつながり
+  [3,40],[6,40],[12,40],[40,43],[40,41],
+  [0,41],[22,41],[18,41],[41,42],
+  [7,42],[35,42],[42,54],[2,42],
+  [6,43],[2,43],[15,43],[43,40],
+  [21,44],[44,50],[44,52],[4,44],
+  [7,45],[16,45],[45,48],[45,46],[32,45],
+  [28,46],[35,46],[46,51],[39,46],[45,46],
+  [13,47],[25,47],[47,53],[19,47],[1,47],
+  [32,48],[29,48],[45,48],[39,48],
+  [35,49],[28,49],[49,42],[17,49],
+  [21,50],[44,50],[52,50],[50,4],
+  [28,51],[36,51],[46,51],[9,51],
+  [21,52],[44,52],[50,52],
+  [25,53],[47,53],[1,53],[26,53],
+  [42,54],[7,54],[20,54],
 ]
+
+// ジャンル別エリア定義（ワールド座標）
+const GENRE_ZONE = {
+  'ロック':      { cx:-300, cy:-100, rx:300, ry:260 },
+  'J-POP':       { cx: 180, cy:-260, rx:280, ry:240 },
+  'エレクトロ':  { cx:  20, cy:-450, rx:200, ry:160 },
+  'ソウル/R&B':  { cx: 420, cy:  80, rx:200, ry:240 },
+  'インディー':  { cx:-320, cy: 270, rx:300, ry:260 },
+  'ヒップホップ':{ cx: 260, cy: 380, rx:220, ry:190 },
+}
 
 // ════════════════ CANVAS SETUP ════════════════
 const canvas = document.getElementById('canvas')
@@ -592,9 +786,9 @@ let W = innerWidth, H = innerHeight
 canvas.width = W; canvas.height = H
 
 // ════════════════ CAMERA ════════════════
-let viewX=0, viewY=0   // world position at screen centre
-let zoom=0.65          // current zoom (start slightly zoomed out)
-let panVX=0, panVY=0   // pan inertia velocity (world units/frame)
+let viewX=0, viewY=0
+let zoom=0.60
+let panVX=0, panVY=0
 
 // ════════════════ HELPERS ════════════════
 function hx(col, a=1){
@@ -606,7 +800,6 @@ function getRelated(id){
     .filter(([a,b])=>a===id||b===id)
     .map(([a,b])=>a===id?b:a)
 }
-// World ↔ Screen transforms
 function w2s(wx,wy){ return [(wx-viewX)*zoom+W/2, (wy-viewY)*zoom+H/2] }
 function s2w(sx,sy){ return [(sx-W/2)/zoom+viewX, (sy-H/2)/zoom+viewY] }
 
@@ -615,11 +808,9 @@ const BG = Array.from({length:1800},()=>({
   x:Math.random(), y:Math.random(),
   r:Math.random()*1.1+0.2,
   a:Math.random()*.6+.1,
-  // subtle twinkle
   tp:Math.random()*Math.PI*2,
   tf:Math.random()*.4+.1,
 }))
-// Some colored nebula stars
 const NEB = Array.from({length:600},()=>{
   const h=Math.random()*.25+.55
   const [r,g,b]=hslToRgb(h,.7,.55)
@@ -641,43 +832,132 @@ function hue(p,q,t){
   return p
 }
 
+// ════════════════ 流れ星 & UFO ════════════════
+const SHOOTING_STARS = []
+let ufo = null
+let ufoTimer = 0
+
+function spawnShootingStar(){
+  SHOOTING_STARS.push({
+    x: Math.random() < 0.5 ? -10 : W * (0.3 + Math.random() * 0.7),
+    y: Math.random() * H * 0.55,
+    angle: Math.PI / 4 + (Math.random() - 0.5) * 0.5,
+    speed: 10 + Math.random() * 14,
+    length: 70 + Math.random() * 130,
+    opacity: 0.9 + Math.random() * 0.1,
+    decay: 0.018 + Math.random() * 0.025,
+  })
+}
+
+function updateShootingStars(){
+  if(Math.random() < 0.006) spawnShootingStar()
+  for(let i=SHOOTING_STARS.length-1; i>=0; i--){
+    const s=SHOOTING_STARS[i]
+    s.x += Math.cos(s.angle)*s.speed
+    s.y += Math.sin(s.angle)*s.speed
+    s.opacity -= s.decay
+    if(s.opacity<=0){ SHOOTING_STARS.splice(i,1); continue }
+    const ex=s.x - Math.cos(s.angle)*s.length
+    const ey=s.y - Math.sin(s.angle)*s.length
+    const grad=ctx.createLinearGradient(s.x,s.y,ex,ey)
+    grad.addColorStop(0,`rgba(255,255,255,${s.opacity})`)
+    grad.addColorStop(0.3,`rgba(200,220,255,${s.opacity*0.5})`)
+    grad.addColorStop(1,'rgba(180,200,255,0)')
+    ctx.save()
+    ctx.strokeStyle=grad
+    ctx.lineWidth=1.5
+    ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(ex,ey); ctx.stroke()
+    ctx.restore()
+  }
+}
+
+function updateUFO(){
+  ufoTimer++
+  if(!ufo && ufoTimer > 2200 && Math.random() < 0.0025){
+    const fromLeft = Math.random() < 0.5
+    ufo = {
+      x: fromLeft ? -80 : W+80,
+      y: 60 + Math.random() * (H * 0.38),
+      speed: (fromLeft ? 1 : -1) * (1.8 + Math.random() * 2.2),
+      wobble: 0, op: 0
+    }
+    ufoTimer = 0
+  }
+  if(!ufo) return
+  ufo.x += ufo.speed
+  ufo.wobble += 0.04
+  ufo.y += Math.sin(ufo.wobble) * 0.6
+  ufo.op = Math.min(0.9, ufo.op + 0.025)
+  const ux=ufo.x, uy=ufo.y
+  ctx.save()
+  ctx.globalAlpha = ufo.op * 0.75
+  // 胴体
+  ctx.fillStyle='#7888bb'
+  ctx.beginPath(); ctx.ellipse(ux,uy,24,9,0,0,Math.PI*2); ctx.fill()
+  // ドーム
+  ctx.fillStyle='rgba(160,190,255,0.7)'
+  ctx.beginPath(); ctx.ellipse(ux,uy-7,12,8,0,Math.PI,0); ctx.fill()
+  // ライト
+  [-10,-4,2,8,14].forEach((lx,i)=>{
+    ctx.fillStyle=`hsl(${(frame*4+i*55)%360},90%,72%)`
+    ctx.beginPath(); ctx.arc(ux+lx,uy+4,2.2,0,Math.PI*2); ctx.fill()
+  })
+  // ビーム（ゆっくり点滅）
+  if(Math.sin(ufo.wobble*1.5)>0.2){
+    const bg=ctx.createLinearGradient(ux,uy+9,ux,uy+58)
+    bg.addColorStop(0,'rgba(160,210,255,0.22)')
+    bg.addColorStop(1,'rgba(160,210,255,0)')
+    ctx.fillStyle=bg
+    ctx.beginPath()
+    ctx.moveTo(ux-10,uy+9); ctx.lineTo(ux+10,uy+9)
+    ctx.lineTo(ux+22,uy+58); ctx.lineTo(ux-22,uy+58)
+    ctx.closePath(); ctx.fill()
+  }
+  ctx.restore()
+  if(ufo.x < -140 || ufo.x > W+140) ufo = null
+}
+
 // ════════════════ STARS STATE ════════════════
 const stars = ARTISTS.map((a,i)=>({
   ...a,
-  r: 3 + Math.pow(a.pop/100, 2)*30,  // 二乗カーブでインディーは極小、人気者は大きく
-  // positions (lerped)
+  r: 3 + Math.pow(a.pop/100, 2)*30,
   x:0, y:0, dx:0, dy:0,
-  tx:0, ty:0,               // base target
-  homeX:0, homeY:0,         // home position
+  tx:0, ty:0,
+  homeX:0, homeY:0,
   opacity:0, topacity:1,
-  // float params
   fpx:Math.random()*Math.PI*2, fpy:Math.random()*Math.PI*2,
-  fax:3+Math.random()*4,    fay:3+Math.random()*4,
+  fax:3+Math.random()*4, fay:3+Math.random()*4,
   ffx:.06+Math.random()*.06, ffy:.06+Math.random()*.06,
-  // physics
   vx:0, vy:0,
-  // pulse for register anim
   pulse:0,
-  // comet orbits (for fav stars)
   comets: Array.from({length:3},(_,j)=>({
     phase: Math.random()*Math.PI*2,
     speed: (1.4+Math.random()*1.8)*(Math.random()<.5?1:-1),
-    rMul:  2.1+j*.6+Math.random()*.35,   // orbit radius multiplier (× star screen radius)
-    tilt:  .28+Math.random()*.42,          // ellipse tilt for 3D feel
+    rMul:  2.1+j*.6+Math.random()*.35,
+    tilt:  .28+Math.random()*.42,
     bright:.55+Math.random()*.45,
   })),
 }))
 
+// ジャンル別エリア配置（placeHome）
 function placeHome(){
-  const span = 800   // ±800 world units (広い宇宙)
+  const minD = 110
   const placed = []
-  const minD = 115
-  stars.forEach(s=>{
+
+  stars.forEach((s,i)=>{
+    const zone = GENRE_ZONE[ARTISTS[i].genre]
     let x,y,ok=false,n=0
-    while(!ok&&n<120){
-      x=(Math.random()-.5)*span*2
-      y=(Math.random()-.5)*span*2
-      ok=placed.every(p=>Math.hypot(p.x-x,p.y-y)>minD)
+    while(!ok && n<150){
+      if(zone && n<100){
+        // ジャンルゾーン内でランダム
+        x = zone.cx + (Math.random()-.5)*zone.rx*2
+        y = zone.cy + (Math.random()-.5)*zone.ry*2
+      } else {
+        // フォールバック：全体ランダム
+        x = (Math.random()-.5)*1600
+        y = (Math.random()-.5)*1600
+      }
+      ok = placed.every(p=>Math.hypot(p.x-x,p.y-y) > minD)
       n++
     }
     s.homeX=x; s.homeY=y
@@ -691,15 +971,14 @@ let selId = -1
 
 function selectArtist(id){
   selId = id
-  // Layout around current view centre (world coords)
   const cx=viewX, cy=viewY
   const rels = getRelated(id)
   const relSet = new Set(rels)
-  const ringR = Math.max(200, 160+rels.length*25)
+  const ringR = Math.max(200, 160+rels.length*22)
 
   stars.forEach((s,i)=>{
     if(i===id){
-      s.tx=cx; s.ty=cy; s.topacity=1   // 選択星 → 画面中心
+      s.tx=cx; s.ty=cy; s.topacity=1
     } else if(relSet.has(i)){
       const ri = rels.indexOf(i)
       const angle = (ri/rels.length)*Math.PI*2 - Math.PI/2
@@ -714,7 +993,6 @@ function selectArtist(id){
       s.topacity = 0.18
     }
   })
-
   openPanel(id)
 }
 
@@ -729,11 +1007,10 @@ function clearSel(){
 let frame=0
 
 function drawBg(t){
-  // background stars
   ctx.save()
   BG.forEach(s=>{
-    const tw = Math.sin(t*s.tf+s.tp)*0.25
-    ctx.globalAlpha = Math.max(0,s.a+tw)
+    const tw=Math.sin(t*s.tf+s.tp)*0.25
+    ctx.globalAlpha=Math.max(0,s.a+tw)
     ctx.fillStyle='#fff'
     ctx.beginPath(); ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); ctx.fill()
   })
@@ -743,10 +1020,15 @@ function drawBg(t){
     ctx.beginPath(); ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); ctx.fill()
   })
   ctx.restore()
+  // 流れ星
+  updateShootingStars()
+  // UFO
+  updateUFO()
 }
 
 function drawConnections(){
   CONNECTIONS.forEach(([a,b])=>{
+    if(a>=stars.length||b>=stars.length) return
     const sa=stars[a], sb=stars[b]
     const highlighted = selId>=0 && (a===selId||b===selId)
     const baseOp = Math.min(sa.opacity,sb.opacity)
@@ -754,27 +1036,28 @@ function drawConnections(){
 
     const [ax,ay]=w2s(sa.dx,sa.dy)
     const [bx,by]=w2s(sb.dx,sb.dy)
-    // 画面外カリング
     if(Math.min(ax,bx)>W+60||Math.max(ax,bx)<-60||Math.min(ay,by)>H+60||Math.max(ay,by)<-60) return
 
-    ctx.beginPath()
-    ctx.moveTo(ax,ay)
-    ctx.lineTo(bx,by)
+    // お気に入り同士のラインは金色で強調
+    const bothFav = sa.fav && sb.fav
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by)
 
-    if(highlighted){
+    if(bothFav){
+      ctx.strokeStyle=`rgba(255,200,60,${.55*baseOp})`
+      ctx.lineWidth=Math.max(1,2.5*zoom)
+      ctx.shadowColor='rgba(255,160,20,.7)'; ctx.shadowBlur=10
+      ctx.stroke(); ctx.shadowBlur=0
+    } else if(highlighted){
       ctx.strokeStyle=`rgba(150,195,255,${.82*baseOp})`
       ctx.lineWidth=Math.max(1.5,3*zoom)
-      ctx.shadowColor='rgba(100,170,255,.9)'
-      ctx.shadowBlur=14
+      ctx.shadowColor='rgba(100,170,255,.9)'; ctx.shadowBlur=14
       ctx.stroke(); ctx.shadowBlur=0
       ctx.strokeStyle=`rgba(220,235,255,${.55*baseOp})`
-      ctx.lineWidth=Math.max(.5,zoom)
-      ctx.stroke()
+      ctx.lineWidth=Math.max(.5,zoom); ctx.stroke()
     } else {
       ctx.strokeStyle=`rgba(140,170,255,${.32*baseOp})`
       ctx.lineWidth=Math.max(.4,1.2*zoom)
-      ctx.shadowColor='rgba(100,140,255,.4)'
-      ctx.shadowBlur=3
+      ctx.shadowColor='rgba(100,140,255,.4)'; ctx.shadowBlur=3
       ctx.stroke(); ctx.shadowBlur=0
     }
   })
@@ -787,30 +1070,25 @@ function drawComets(s, sx, sy, sr, op){
     const orbitR=sr*c.rMul
     const dir=Math.sign(c.speed)
     const STEPS=12
-
-    // テール（尾）：軌道を遡ってフェードアウト
     for(let i=STEPS;i>=0;i--){
       const ta=angle-i*0.10*dir
       const tx_=sx+Math.cos(ta)*orbitR
       const ty_=sy+Math.sin(ta)*orbitR*c.tilt
-      const ratio=(STEPS-i)/STEPS   // 0=尾端 → 1=頭
-      // 奥行き：sin値で裏側を暗く
+      const ratio=(STEPS-i)/STEPS
       const depth=.38+.62*(Math.sin(ta-Math.PI*.5)*.5+.5)
-      const r_=Math.max(.4, (sr*.04+ratio*sr*.11)*zoom)
+      const r_=Math.max(.4,(sr*.04+ratio*sr*.11)*zoom)
       ctx.globalAlpha=ratio*ratio*op*c.bright*depth
       ctx.fillStyle='#c8dcff'
       ctx.beginPath(); ctx.arc(tx_,ty_,r_,0,Math.PI*2); ctx.fill()
     }
-
-    // ヘッド（明るいグロー）
     const hx_=sx+Math.cos(angle)*orbitR
     const hy_=sy+Math.sin(angle)*orbitR*c.tilt
     const depth=.4+.6*(Math.sin(angle-Math.PI*.5)*.5+.5)
     const hr=Math.max(.6,sr*.14*zoom)
     const hg=ctx.createRadialGradient(hx_,hy_,0,hx_,hy_,hr*3.2)
-    hg.addColorStop(0,  `rgba(255,255,255,${op*c.bright*depth})`)
-    hg.addColorStop(.4, `rgba(190,215,255,${op*c.bright*depth*.55})`)
-    hg.addColorStop(1,  'rgba(150,190,255,0)')
+    hg.addColorStop(0,`rgba(255,255,255,${op*c.bright*depth})`)
+    hg.addColorStop(.4,`rgba(190,215,255,${op*c.bright*depth*.55})`)
+    hg.addColorStop(1,'rgba(150,190,255,0)')
     ctx.globalAlpha=1
     ctx.fillStyle=hg
     ctx.beginPath(); ctx.arc(hx_,hy_,hr*3.2,0,Math.PI*2); ctx.fill()
@@ -822,9 +1100,19 @@ function drawStar(s){
   if(s.opacity<0.02) return
   const [sx,sy]=w2s(s.dx,s.dy)
   const sr=s.r*zoom*(1+s.pulse*.25)
-  // 画面外スキップ
   if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
   const op=s.opacity
+
+  // ─ 急上昇アーティスト: 赤オレンジの脈動グロー ─
+  if(s.rising){
+    const pulse=Math.sin(frame*.045+s.fpx)*.5+.5
+    const risingR=sr*(3.8+pulse*1.2)
+    const rg=ctx.createRadialGradient(sx,sy,sr,sx,sy,risingR)
+    rg.addColorStop(0,`rgba(255,80,20,${.25*op*(.6+pulse*.4)})`)
+    rg.addColorStop(0.5,`rgba(255,140,30,${.12*op})`)
+    rg.addColorStop(1,'rgba(255,60,0,0)')
+    ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(sx,sy,risingR,0,Math.PI*2); ctx.fill()
+  }
 
   const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
   g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)')
@@ -836,7 +1124,6 @@ function drawStar(s){
   g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
   ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
 
-  // アーティスト写真（ロード済みかつ十分な大きさの場合）
   const photo=s.img
   if(photo && photo.complete && photo.naturalWidth>0 && sr>=9){
     ctx.save()
@@ -844,14 +1131,12 @@ function drawStar(s){
     const pr=sr*.9
     ctx.beginPath(); ctx.arc(sx,sy,pr,0,Math.PI*2); ctx.clip()
     ctx.drawImage(photo, sx-pr, sy-pr, pr*2, pr*2)
-    // ビネット（周辺減光）
     const vg=ctx.createRadialGradient(sx,sy,pr*.25,sx,sy,pr)
     vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,15,.55)')
     ctx.fillStyle=vg; ctx.fillRect(sx-pr,sy-pr,pr*2,pr*2)
     ctx.restore()
   }
 
-  // スペキュラーハイライト（写真がある場合は控えめに）
   const specOp = photo && photo.complete ? .22 : .55
   const g3=ctx.createRadialGradient(sx-sr*.28,sy-sr*.28,0,sx,sy,sr*.7)
   g3.addColorStop(0,`rgba(255,255,255,${specOp*op})`); g3.addColorStop(1,'rgba(255,255,255,0)')
@@ -863,17 +1148,31 @@ function drawStar(s){
     ctx.shadowColor=`rgba(255,180,30,${op})`; ctx.shadowBlur=10
     ctx.beginPath(); ctx.arc(sx,sy,sr*1.7,0,Math.PI*2); ctx.stroke()
     ctx.shadowBlur=0
-    // 彗星エフェクト（ゴールドリングの外側を周回）
     if(sr>=5) drawComets(s,sx,sy,sr,op)
   }
 
   const fs=Math.max(9,Math.min(14,11*zoom))
   ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
   ctx.textAlign='center'
-  ctx.shadowColor=s.fav?`rgba(255,175,30,${op})`:`rgba(70,115,255,${op*.8})`
-  ctx.shadowBlur=7
-  ctx.fillStyle=s.fav?`rgba(255,205,70,${op})`:`rgba(190,215,255,${op*.88})`
+  // 急上昇アーティストは名前をオレンジに
+  if(s.rising){
+    ctx.shadowColor=`rgba(255,100,20,${op*.9})`
+    ctx.shadowBlur=8
+    ctx.fillStyle=`rgba(255,175,100,${op*.9})`
+  } else {
+    ctx.shadowColor=s.fav?`rgba(255,175,30,${op})`:`rgba(70,115,255,${op*.8})`
+    ctx.shadowBlur=7
+    ctx.fillStyle=s.fav?`rgba(255,205,70,${op})`:`rgba(190,215,255,${op*.88})`
+  }
   ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+
+  // 急上昇マーク
+  if(s.rising && sr*zoom > 3){
+    ctx.font=`bold ${Math.max(8,9*zoom)}px -apple-system`
+    ctx.fillStyle=`rgba(255,140,60,${op*.8})`
+    ctx.shadowBlur=0
+    ctx.fillText('🔥', sx, sy-sr-Math.max(4,6*zoom))
+  }
   ctx.shadowBlur=0
 }
 
@@ -882,13 +1181,12 @@ function loop(){
   frame++
   const t = frame*.016
 
-  // ── パン慣性（リリース後ドリフト） ──
   if(!isPanning){
     viewX+=panVX; viewY+=panVY
     panVX*=.92; panVY*=.92
   }
 
-  // ── 斥力（全ペア） ──
+  // ── 斥力 ──
   for(let i=0;i<stars.length;i++){
     for(let j=i+1;j<stars.length;j++){
       const a=stars[i], b=stars[j]
@@ -904,11 +1202,29 @@ function loop(){
     }
   }
 
-  // ── 位置・速度更新（慣性スプリング） ──
+  // ── お気に入り引力 ──
+  const favIds = []
+  for(let i=0;i<stars.length;i++){ if(stars[i].fav) favIds.push(i) }
+  for(let fi=0; fi<favIds.length; fi++){
+    for(let fj=fi+1; fj<favIds.length; fj++){
+      const i=favIds[fi], j=favIds[fj]
+      const a=stars[i], b=stars[j]
+      const dx=b.x-a.x, dy=b.y-a.y
+      const d=Math.hypot(dx,dy)||0.1
+      const targetD = 200
+      if(d > targetD && selId<0){
+        const f = Math.min((d-targetD)/d*0.10, 0.8)
+        const nx=dx/d, ny=dy/d
+        if(i!==dragId){ a.vx+=nx*f; a.vy+=ny*f }
+        if(j!==dragId){ b.vx-=nx*f; b.vy-=ny*f }
+      }
+    }
+  }
+
+  // ── 位置・速度更新 ──
   stars.forEach((s,i)=>{
     s.opacity += (s.topacity-s.opacity)*.07
     if(s.pulse>0) s.pulse=Math.max(0,s.pulse-.04)
-
     if(i===dragId){
       s.vx=(s.vx+(s.tx-s.x)*.10)*.80
       s.vy=(s.vy+(s.ty-s.y)*.10)*.80
@@ -917,7 +1233,6 @@ function loop(){
       s.vy=(s.vy+(s.ty-s.y)*.015)*.88
     }
     s.x+=s.vx; s.y+=s.vy
-
     const fa=(i===dragId)?0:(i===selId)?.25:1
     s.dx=s.x+Math.sin(t*s.ffx+s.fpx)*s.fax*fa
     s.dy=s.y+Math.cos(t*s.ffy+s.fpy)*s.fay*fa
@@ -946,19 +1261,16 @@ function findStar(mx,my){
   return found
 }
 
-// ── スクロールでズーム ──
 canvas.addEventListener('wheel',e=>{
   e.preventDefault()
   const factor=e.deltaY>0?.88:1.14
   const [wx,wy]=s2w(e.clientX,e.clientY)
   zoom=Math.max(.15,Math.min(5,zoom*factor))
-  // カーソル下のワールド座標を固定したままズーム
   viewX=wx-(e.clientX-W/2)/zoom
   viewY=wy-(e.clientY-H/2)/zoom
   panVX=0; panVY=0
 },{passive:false})
 
-// ── Mouse ──
 canvas.addEventListener('mousedown',e=>{
   if(e.button!==0) return
   const found=findStar(e.clientX,e.clientY)
@@ -982,7 +1294,6 @@ addEventListener('mousemove',e=>{
   } else if(isPanning){
     const dx=e.clientX-panLX, dy=e.clientY-panLY
     viewX-=dx/zoom; viewY-=dy/zoom
-    // 慣性用速度を記録
     panVX=-(e.clientX-panPrevLX)/zoom
     panVY=-(e.clientY-panPrevLY)/zoom
     panPrevLX=panLX; panPrevLY=panLY
@@ -999,8 +1310,6 @@ addEventListener('mouseup',()=>{
   }
   isPanning=false; canvas.style.cursor=''
 })
-
-// ── Click ──
 canvas.addEventListener('click',e=>{
   if(wasDrag){wasDrag=false;return}
   const found=findStar(e.clientX,e.clientY)
@@ -1010,16 +1319,14 @@ canvas.addEventListener('click',e=>{
   } else { if(selId>=0) clearSel() }
 })
 
-// ── Touch（ピンチズーム対応） ──
 let pinchStart=0, pinchZoomStart=1, pinchCX=0, pinchCY=0, pinchVX=0, pinchVY=0
-
 canvas.addEventListener('touchstart',e=>{
   if(e.touches.length===2){
     const t0=e.touches[0],t1=e.touches[1]
     pinchStart=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY)
     pinchZoomStart=zoom
     pinchCX=(t0.clientX+t1.clientX)/2; pinchCY=(t0.clientY+t1.clientY)/2
-    pinchVX=viewX; pinchVY=viewY   // ズーム基準点のビュー
+    pinchVX=viewX; pinchVY=viewY
     dragId=-1; isPanning=false
     e.preventDefault(); return
   }
@@ -1036,13 +1343,11 @@ canvas.addEventListener('touchstart',e=>{
   }
   e.preventDefault()
 },{passive:false})
-
 canvas.addEventListener('touchmove',e=>{
   if(e.touches.length===2){
     const t0=e.touches[0],t1=e.touches[1]
     const d=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY)
     const newZoom=Math.max(.15,Math.min(5,pinchZoomStart*d/pinchStart))
-    // ピンチ中心のワールド座標を固定
     const wx=(pinchCX-W/2)/pinchZoomStart+pinchVX
     const wy=(pinchCY-H/2)/pinchZoomStart+pinchVY
     zoom=newZoom
@@ -1064,7 +1369,6 @@ canvas.addEventListener('touchmove',e=>{
   }
   e.preventDefault()
 },{passive:false})
-
 canvas.addEventListener('touchend',e=>{
   if(e.touches.length>0) return
   if(dragId>=0){
@@ -1075,7 +1379,7 @@ canvas.addEventListener('touchend',e=>{
   isPanning=false
 })
 
-// ════════════════ ARTIST PHOTOS (Wikipedia JSONP) ════════════════
+// ════════════════ ARTIST PHOTOS ════════════════
 function loadArtistPhoto(i){
   if(stars[i].imgTried) return
   stars[i].imgTried=true
@@ -1090,16 +1394,11 @@ function loadArtistPhoto(i){
     const url=page?.thumbnail?.source
     if(!url) return
     const img=new Image()
-    img.crossOrigin='anonymous'
-    img.src=url
-    img.onload=()=>{
-      stars[i].img=img
-      if(i===selId) updatePanelPhoto(i)
-    }
+    img.crossOrigin='anonymous'; img.src=url
+    img.onload=()=>{ stars[i].img=img; if(i===selId) updatePanelPhoto(i) }
   }
   sc.onerror=()=>{
     try{delete window[fn];sc.remove()}catch(e){}
-    // 英語版Wikipediaにフォールバック
     if(!stars[i].imgTriedEn){
       stars[i].imgTriedEn=true
       const fn2='_we'+i+'x'+Math.random().toString(36).slice(2)
@@ -1112,15 +1411,14 @@ function loadArtistPhoto(i){
         const url=page?.thumbnail?.source
         if(!url) return
         const img=new Image()
-        img.crossOrigin='anonymous'
-        img.src=url
+        img.crossOrigin='anonymous'; img.src=url
         img.onload=()=>{ stars[i].img=img; if(i===selId) updatePanelPhoto(i) }
       }
-      sc2.src=`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(ARTISTS[i].name)}&prop=pageimages&format=json&pithumbsize=300&callback=${fn2}`
+      sc2.src='https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(ARTISTS[i].name)+'&prop=pageimages&format=json&pithumbsize=300&callback='+fn2
       document.head.appendChild(sc2)
     }
   }
-  sc.src=`https://ja.wikipedia.org/w/api.php?action=query&titles=${q}&prop=pageimages&format=json&pithumbsize=300&callback=${fn}`
+  sc.src='https://ja.wikipedia.org/w/api.php?action=query&titles='+q+'&prop=pageimages&format=json&pithumbsize=300&callback='+fn
   document.head.appendChild(sc)
 }
 
@@ -1128,11 +1426,10 @@ function updatePanelPhoto(id){
   const s=stars[id]
   const el=document.getElementById('p-photo')
   const init=document.getElementById('p-photo-init')
-  if(s?.img?.complete && s.img.naturalWidth>0){
+  if(s && s.img && s.img.complete && s.img.naturalWidth>0){
     el.src=s.img.src; el.style.display='block'; init.style.display='none'
   } else {
     el.style.display='none'; init.style.display=''
-    // イニシャル表示（ロード待ち）
     init.textContent=ARTISTS[id].name[0]
   }
 }
@@ -1145,37 +1442,37 @@ function openPanel(id){
   document.getElementById('p-popbar').style.width = a.pop+'%'
   document.getElementById('p-popnum').textContent = a.pop
   const c='#'+a.col.toString(16).padStart(6,'0')
-  document.getElementById('p-tags').innerHTML=`<span class="tag" style="border-color:${c}44;color:${c}">${a.genre}</span>`
+  let tags='<span class="tag" style="border-color:'+c+'44;color:'+c+'">'+a.genre+'</span>'
+  if(a.rising) tags+='<span class="tag tag-rising">🔥 急上昇</span>'
+  document.getElementById('p-tags').innerHTML=tags
+
   const btn=document.getElementById('btn-reg')
   if(a.fav){btn.textContent='✓ 登録済み（解除）';btn.classList.add('on')}
   else     {btn.textContent='＋ お気に入りに登録';btn.classList.remove('on')}
 
-  // 人気曲TOP3
   const ranks=['①','②','③']
-  document.getElementById('p-songs').innerHTML=(a.songs||[]).map((s,i)=>{
+  document.getElementById('p-songs').innerHTML=(a.songs||[]).map(function(s,i){
     const q=encodeURIComponent(a.name+' '+s)
-    return `<div class="song-item" onclick="open('https://www.youtube.com/results?search_query=${q}','_blank')">
-      <span class="song-num">${ranks[i]}</span>
-      <span class="song-title">${s}</span>
-      <span class="song-play">▶ YT</span>
-    </div>`
+    return '<div class="song-item" onclick="open(\'https://www.youtube.com/results?search_query='+q+'\',\'_blank\')">'
+      +'<span class="song-num">'+ranks[i]+'</span>'
+      +'<span class="song-title">'+s+'</span>'
+      +'<span class="song-play">▶ YT</span></div>'
   }).join('')
 
   const rels=getRelated(id)
-  document.getElementById('p-related').innerHTML=rels.map(rid=>{
+  document.getElementById('p-related').innerHTML=rels.map(function(rid){
+    if(rid>=ARTISTS.length) return ''
     const ra=ARTISTS[rid]
     const rc='#'+ra.col.toString(16).padStart(6,'0')
-    return `<div class="rel-item" onclick="selectArtist(${rid})">
-      <div class="rel-dot" style="background:${rc}"></div>
-      <div class="rel-name">${ra.name}</div>
-      <div class="rel-pop">人気 ${ra.pop}</div></div>`
+    return '<div class="rel-item" onclick="selectArtist('+rid+')">'
+      +'<div class="rel-dot" style="background:'+rc+'"></div>'
+      +'<div class="rel-name">'+ra.name+(ra.rising?'🔥':'')+'</div>'
+      +'<div class="rel-pop">人気 '+ra.pop+'</div></div>'
   }).join('')
-  // 写真表示＆未ロードなら取得開始
+
   updatePanelPhoto(id)
   loadArtistPhoto(id)
-  // 関連アーティストの写真も先読み
-  getRelated(id).forEach(rid=>loadArtistPhoto(rid))
-
+  getRelated(id).forEach(function(rid){ if(rid<ARTISTS.length) loadArtistPhoto(rid) })
   document.getElementById('panel').classList.add('open')
   document.getElementById('hint').textContent='同じ星をクリックで全体に戻る　・　関連アーティストをクリックで移動'
 }
@@ -1188,12 +1485,13 @@ function toggleReg(){
   if(selId<0) return
   const a=ARTISTS[selId]
   a.fav=!a.fav
-  stars[selId].fav=a.fav  // star側も同期
+  stars[selId].fav=a.fav
   const btn=document.getElementById('btn-reg')
   if(a.fav){btn.textContent='✓ 登録済み（解除）';btn.classList.add('on')}
   else     {btn.textContent='＋ お気に入りに登録';btn.classList.remove('on')}
-  document.getElementById('fav-count').textContent=stars.filter(s=>s.fav).length
+  document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
   if(a.fav) stars[selId].pulse=1
+  renderFavList()
 }
 
 function openYT(){
@@ -1205,109 +1503,164 @@ function openAM(){
   open('https://music.apple.com/jp/search?term='+encodeURIComponent(ARTISTS[selId].name),'_blank')
 }
 
+// ════════════════ 検索機能 ════════════════
+const searchInput = document.getElementById('search-input')
+const searchResults = document.getElementById('search-results')
+
+searchInput.addEventListener('input', function(){
+  const q = searchInput.value.trim().toLowerCase()
+  if(!q){ searchResults.style.display='none'; return }
+  const matches = ARTISTS
+    .map(function(a,i){return {a:a,i:i}})
+    .filter(function(x){return x.a.name.toLowerCase().indexOf(q)>=0 || x.a.genre.toLowerCase().indexOf(q)>=0})
+    .slice(0,8)
+  if(!matches.length){ searchResults.style.display='none'; return }
+  searchResults.innerHTML = matches.map(function(x){
+    const c='#'+x.a.col.toString(16).padStart(6,'0')
+    return '<div class="s-result" onclick="jumpToArtist('+x.i+')">'
+      +'<div class="s-dot" style="background:'+c+'"></div>'
+      +'<div style="flex:1">'+x.a.name+(x.a.rising?'<span class="s-rising">🔥</span>':'')+'</div>'
+      +'<div class="s-genre">'+x.a.genre+'</div></div>'
+  }).join('')
+  searchResults.style.display='block'
+})
+
+searchInput.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){ searchInput.value=''; searchResults.style.display='none'; searchInput.blur() }
+  if(e.key==='Enter'){
+    const q=searchInput.value.trim().toLowerCase()
+    if(!q) return
+    const idx=ARTISTS.findIndex(function(a){return a.name.toLowerCase().indexOf(q)>=0})
+    if(idx>=0) jumpToArtist(idx)
+  }
+})
+
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#search-wrap')) searchResults.style.display='none'
+})
+
+function jumpToArtist(id){
+  searchResults.style.display='none'
+  searchInput.value=''
+  searchInput.blur()
+  viewX=stars[id].x; viewY=stars[id].y
+  zoom=1.2; panVX=0; panVY=0
+  selectArtist(id)
+  stars[id].pulse=1.2
+}
+
+// ════════════════ お気に入り一覧パネル ════════════════
+var favPanelOpen = false
+
+function toggleFavPanel(){
+  favPanelOpen = !favPanelOpen
+  const panel=document.getElementById('fav-panel')
+  if(favPanelOpen){ renderFavList(); panel.classList.add('open') }
+  else panel.classList.remove('open')
+}
+
+function renderFavList(){
+  const favs = stars.map(function(s,i){return {s:s,i:i}}).filter(function(x){return x.s.fav})
+  const list=document.getElementById('fav-list')
+  if(!favs.length){
+    list.innerHTML='<div class="fp-empty">まだお気に入りがいません。<br>アーティストをクリックして<br>登録してみましょう！</div>'
+    return
+  }
+  list.innerHTML=favs.map(function(x){
+    const c='#'+x.s.col.toString(16).padStart(6,'0')
+    return '<div class="fp-item" onclick="jumpToArtist('+x.i+');if(favPanelOpen)toggleFavPanel()">'
+      +'<div class="fp-dot" style="background:'+c+'"></div>'
+      +'<div class="fp-name">'+x.s.name+(x.s.rising?'🔥':'')+'</div>'
+      +'<div class="fp-genre">'+x.s.genre+'</div></div>'
+  }).join('')
+  document.getElementById('fav-count').textContent=favs.length
+}
+
+// ════════════════ SNSシェア ════════════════
+function shareApp(){
+  const url=encodeURIComponent('https://musicvarce.vercel.app')
+  const text=encodeURIComponent('✦ MUSIC VERSE — 音楽の宇宙を探検しよう！好きなアーティストが星になる音楽発見アプリ🌌')
+  open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
+}
+
+function shareArtist(){
+  if(selId<0) return
+  const a=ARTISTS[selId]
+  const url=encodeURIComponent('https://musicvarce.vercel.app')
+  const text=encodeURIComponent('✦ MUSIC VERSE で '+a.name+' を発見！音楽の宇宙を一緒に探検しよう🌌'+(a.rising?' 🔥急上昇中！':''))
+  open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
+}
+
 // ════════════════ VIEW CONTROLS ════════════════
 function resetView(){
-  viewX=0; viewY=0; zoom=0.65; panVX=0; panVY=0
+  viewX=0; viewY=0; zoom=0.60; panVX=0; panVY=0
   if(selId>=0) clearSel()
 }
 
 function doZoom(factor){
-  const newZoom=Math.max(.15,Math.min(5,zoom*factor))
-  // 画面中心を基準にズーム
-  viewX=viewX+(W/2-W/2)/zoom*(1-factor/1)
-  viewY=viewY+(H/2-H/2)/zoom*(1-factor/1)
-  zoom=newZoom
+  zoom=Math.max(.15,Math.min(5,zoom*factor))
   panVX=0; panVY=0
 }
 
-// キーボードショートカット
-addEventListener('keydown',e=>{
-  if(e.key==='Escape'||e.key==='Esc'){ if(selId>=0) clearSel() }
+addEventListener('keydown',function(e){
+  if(document.activeElement===searchInput) return
+  if(e.key==='Escape'){ if(selId>=0) clearSel(); if(favPanelOpen) toggleFavPanel() }
   if(e.key==='='||e.key==='+'){ doZoom(1.2) }
   if(e.key==='-'||e.key==='_'){ doZoom(0.83) }
   if(e.key==='0'){ resetView() }
+  if(e.key==='f'||e.key==='F'){ toggleFavPanel() }
 })
 
-// ════════════════ RESIZE ════════════════
-addEventListener('resize',()=>{
+addEventListener('resize',function(){
   W=innerWidth; H=innerHeight
   canvas.width=W; canvas.height=H
-  // ワールド座標はそのまま、キャンバスサイズだけ更新
 })
 
 // ════════════════ WELCOME MODAL ════════════════
 function closeWelcome(){
   const el=document.getElementById('welcome')
-  el.style.opacity='0'
-  el.style.pointerEvents='none'
-  setTimeout(()=>el.style.display='none',400)
-  localStorage.setItem('mv_welcomed','1')
+  el.style.opacity='0'; el.style.pointerEvents='none'
+  setTimeout(function(){el.style.display='none'},400)
+  localStorage.setItem('mv_welcomed','2')
 }
-
 function maybeShowWelcome(){
   if(!localStorage.getItem('mv_welcomed')){
     const el=document.getElementById('welcome')
     el.style.display='flex'
-    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')))
+    requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('show')})})
   }
 }
 
-// ════════════════ SERVICE WORKER (PWA オフライン対応) ════════════════
+// ════════════════ SERVICE WORKER ════════════════
 if('serviceWorker' in navigator){
-  const swCode=`
-const CACHE='mv-v1'
-const ASSETS=['./']
-self.addEventListener('install',e=>e.waitUntil(
-  caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
-))
-self.addEventListener('activate',e=>e.waitUntil(
-  caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
-    .then(()=>self.clients.claim())
-))
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET') return
-  e.respondWith(
-    caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
-      if(res.ok){
-        const clone=res.clone()
-        caches.open(CACHE).then(c=>c.put(e.request,clone))
-      }
-      return res
-    }).catch(()=>caches.match('./')))
-  )
-})`
+  const swCode="const CACHE='mv-v2';const ASSETS=['./'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const clone=res.clone();caches.open(CACHE).then(c=>c.put(e.request,clone))}return res}).catch(()=>caches.match('./'))))})"
   const blob=new Blob([swCode],{type:'application/javascript'})
-  const swUrl=URL.createObjectURL(blob)
-  navigator.serviceWorker.register(swUrl,{scope:'./'})
-    .catch(()=>{/* file://では動作しないため無視 */})
+  navigator.serviceWorker.register(URL.createObjectURL(blob),{scope:'./'}).catch(function(){})
 }
 
 // ════════════════ BOOT ════════════════
 placeHome()
-stars.forEach(s=>{ s.opacity=0 })
+stars.forEach(function(s){ s.opacity=0 })
 loop()
 
-setTimeout(()=>document.getElementById('load-sub').textContent='星間航路を確立中...',700)
-setTimeout(()=>{
+setTimeout(function(){document.getElementById('load-sub').textContent='星間航路を確立中...'},700)
+setTimeout(function(){
   const el=document.getElementById('loading')
   el.style.opacity='0'
-  setTimeout(()=>el.style.display='none',1000)
-  stars.forEach(s=>s.topacity=1)
+  setTimeout(function(){el.style.display='none'},1000)
+  stars.forEach(function(s){s.topacity=1})
 },1800)
 
-// Auto-select 米津玄師 after intro
-setTimeout(()=>selectArtist(0), 2600)
+setTimeout(function(){selectArtist(0)}, 2600)
 
-// バックグラウンドで全アーティスト写真を段階的にロード（150ms間隔）
-setTimeout(()=>{
-  ARTISTS.forEach((_,i)=>setTimeout(()=>loadArtistPhoto(i), i*150))
+setTimeout(function(){
+  ARTISTS.forEach(function(_,i){setTimeout(function(){loadArtistPhoto(i)}, i*140)})
 }, 3000)
 
-// ウェルカムモーダル（初回訪問のみ）
-setTimeout(()=>maybeShowWelcome(), 4500)
+setTimeout(function(){maybeShowWelcome()}, 4500)
+setTimeout(function(){initLastFm()}, 5000)
 
-// Last.fm 動的データ取得（APIキーが設定されている場合）
-setTimeout(()=>initLastFm(), 5000)
+document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
 </script>
 </body>
 </html>
