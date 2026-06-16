@@ -284,6 +284,23 @@ body {
 .ctrl-btn:hover { background:rgba(60,80,180,.4); color:white; border-color:rgba(100,140,255,.45); }
 .ctrl-btn:active { transform:scale(.92); }
 
+/* ══ モバイル全体表示ボタン ══ */
+#return-btn {
+  position:fixed; bottom:72px; left:50%; transform:translateX(-50%);
+  background:rgba(8,16,60,.82); border:1px solid rgba(100,140,255,.28);
+  border-radius:24px; padding:11px 26px;
+  color:rgba(160,200,255,.82); font-size:13px; letter-spacing:.5px;
+  cursor:pointer; pointer-events:auto; z-index:150;
+  backdrop-filter:blur(16px);
+  opacity:0; pointer-events:none;
+  transition:opacity .35s;
+  white-space:nowrap;
+}
+#return-btn.visible { opacity:1; pointer-events:auto; }
+@media (max-width:520px) {
+  #return-btn { bottom:14px; font-size:14px; padding:13px 30px; }
+}
+
 /* ══ HINT ══ */
 #hint {
   position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
@@ -438,6 +455,9 @@ body {
   <button class="ctrl-btn" onclick="doZoom(1.25)" title="ズームイン">＋</button>
   <button class="ctrl-btn" onclick="doZoom(0.8)"  title="ズームアウト">－</button>
 </div>
+
+<!-- モバイル用全体表示ボタン（星から迷子になったとき） -->
+<button id="return-btn" onclick="resetView()">⌂ 全体を表示</button>
 
 <div id="hint">クリックでアーティスト選択　・　スクロールでズーム　・　余白ドラッグで移動</div>
 
@@ -857,6 +877,33 @@ const CONNECTIONS = [
   [17,74],[39,74],[58,74],[70,74],
 ]
 
+// ════════════════ 銀河重力（BFS距離ベース） ════════════════
+// gravWeight: 1.0=お気に入り(中心引力), 0.4=直接つながり, 0.1=2hop, -(0.2~0.4)=無関係(外周)
+function updateGravityWeights(){
+  const dist = new Array(stars.length).fill(Infinity)
+  const queue = []
+  stars.forEach(function(s,i){ if(s.fav){ dist[i]=0; queue.push(i) } })
+  var qi=0
+  while(qi<queue.length){
+    const cur=queue[qi++]
+    CONNECTIONS.forEach(function(pair){
+      const a=pair[0],b=pair[1]
+      let next=-1
+      if(a===cur && dist[b]===Infinity) next=b
+      else if(b===cur && dist[a]===Infinity) next=a
+      if(next>=0){ dist[next]=dist[cur]+1; queue.push(next) }
+    })
+  }
+  stars.forEach(function(s,i){
+    const d=dist[i]
+    if(d===0)        s.gravWeight= 1.0   // お気に入り → 強く中心へ
+    else if(d===1)   s.gravWeight= 0.45  // 直接つながり
+    else if(d===2)   s.gravWeight= 0.15  // 2hop
+    else if(d===3)   s.gravWeight=-0.08  // 遠い
+    else             s.gravWeight=-0.22  // 無関係 → 外周へ
+  })
+}
+
 // ジャンル別エリア定義（ワールド座標）
 const GENRE_ZONE = {
   'ロック':      { cx:-300, cy:-100, rx:300, ry:260 },
@@ -1254,13 +1301,6 @@ function drawStar(s){
   }
   ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
 
-  // 急上昇マーク
-  if(s.rising && sr*zoom > 3){
-    ctx.font=`bold ${Math.max(8,9*zoom)}px -apple-system`
-    ctx.fillStyle=`rgba(255,140,60,${op*.8})`
-    ctx.shadowBlur=0
-    ctx.fillText('🔥', sx, sy-sr-Math.max(4,6*zoom))
-  }
   ctx.shadowBlur=0
 }
 
@@ -1290,23 +1330,21 @@ function loop(){
     }
   }
 
-  // ── お気に入り引力 ──
-  const favIds = []
-  for(let i=0;i<stars.length;i++){ if(stars[i].fav) favIds.push(i) }
-  for(let fi=0; fi<favIds.length; fi++){
-    for(let fj=fi+1; fj<favIds.length; fj++){
-      const i=favIds[fi], j=favIds[fj]
-      const a=stars[i], b=stars[j]
-      const dx=b.x-a.x, dy=b.y-a.y
-      const d=Math.hypot(dx,dy)||0.1
-      const targetD = 200
-      if(d > targetD && selId<0){
-        const f = Math.min((d-targetD)/d*0.10, 0.8)
-        const nx=dx/d, ny=dy/d
-        if(i!==dragId){ a.vx+=nx*f; a.vy+=ny*f }
-        if(j!==dragId){ b.vx-=nx*f; b.vy-=ny*f }
-      }
-    }
+  // ── 銀河重力（お気に入りBFSベース） ──
+  // selId<0（ホームモード）のときだけ作用
+  if(selId < 0){
+    stars.forEach(function(s,i){
+      if(i===dragId) return
+      const gw = s.gravWeight
+      if(gw === undefined || gw === 0) return
+      // 原点(銀河中心)に向かう方向
+      const d = Math.hypot(s.x, s.y) || 0.1
+      // gw>0 → 中心引力、gw<0 → 外周への反発
+      // 強さは距離に比例（遠いほど強い引力/反発）
+      const f = gw * Math.min(d, 600) * 0.000025
+      s.vx -= (s.x/d) * f * d
+      s.vy -= (s.y/d) * f * d
+    })
   }
 
   // ── 位置・速度更新 ──
@@ -1331,6 +1369,19 @@ function loop(){
   drawBg(t)
   drawConnections()
   stars.forEach(drawStar)
+
+  // 復帰ボタン: 画面内の星が3つ未満なら表示
+  if(frame % 60 === 0){
+    var visible=0
+    stars.forEach(function(s){
+      if(s.opacity<0.1) return
+      var sc=w2s(s.dx,s.dy)
+      if(sc[0]>-50&&sc[0]<W+50&&sc[1]>-50&&sc[1]<H+50) visible++
+    })
+    var rb=document.getElementById('return-btn')
+    if(visible<3) rb.classList.add('visible')
+    else rb.classList.remove('visible')
+  }
 }
 
 // ════════════════ INTERACTION ════════════════
@@ -1554,7 +1605,7 @@ function openPanel(id){
     const rc='#'+ra.col.toString(16).padStart(6,'0')
     return '<div class="rel-item" onclick="selectArtist('+rid+')">'
       +'<div class="rel-dot" style="background:'+rc+'"></div>'
-      +'<div class="rel-name">'+ra.name+(ra.rising?'🔥':'')+'</div>'
+      +'<div class="rel-name">'+ra.name+'</div>'
       +'<div class="rel-pop">人気 '+ra.pop+'</div></div>'
   }).join('')
 
@@ -1579,6 +1630,7 @@ function toggleReg(){
   else     {btn.textContent='＋ お気に入りに登録';btn.classList.remove('on')}
   document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
   if(a.fav) stars[selId].pulse=1
+  updateGravityWeights()   // BFS再計算
   renderFavList()
 }
 
@@ -1607,7 +1659,7 @@ searchInput.addEventListener('input', function(){
     const c='#'+x.a.col.toString(16).padStart(6,'0')
     return '<div class="s-result" onclick="jumpToArtist('+x.i+')">'
       +'<div class="s-dot" style="background:'+c+'"></div>'
-      +'<div style="flex:1">'+x.a.name+(x.a.rising?'<span class="s-rising">🔥</span>':'')+'</div>'
+      +'<div style="flex:1">'+x.a.name+'</div>'
       +'<div class="s-genre">'+x.a.genre+'</div></div>'
   }).join('')
   searchResults.style.display='block'
@@ -1658,7 +1710,7 @@ function renderFavList(){
     const c='#'+x.s.col.toString(16).padStart(6,'0')
     return '<div class="fp-item" onclick="jumpToArtist('+x.i+');if(favPanelOpen)toggleFavPanel()">'
       +'<div class="fp-dot" style="background:'+c+'"></div>'
-      +'<div class="fp-name">'+x.s.name+(x.s.rising?'🔥':'')+'</div>'
+      +'<div class="fp-name">'+x.s.name+'</div>'
       +'<div class="fp-genre">'+x.s.genre+'</div></div>'
   }).join('')
   document.getElementById('fav-count').textContent=favs.length
@@ -1683,6 +1735,7 @@ function shareArtist(){
 function resetView(){
   viewX=0; viewY=0; zoom=0.60; panVX=0; panVY=0
   if(selId>=0) clearSel()
+  document.getElementById('return-btn').classList.remove('visible')
 }
 
 function doZoom(factor){
