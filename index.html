@@ -950,9 +950,9 @@ function updateGravityWeights(){
   }
   stars.forEach(function(s,i){
     const d=dist[i]
-    if(d===0)        s.gravWeight= 1.8   // お気に入り → 強く中心へ
-    else if(d===1)   s.gravWeight= 0.55  // 直接つながり
-    else if(d===2)   s.gravWeight= 0.18  // 2hop
+    if(d===0)        s.gravWeight= 1.25  // お気に入り → 強く中心へ
+    else if(d===1)   s.gravWeight= 0.50  // 直接つながり
+    else if(d===2)   s.gravWeight= 0.16  // 2hop
     else if(d===3)   s.gravWeight=-0.08  // 遠い
     else             s.gravWeight=-0.22  // 無関係 → 外周へ
   })
@@ -1410,11 +1410,11 @@ function loop(){
         const dx=b.x-a.x, dy=b.y-a.y
         const d=Math.hypot(dx,dy)||0.1
         const minD=(a.r+b.r)*3.2
-        if(d>minD){                       // 近すぎなければ引き合う
-          const f=Math.min(d,500)*0.00055
+        if(d>minD){                       // 近すぎなければ引き合う（距離に比例・上限付きで安定）
+          const f=Math.min(d-minD,240)*0.00010
           const nx=dx/d, ny=dy/d
-          if(favIdx[m]!==dragId){ a.vx+=nx*f*d; a.vy+=ny*f*d }
-          if(favIdx[n]!==dragId){ b.vx-=nx*f*d; b.vy-=ny*f*d }
+          if(favIdx[m]!==dragId){ a.vx+=nx*f; a.vy+=ny*f }
+          if(favIdx[n]!==dragId){ b.vx-=nx*f; b.vy-=ny*f }
         }
       }
     }
