@@ -144,6 +144,18 @@ body {
 #universe-btn:hover { background:rgba(0,90,82,.4); border-color:rgba(60,220,200,.45); }
 #universe-btn.on { background:rgba(60,220,200,.32); color:#06201c; border-color:rgba(60,220,200,.7); }
 
+/* ポスター保存ボタン（お気に入りパネル内） */
+#poster-btn {
+  display:block; width:100%; margin-top:14px;
+  font-size:13px; font-weight:500; letter-spacing:.3px;
+  color:rgba(255,210,90,.95); cursor:pointer;
+  padding:11px 12px; border-radius:12px;
+  background:rgba(90,65,0,.3); border:1px solid rgba(255,190,40,.35);
+  transition:all .18s;
+}
+#poster-btn:hover { background:rgba(130,95,0,.45); border-color:rgba(255,190,40,.6); }
+#poster-btn:active { transform:scale(.98); }
+
 /* シェアボタン */
 #share-btn {
   background:rgba(30,50,130,.5);
@@ -442,6 +454,7 @@ body {
     <button class="fp-close" onclick="toggleFavPanel()">✕</button>
   </div>
   <div id="fav-list"></div>
+  <button id="poster-btn" onclick="exportPoster()">⬇ コレクションをポスターに保存</button>
 </div>
 
 <div id="panel">
@@ -2645,6 +2658,106 @@ function toggleFavOnly(){
   // 全体が見えるようにビューをリセット
   viewX=0; viewY=0; zoom = favOnly ? 0.9 : 0.60; panVX=0; panVY=0
   document.getElementById('return-btn').classList.remove('visible')
+}
+
+// ════════════════ お気に入りコレクションをポスター画像に書き出し ════════════════
+function rrect(c,x,y,w,h,r){
+  c.beginPath()
+  c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r)
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath()
+}
+function fitText(c,text,maxW){
+  if(c.measureText(text).width<=maxW) return text
+  let t=text
+  while(t.length>1 && c.measureText(t+'…').width>maxW){ t=t.slice(0,-1) }
+  return t+'…'
+}
+// CORSが通って安全にcanvasへ描ける画像だけ採用（タイント＝書き出し失敗を防ぐ）
+function imgSafe(img){
+  if(!img||!img.complete||!img.naturalWidth) return false
+  try{
+    const t=document.createElement('canvas'); t.width=t.height=2
+    t.getContext('2d').drawImage(img,0,0,2,2); t.toDataURL()
+    return true
+  }catch(e){ return false }
+}
+function drawJacket(c, s, x, y, size){
+  const col = '#'+((s.col!=null?s.col:0x4499ff).toString(16).padStart(6,'0'))
+  c.save(); rrect(c,x,y,size,size,12); c.clip()
+  c.fillStyle=col; c.fillRect(x,y,size,size)
+  if(imgSafe(s.img)){
+    const iw=s.img.naturalWidth, ih=s.img.naturalHeight
+    const sc=Math.max(size/iw,size/ih), dw=iw*sc, dh=ih*sc
+    c.globalAlpha=.96; c.drawImage(s.img, x+(size-dw)/2, y+(size-dh)/2, dw, dh); c.globalAlpha=1
+  } else {
+    c.fillStyle='rgba(255,255,255,.9)'; c.textAlign='center'
+    c.font='700 '+Math.round(size*.32)+'px -apple-system,sans-serif'
+    c.fillText(s.name.slice(0,2), x+size/2, y+size/2+size*.11)
+  }
+  const g=c.createLinearGradient(0,y+size*.5,0,y+size)
+  g.addColorStop(0,'rgba(4,6,18,0)'); g.addColorStop(1,'rgba(4,6,18,.82)')
+  c.fillStyle=g; c.fillRect(x,y+size*.45,size,size*.55)
+  c.restore()
+  c.fillStyle='#fff'; c.textAlign='left'
+  c.font='600 '+Math.max(15,Math.round(size*.1))+'px -apple-system,sans-serif'
+  c.fillText(fitText(c, s.name, size-20), x+12, y+size-15)
+}
+function buildPoster(){
+  const favs = stars.map(function(s){return s}).filter(function(s){return s.fav})
+  favs.sort(function(a,b){ return b.pop - a.pop })
+  const n=favs.length
+  const cols=Math.min(5, Math.max(2, Math.ceil(Math.sqrt(n))))
+  const rows=Math.ceil(n/cols)
+  const W=1080, pad=60, gap=18, headerH=235, footerH=104
+  const cell=Math.floor((W - pad*2 - gap*(cols-1))/cols)
+  const H=headerH + rows*cell + (rows-1)*gap + footerH
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H
+  const c=cv.getContext('2d')
+  c.fillStyle='#070b1e'; c.fillRect(0,0,W,H)
+  for(let k=0;k<140;k++){
+    c.globalAlpha=Math.random()*.5+.08
+    c.fillStyle='#cfe0ff'
+    c.beginPath(); c.arc(Math.random()*W, Math.random()*H, Math.random()*1.4, 0, 7); c.fill()
+  }
+  c.globalAlpha=1; c.textAlign='center'
+  c.fillStyle='#7da0ff'; c.font='600 26px -apple-system,sans-serif'
+  c.fillText('M U S I C   V E R S E', W/2, 80)
+  c.fillStyle='#ffffff'; c.font='700 54px -apple-system,sans-serif'
+  c.fillText('MY FAVORITE ARTISTS', W/2, 150)
+  c.fillStyle='rgba(190,210,255,.72)'; c.font='400 22px -apple-system,sans-serif'
+  c.fillText(n+' artists  ·  '+new Date().toLocaleDateString('ja-JP'), W/2, 196)
+  let idx=0
+  for(let r=0;r<rows;r++){
+    for(let col=0;col<cols;col++){
+      if(idx>=n) break
+      const x=pad+col*(cell+gap), y=headerH+r*(cell+gap)
+      drawJacket(c, favs[idx++], x, y, cell)
+    }
+  }
+  c.textAlign='center'; c.fillStyle='rgba(150,175,255,.6)'; c.font='400 20px -apple-system,sans-serif'
+  c.fillText('好きなアーティストの宇宙  ·  MUSIC VERSE', W/2, H-42)
+  return cv
+}
+function downloadBlob(blob, name){
+  const url=URL.createObjectURL(blob)
+  const a=document.createElement('a'); a.href=url; a.download=name
+  document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(function(){URL.revokeObjectURL(url)}, 2000)
+}
+function exportPoster(){
+  const n=stars.filter(function(s){return s.fav}).length
+  if(n===0){ alert('まずアーティストをお気に入りに登録してください。\nお気に入りがポスターになります。'); return }
+  const cv=buildPoster()
+  cv.toBlob(function(blob){
+    if(!blob){ alert('画像の生成に失敗しました'); return }
+    const file=new File([blob],'music-verse-favorites.png',{type:'image/png'})
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file], title:'MY FAVORITE ARTISTS', text:'私の好きなアーティスト宇宙 #MUSICVERSE'})
+        .catch(function(){ downloadBlob(blob,'music-verse-favorites.png') })
+    } else {
+      downloadBlob(blob,'music-verse-favorites.png')
+    }
+  }, 'image/png')
 }
 
 // ════════════════ お気に入りの永続化（localStorage） ════════════════
