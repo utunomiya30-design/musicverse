@@ -1,4 +1,4 @@
-﻿{
+{
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -12,15 +12,9 @@
       ]
     },
     {
-      "source": "/index.html",
+      "source": "/musicverse.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {
@@ -29,5 +23,8 @@
         { "key": "Cache-Control", "value": "public, max-age=86400, immutable" }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/musicverse.html" }
   ]
 }
