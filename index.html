@@ -133,6 +133,17 @@ body {
 }
 #fav-badge:hover { background:rgba(120,80,0,.35); border-color:rgba(255,180,30,.4); }
 
+/* お気に入りの宇宙トグル */
+#universe-btn {
+  font-size:11px; color:rgba(80,230,210,.85); letter-spacing:.3px;
+  cursor:pointer; pointer-events:auto; flex-shrink:0;
+  padding:6px 12px; border-radius:16px;
+  background:rgba(0,60,55,.25); border:1px solid rgba(60,220,200,.2);
+  transition:all .18s; white-space:nowrap;
+}
+#universe-btn:hover { background:rgba(0,90,82,.4); border-color:rgba(60,220,200,.45); }
+#universe-btn.on { background:rgba(60,220,200,.32); color:#06201c; border-color:rgba(60,220,200,.7); }
+
 /* シェアボタン */
 #share-btn {
   background:rgba(30,50,130,.5);
@@ -416,6 +427,9 @@ body {
 
   <!-- お気に入りバッジ -->
   <div id="fav-badge" onclick="toggleFavPanel()">★ <span id="fav-count">0</span></div>
+
+  <!-- お気に入りの宇宙トグル -->
+  <div id="universe-btn" onclick="toggleFavOnly()">✦ お気に入りの宇宙</div>
 
   <!-- SNSシェアボタン -->
   <button id="share-btn" onclick="shareApp()">🐦 シェア</button>
@@ -1271,6 +1285,107 @@ const ARTISTS = [
     desc:'パワフルな歌声で90年代に数々のヒットを放った女性シンガー。', songs:['ら・ら・ら','あなただけ見つめてる','熱くなれ'] },
   { id:299, name:'森高千里', pop:72, genre:'J-POP', col:0xff99aa, fav:false, rising:false,
     desc:'作詞作曲も手がけ、時代を超えて愛される名曲を残す女性アーティスト。', songs:['私がオバさんになっても','渡良瀬橋','17才'] },
+  // 追加 300-349（さらに拡充）
+  { id:300, name:'YUKI', pop:74, genre:'J-POP', col:0xff88bb, fav:false, rising:false,
+    desc:'JUDY AND MARYを経て、キュートでカラフルなポップを歌う女性シンガー。', songs:['JOY','ふがいないや','長い夢'] },
+  { id:301, name:'チャットモンチー', pop:68, genre:'ロック', col:0xff77aa, fav:false, rising:false,
+    desc:'徳島発、瑞々しい感性とサウンドで人気を博したガールズロックバンド。', songs:['シャングリラ','風吹けば恋','恋愛スピリッツ'] },
+  { id:302, name:'小沢健二', pop:70, genre:'J-POP', col:0x66bbdd, fav:false, rising:false,
+    desc:'渋谷系を象徴する存在。洒脱で多幸感あふれるポップスを生み出す。', songs:['今夜はブギー・バック','ぼくらが旅に出る理由','強い気持ち・強い愛'] },
+  { id:303, name:'ピチカート・ファイヴ', pop:64, genre:'J-POP', col:0xff99cc, fav:false, rising:false,
+    desc:'野宮真貴を擁する渋谷系を代表するおしゃれでポップなユニット。', songs:['東京は夜の七時','スウィート・ソウル・レヴュー','恋のルール・新しいルール'] },
+  { id:304, name:'コーネリアス', pop:66, genre:'インディー', col:0x88ccbb, fav:false, rising:false,
+    desc:'小山田圭吾による実験的かつ洗練された音響表現で世界的に評価される。', songs:['Star Fruits Surf Rider','Drop','あなたがいるなら'] },
+  { id:305, name:'サニーデイ・サービス', pop:64, genre:'インディー', col:0x99ccaa, fav:false, rising:false,
+    desc:'曽我部恵一率いる、東京の風景を歌う叙情的なギターロックバンド。', songs:['青春狂走曲','恋人よ','セツナ'] },
+  { id:306, name:'フリッパーズ・ギター', pop:62, genre:'インディー', col:0xaaccdd, fav:false, rising:false,
+    desc:'小沢健二と小山田圭吾による渋谷系の原点とも言える伝説的ユニット。', songs:['恋とマシンガン','カメラ!カメラ!カメラ!','ヘッド博士の世界塔'] },
+  { id:307, name:'中村一義', pop:60, genre:'ロック', col:0x77bbcc, fav:false, rising:false,
+    desc:'宅録から登場し、独創的な世界観で天才と評されたシンガーソングライター。', songs:['犬と猫','ジュビリー','1,2,3'] },
+  { id:308, name:'怒髪天', pop:58, genre:'ロック', col:0xdd5544, fav:false, rising:false,
+    desc:'増子直純の熱い歌声で「日本ロックンロール宣言」を掲げる男気バンド。', songs:['喜びの歌','ロクでナシ','季節のない街'] },
+  { id:309, name:'真心ブラザーズ', pop:60, genre:'ロック', col:0xee7755, fav:false, rising:false,
+    desc:'YO-KINGと倉持陽一による、肩の力の抜けたロックンロールデュオ。', songs:['どか〜ん','サマーヌード','ENDLESS SUMMER NUDE'] },
+  { id:310, name:'THE BOOM', pop:64, genre:'ロック', col:0xffaa44, fav:false, rising:false,
+    desc:'宮沢和史率いる、沖縄音楽やワールドミュージックを取り込んだバンド。', songs:['島唄','風になりたい','中央線'] },
+  { id:311, name:'BEGIN', pop:64, genre:'J-POP', col:0x66ccaa, fav:false, rising:false,
+    desc:'沖縄・石垣島出身、三線を取り入れた温かい楽曲で愛されるバンド。', songs:['涙そうそう','島人ぬ宝','三線の花'] },
+  { id:312, name:'HY', pop:66, genre:'ロック', col:0x55bbcc, fav:false, rising:false,
+    desc:'沖縄発、男女ツインボーカルの幅広い楽曲で人気のバンド。', songs:['366日','AM11:00','NAO'] },
+  { id:313, name:'ORANGE RANGE', pop:72, genre:'ロック', col:0xff8844, fav:false, rising:false,
+    desc:'沖縄発、ミクスチャーで2000年代を席巻したエンタメ性豊かなバンド。', songs:['花','上海ハニー','ロコローション'] },
+  { id:314, name:'SCANDAL', pop:66, genre:'ロック', col:0xff6699, fav:false, rising:false,
+    desc:'ガールズバンドの代表格。キャッチーでパワフルなロックが魅力。', songs:['少女S','瞬間センチメンタル','会わないつもりの、元気でね'] },
+  { id:315, name:'赤い公園', pop:60, genre:'ロック', col:0xdd5566, fav:false, rising:false,
+    desc:'津野米咲の才能が光った、エモーショナルで先鋭的なガールズバンド。', songs:['NOW ON AIR','闇夜のうさぎ','絶対零度'] },
+  { id:316, name:'ZAZEN BOYS', pop:60, genre:'ロック', col:0xcc5544, fav:false, rising:false,
+    desc:'向井秀徳率いる、緊張感と反復で独自の世界を築くロックバンド。', songs:['自問自答','RIFF MAN','Honnoji'] },
+  { id:317, name:'THE NOVEMBERS', pop:56, genre:'ロック', col:0x9966bb, fav:false, rising:false,
+    desc:'轟音と耽美が同居するシューゲイザー/オルタナバンド。', songs:['Romancé','黒い晴れ間','BAD DREAM'] },
+  { id:318, name:'ハルカミライ', pop:62, genre:'ロック', col:0xff7733, fav:false, rising:true,
+    desc:'衝動的でエモーショナルなライブが熱狂を生む4人組ロックバンド。', songs:['世界を終わらせて','カントリーロード','ファイト!!'] },
+  { id:319, name:'the telephones', pop:58, genre:'ロック', col:0x55aadd, fav:false, rising:false,
+    desc:'「DISCO!」の掛け声でフロアを沸かせるダンスロックバンド。', songs:['Monkey Discooooooo','Urban Disco Night','A.B.C.D.E.'] },
+  { id:320, name:"SOUL'd OUT", pop:64, genre:'ヒップホップ', col:0x88dd55, fav:false, rising:false,
+    desc:'Diggy-MO\'の超高速ラップとファンキーなサウンドで人気のユニット。', songs:['ウェカピポ','ガオガオ・オールスターズ','To All Tha Dreamers'] },
+  { id:321, name:'nobodyknows+', pop:62, genre:'ヒップホップ', col:0x77cc44, fav:false, rising:false,
+    desc:'名古屋発、軽快でキャッチーなヒップホップで広く愛されたグループ。', songs:['ココロオドル',"Hero's come back!!",'T.I.T.S'] },
+  { id:322, name:'HOME MADE 家族', pop:60, genre:'ヒップホップ', col:0x99dd66, fav:false, rising:false,
+    desc:'ポジティブなメッセージとポップなヒップホップで人気のユニット。', songs:['サンキュー!!','少年ハート','ナナイロノキセキ'] },
+  { id:323, name:'三代目 J SOUL BROTHERS', pop:76, genre:'J-POP', col:0xffaa33, fav:false, rising:false,
+    desc:'EXILE TRIBEの中核。「R.Y.U.S.E.I.」のランニングマンが社会現象に。', songs:['R.Y.U.S.E.I.','花火','Unfair World'] },
+  { id:324, name:'GENERATIONS', pop:70, genre:'J-POP', col:0x5599dd, fav:false, rising:false,
+    desc:'EXILE TRIBE所属、爽やかでエネルギッシュなパフォーマンスグループ。', songs:['AGEHA','ALRIGHT! ALRIGHT!','涙'] },
+  { id:325, name:'EXILE', pop:80, genre:'J-POP', col:0xddaa44, fav:false, rising:false,
+    desc:'圧巻のパフォーマンスとバラードで一時代を築いた大型グループ。', songs:['Choo Choo TRAIN','Ti Amo','Lovers Again'] },
+  { id:326, name:'w-inds.', pop:66, genre:'J-POP', col:0x6699cc, fav:false, rising:false,
+    desc:'歌とダンスを高水準で両立する3人組。後期はR&B路線でも評価が高い。', songs:['Forever Memories','Paradox','Pieces'] },
+  { id:327, name:'AAA', pop:72, genre:'J-POP', col:0x55aacc, fav:false, rising:false,
+    desc:'男女混成のパフォーマンスグループ。「恋音と雨空」などヒット多数。', songs:['恋音と雨空','さよならの前に','Wake up!'] },
+  { id:328, name:'BoA', pop:72, genre:'J-POP', col:0xff88cc, fav:false, rising:false,
+    desc:'歌とダンスを兼ね備え、日韓で活躍したアジアを代表する歌姫。', songs:['メリクリ','VALENTI','LISTEN TO MY HEART'] },
+  { id:329, name:'東方神起', pop:74, genre:'J-POP', col:0xcc77dd, fav:false, rising:false,
+    desc:'パワフルな歌とダンスで日本でも絶大な人気を誇るデュオ。', songs:['Why? (Keep Your Head Down)','Share The World','時ヲ止メテ'] },
+  { id:330, name:'Number_i', pop:74, genre:'J-POP', col:0x4488dd, fav:false, rising:true,
+    desc:'平野紫耀ら3人による新世代グループ。攻めたラップとダンスで話題。', songs:['GOAT','BON','INZM'] },
+  { id:331, name:'BE:FIRST', pop:74, genre:'J-POP', col:0x5577cc, fav:false, rising:true,
+    desc:'オーディションから誕生した実力派ボーイズグループ。歌唱力に定評。', songs:['Gifted.','Boom Boom Back','Bye-Good-Bye'] },
+  { id:332, name:'JO1', pop:72, genre:'J-POP', col:0x66aadd, fav:false, rising:false,
+    desc:'サバイバル番組から誕生した11人組グローバルボーイズグループ。', songs:['INFINITY','OH-EH-OH','Tiger'] },
+  { id:333, name:'INI', pop:70, genre:'J-POP', col:0x77bbee, fav:false, rising:false,
+    desc:'実力とビジュアルを兼ね備えた11人組ボーイズグループ。', songs:['Rocketeer','FANFARE','CALL 119'] },
+  { id:334, name:'なにわ男子', pop:74, genre:'J-POP', col:0x66ccdd, fav:false, rising:false,
+    desc:'関西発、フレッシュで親しみやすい王道アイドルグループ。', songs:['初心LOVE','ハッピーサーフィン','The Answer'] },
+  { id:335, name:'Travis Japan', pop:68, genre:'J-POP', col:0x55bbdd, fav:false, rising:false,
+    desc:'高いダンススキルとエンタメ性で世界進出も果たすグループ。', songs:['JUST DANCE!','Moving Pieces','LEVEL UP'] },
+  { id:336, name:'KAT-TUN', pop:72, genre:'J-POP', col:0xee7766, fav:false, rising:false,
+    desc:'ロックテイストのクールな楽曲で人気を集めたアイドルグループ。', songs:['Real Face','SIGNAL','Your side'] },
+  { id:337, name:'V6', pop:72, genre:'J-POP', col:0x55aadd, fav:false, rising:false,
+    desc:'幅広い世代に愛された6人組。「WAになっておどろう」など。', songs:['WAになっておどろう','Believe','愛なんだ'] },
+  { id:338, name:'TOKIO', pop:72, genre:'J-POP', col:0xff8855, fav:false, rising:false,
+    desc:'バンドスタイルで活動した、親しみやすさ抜群のアイドルグループ。', songs:['AMBITIOUS JAPAN!','宙船','LOVE YOU ONLY'] },
+  { id:339, name:'光GENJI', pop:66, genre:'J-POP', col:0xffbb66, fav:false, rising:false,
+    desc:'ローラースケートで一世を風靡した80〜90年代の国民的アイドル。', songs:['パラダイス銀河','ガラスの十代','剣の舞'] },
+  { id:340, name:'少年隊', pop:64, genre:'J-POP', col:0xffaa77, fav:false, rising:false,
+    desc:'圧巻のダンスと歌で80年代を代表したアイドルグループ。', songs:['仮面舞踏会','デカメロン伝説','ABC'] },
+  { id:341, name:'SPEED', pop:70, genre:'J-POP', col:0x66ccbb, fav:false, rising:false,
+    desc:'圧倒的な歌唱とダンスで90年代を駆け抜けた沖縄発の4人組。', songs:['White Love','my graduation','Body & Soul'] },
+  { id:342, name:'安室奈美恵', pop:82, genre:'J-POP', col:0xff77bb, fav:false, rising:false,
+    desc:'平成を象徴する歌姫。歌・ダンス・ファッションで時代をリードした。', songs:['CAN YOU CELEBRATE?','Hero',"Baby Don't Cry"] },
+  { id:343, name:'TRF', pop:70, genre:'エレクトロ', col:0xaa66dd, fav:false, rising:false,
+    desc:'小室哲哉プロデュースで一世を風靡したダンスミュージックグループ。', songs:['EZ DO DANCE','BOY MEETS GIRL','survival dAnce'] },
+  { id:344, name:'華原朋美', pop:66, genre:'J-POP', col:0xff99bb, fav:false, rising:false,
+    desc:'小室哲哉プロデュースで90年代に数々のヒットを放った歌姫。', songs:["I'm proud",'save your dream','I BELIEVE'] },
+  { id:345, name:'篠原涼子', pop:62, genre:'J-POP', col:0xffaacc, fav:false, rising:false,
+    desc:'小室サウンドで大ヒットを記録した女優・歌手。', songs:['恋しさと せつなさと 心強さと','もっと もっと…','愛しさと'] },
+  { id:346, name:'TENDRE', pop:62, genre:'ソウル/R&B', col:0xeeaa55, fav:false, rising:false,
+    desc:'河原太朗による、マルチに楽器を操る心地よいネオソウルプロジェクト。', songs:['DOCUMENT','hanashi','RABBIT'] },
+  { id:347, name:'group_inou', pop:58, genre:'エレクトロ', col:0xbb66dd, fav:false, rising:false,
+    desc:'cpとimaiによる、奇想天外で中毒性の高いエレクトロ/ヒップホップ。', songs:['EYE','HEART','THERAPY'] },
+  { id:348, name:'スカート', pop:58, genre:'インディー', col:0xaaccbb, fav:false, rising:false,
+    desc:'澤部渡による、丁寧なポップソングが光るソロプロジェクト。', songs:['CALL','ランプトン','視界良好'] },
+  { id:349, name:'BONNIE PINK', pop:64, genre:'J-POP', col:0xff99aa, fav:false, rising:false,
+    desc:'英語詞も操る洗練されたポップ/ロックで愛される女性シンガー。', songs:['A Perfect Sky',"Heaven's Kitchen",'Joy'] },
 ]
 
 const CONNECTIONS = [
@@ -1579,6 +1694,57 @@ const CONNECTIONS = [
   [297,296],[297,298],[297,109],
   [298,299],[298,297],[298,112],
   [299,298],[299,170],[299,150],
+  // 300-349 の新接続
+  [300,251],[300,301],[300,153],
+  [301,300],[301,72],[301,117],
+  [302,303],[302,306],[302,304],
+  [303,302],[303,304],[303,128],
+  [304,302],[304,306],[304,35],
+  [305,266],[305,306],[305,148],
+  [306,302],[306,304],[306,303],
+  [307,0],[307,27],[307,258],
+  [308,309],[308,250],[308,261],
+  [309,308],[309,310],[309,264],
+  [310,311],[310,262],[310,309],
+  [311,310],[311,121],[311,312],
+  [312,313],[312,184],[312,318],
+  [313,312],[313,319],[313,177],
+  [314,315],[314,116],[314,187],
+  [315,314],[315,28],[315,40],
+  [316,255],[316,8],[316,260],
+  [317,105],[317,279],[317,260],
+  [318,184],[318,191],[318,97],
+  [319,99],[319,53],[319,263],
+  [320,321],[320,206],[320,205],
+  [321,320],[321,322],[321,207],
+  [322,321],[322,208],[322,199],
+  [323,324],[323,325],[323,229],
+  [324,323],[324,325],[324,331],
+  [325,323],[325,324],[325,134],
+  [326,328],[326,329],[326,134],
+  [327,229],[327,141],[327,325],
+  [328,329],[328,158],[328,326],
+  [329,328],[329,326],[329,230],
+  [330,209],[330,21],[330,331],
+  [331,332],[331,229],[331,324],
+  [332,333],[332,331],[332,228],
+  [333,332],[333,331],[333,228],
+  [334,335],[334,245],[334,232],
+  [335,334],[335,232],[335,233],
+  [336,235],[336,230],[336,236],
+  [337,338],[337,231],[337,235],
+  [338,337],[338,231],[338,296],
+  [339,340],[339,231],[339,243],
+  [340,339],[340,235],[340,337],
+  [341,342],[341,328],[341,243],
+  [342,341],[342,158],[342,328],
+  [343,249],[343,133],[343,128],
+  [344,342],[344,249],[344,158],
+  [345,344],[345,343],[345,127],
+  [346,265],[346,31],[346,30],
+  [347,263],[347,35],[347,270],
+  [348,306],[348,266],[348,305],
+  [349,300],[349,159],[349,40],
 ]
 
 // ════════════════ 銀河重力（BFS距離ベース） ════════════════
@@ -1623,6 +1789,17 @@ function updateGravityWeights(){
     else           s.targetR = RING[4]          // 5ホップ以上 or 到達不可 → 最外周
     s.radK = 0.016
   })
+
+  // ── おすすめTOP7：お気に入りと最も多くつながる非お気に入りを抽出 ──
+  stars.forEach(function(s){ s.recommended=false; s.recRank=0 })
+  recommended = []
+  if(anyFav){
+    const cand=[]
+    for(let i=0;i<N;i++){ if(!stars[i].fav && favLinks[i]>0) cand.push({i:i, c:favLinks[i], p:stars[i].pop}) }
+    cand.sort(function(a,b){ return (b.c-a.c) || (b.p-a.p) })  // つながり数→人気度の順
+    recommended = cand.slice(0,7).map(function(x){ return x.i })
+    recommended.forEach(function(idx,rank){ stars[idx].recommended=true; stars[idx].recRank=rank+1 })
+  }
 }
 
 // ジャンル別エリア定義（ワールド座標）
@@ -1824,6 +2001,8 @@ function placeHome(){
 
 // ════════════════ LAYOUT ════════════════
 let selId = -1
+let favOnly = false        // お気に入りだけの宇宙モード
+let recommended = []       // おすすめTOP7（星インデックス配列）
 
 function selectArtist(id){
   selId = id
@@ -1886,6 +2065,8 @@ function drawConnections(){
   CONNECTIONS.forEach(([a,b])=>{
     if(a>=stars.length||b>=stars.length) return
     const sa=stars[a], sb=stars[b]
+    // お気に入り宇宙：お気に入り/おすすめ同士の線だけ表示
+    if(favOnly && !((sa.fav||sa.recommended)&&(sb.fav||sb.recommended))) return
     const highlighted = selId>=0 && (a===selId||b===selId)
     const baseOp = Math.min(sa.opacity,sb.opacity)
     if(baseOp<0.02) return
@@ -1954,6 +2135,7 @@ function drawComets(s, sx, sy, sr, op){
 
 function drawStar(s){
   if(s.opacity<0.02) return
+  if(favOnly && !s.fav && !s.recommended) return   // お気に入り宇宙ではお気に入り＋おすすめのみ
   const [sx,sy]=w2s(s.dx,s.dy)
   const sr=s.r*zoom*(1+s.pulse*.25)
   if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
@@ -1970,9 +2152,12 @@ function drawStar(s){
     ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(sx,sy,risingR,0,Math.PI*2); ctx.fill()
   }
 
-  const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
-  g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)')
-  ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(sx,sy,sr*3.5,0,Math.PI*2); ctx.fill()
+  // 外側の柔らかいハロー（小さく表示される星では省略して軽量化）
+  if(sr>3.4){
+    const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
+    g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)')
+    ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(sx,sy,sr*3.5,0,Math.PI*2); ctx.fill()
+  }
 
   const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sr)
   g2.addColorStop(0,`rgba(255,255,255,${op})`)
@@ -2007,26 +2192,44 @@ function drawStar(s){
     if(sr>=5) drawComets(s,sx,sy,sr,op)
   }
 
-  const fs=Math.max(9,Math.min(14,11*zoom))
-  ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
-  ctx.textAlign='center'
-  // 名前のグローはお気に入り/急上昇のみ（通常星は影なしで軽量化）
-  if(s.rising){
-    ctx.shadowColor=`rgba(255,100,20,${op*.9})`
-    ctx.shadowBlur=8
-    ctx.fillStyle=`rgba(255,175,100,${op*.9})`
-  } else if(s.fav){
-    ctx.shadowColor=`rgba(255,175,30,${op})`
-    ctx.shadowBlur=7
-    ctx.fillStyle=`rgba(255,205,70,${op})`
-  } else {
+  // ── おすすめTOP7：お気に入り宇宙でシアンのリングと番号で強調 ──
+  const showRec = s.recommended && favOnly
+  if(showRec){
+    ctx.strokeStyle=`rgba(80,230,210,${.85*op})`
+    ctx.lineWidth=Math.max(1.2,2*zoom)
+    ctx.shadowColor=`rgba(60,220,200,${op})`; ctx.shadowBlur=12
+    ctx.beginPath(); ctx.arc(sx,sy,sr*1.9,0,Math.PI*2); ctx.stroke()
     ctx.shadowBlur=0
-    ctx.fillStyle=`rgba(190,215,255,${op*.88})`
   }
-  ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+
+  // ── 名前ラベル（ズームアウト時は重要な星以外を省略して軽量化） ──
+  const showLabel = zoom>0.5 || s.fav || s.rising || showRec || s===selStar()
+  if(showLabel){
+    const fs=Math.max(9,Math.min(14,11*zoom))
+    ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
+    ctx.textAlign='center'
+    if(showRec){
+      ctx.shadowColor=`rgba(60,220,200,${op})`; ctx.shadowBlur=8
+      ctx.fillStyle=`rgba(150,245,230,${op})`
+      ctx.fillText('★おすすめ '+s.name, sx, sy+sr+Math.max(12,17*zoom))
+    } else if(s.rising){
+      ctx.shadowColor=`rgba(255,100,20,${op*.9})`; ctx.shadowBlur=8
+      ctx.fillStyle=`rgba(255,175,100,${op*.9})`
+      ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+    } else if(s.fav){
+      ctx.shadowColor=`rgba(255,175,30,${op})`; ctx.shadowBlur=7
+      ctx.fillStyle=`rgba(255,205,70,${op})`
+      ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+    } else {
+      ctx.shadowBlur=0
+      ctx.fillStyle=`rgba(190,215,255,${op*.88})`
+      ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+    }
+  }
 
   ctx.shadowBlur=0
 }
+function selStar(){ return selId>=0 ? stars[selId] : null }
 
 function loop(){
   requestAnimationFrame(loop)
@@ -2423,6 +2626,25 @@ function toggleReg(){
   updateGravityWeights()   // BFS再計算
   renderFavList()
   saveFavs()               // localStorageへ永続化
+}
+
+// ════════════════ お気に入りだけの宇宙モード ════════════════
+function toggleFavOnly(){
+  const favCount = stars.filter(function(s){return s.fav}).length
+  if(!favOnly && favCount===0){
+    alert('まずアーティストをお気に入りに登録してください。\nお気に入りだけの宇宙と、おすすめTOP7が表示されます。')
+    return
+  }
+  favOnly = !favOnly
+  const btn=document.getElementById('universe-btn')
+  if(favOnly){ btn.classList.add('on'); btn.textContent='✦ 全体に戻す' }
+  else { btn.classList.remove('on'); btn.textContent='✦ お気に入りの宇宙' }
+  if(selId>=0) clearSel()
+  if(favPanelOpen) toggleFavPanel()
+  updateGravityWeights()
+  // 全体が見えるようにビューをリセット
+  viewX=0; viewY=0; zoom = favOnly ? 0.9 : 0.60; panVX=0; panVY=0
+  document.getElementById('return-btn').classList.remove('visible')
 }
 
 // ════════════════ お気に入りの永続化（localStorage） ════════════════
