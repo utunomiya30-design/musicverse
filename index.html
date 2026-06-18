@@ -1130,30 +1130,44 @@ const CONNECTIONS = [
 // ════════════════ 銀河重力（BFS距離ベース） ════════════════
 // gravWeight: 1.0=お気に入り(中心引力), 0.4=直接つながり, 0.1=2hop, -(0.2~0.4)=無関係(外周)
 function updateGravityWeights(){
-  // お気に入りと「直接つながっている本数」をカウント
-  // 本数が多いほど中心寄り → お気に入りハブを見つけやすく
-  const favLinks = new Array(stars.length).fill(0)
+  // お気に入りからの「ホップ距離(dist)」と「直接つながり本数(favLinks)」を計算
+  const N = stars.length
+  const favLinks = new Array(N).fill(0)
+  const dist = new Array(N).fill(Infinity)
+  const queue = []
   let anyFav = false
-  for(let i=0;i<stars.length;i++){ if(stars[i].fav){ anyFav=true; break } }
+  stars.forEach(function(s,i){ if(s.fav){ anyFav=true; dist[i]=0; queue.push(i) } })
   CONNECTIONS.forEach(function(pair){
     const a=pair[0], b=pair[1]
-    if(a>=stars.length||b>=stars.length) return
+    if(a>=N||b>=N) return
     if(stars[a].fav && !stars[b].fav) favLinks[b]++
     if(stars[b].fav && !stars[a].fav) favLinks[a]++
   })
-  // 各星に「目標半径(targetR)」を割り当て → 同心円状の二重リングを作る
-  //   お気に入り = 中心コア / 好み近め(つながり1本以上) = 内側リング / 好み遠め = 外側リング
+  // BFS：お気に入りから何ホップで届くか（=好みの近さ）
+  var qi=0
+  while(qi<queue.length){
+    const cur=queue[qi++]
+    CONNECTIONS.forEach(function(pair){
+      const a=pair[0], b=pair[1]
+      if(a>=N||b>=N) return
+      let nx=-1
+      if(a===cur && dist[b]===Infinity) nx=b
+      else if(b===cur && dist[a]===Infinity) nx=a
+      if(nx>=0){ dist[nx]=dist[cur]+1; queue.push(nx) }
+    })
+  }
+  // 中心コア＋5重リングの半径テーブル（好みが近いほど内側）
+  const RING=[360,560,760,960,1180]
   stars.forEach(function(s,i){
     if(!anyFav){ s.targetR = -1; return }       // お気に入りゼロ → リング無効（通常配置）
-    if(s.fav){ s.targetR = 0; s.radK = 0.013; return }   // 中心コア
-    const c = favLinks[i]
-    if(c>=1){                                   // 好み近め → 内側リング（ハブほど内側）
-      s.targetR = 620 - Math.min(c,6)*40
-      s.radK = 0.016
-    } else {                                    // 好み遠め → 外側リング
-      s.targetR = 1180
-      s.radK = 0.018
-    }
+    if(s.fav){ s.targetR = 0; s.radK = 0.013; return }  // 中心コア
+    const h = dist[i]
+    if(h===1)      s.targetR = RING[0] - Math.min(favLinks[i],5)*16  // 直接つながり（ハブほど内側）
+    else if(h===2) s.targetR = RING[1]
+    else if(h===3) s.targetR = RING[2]
+    else if(h===4) s.targetR = RING[3]
+    else           s.targetR = RING[4]          // 5ホップ以上 or 到達不可 → 最外周
+    s.radK = 0.016
   })
 }
 
@@ -1542,15 +1556,18 @@ function drawStar(s){
   const fs=Math.max(9,Math.min(14,11*zoom))
   ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
   ctx.textAlign='center'
-  // 急上昇アーティストは名前をオレンジに
+  // 名前のグローはお気に入り/急上昇のみ（通常星は影なしで軽量化）
   if(s.rising){
     ctx.shadowColor=`rgba(255,100,20,${op*.9})`
     ctx.shadowBlur=8
     ctx.fillStyle=`rgba(255,175,100,${op*.9})`
-  } else {
-    ctx.shadowColor=s.fav?`rgba(255,175,30,${op})`:`rgba(70,115,255,${op*.8})`
+  } else if(s.fav){
+    ctx.shadowColor=`rgba(255,175,30,${op})`
     ctx.shadowBlur=7
-    ctx.fillStyle=s.fav?`rgba(255,205,70,${op})`:`rgba(190,215,255,${op*.88})`
+    ctx.fillStyle=`rgba(255,205,70,${op})`
+  } else {
+    ctx.shadowBlur=0
+    ctx.fillStyle=`rgba(190,215,255,${op*.88})`
   }
   ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
 
@@ -1567,14 +1584,18 @@ function loop(){
     panVX*=.92; panVY*=.92
   }
 
-  // ── 斥力 ──
-  for(let i=0;i<stars.length;i++){
-    for(let j=i+1;j<stars.length;j++){
-      const a=stars[i], b=stars[j]
-      const dx=b.x-a.x, dy=b.y-a.y
-      const d=Math.hypot(dx,dy)||.1
+  // ── 斥力（近いペアのみ計算：高価なsqrt前にバウンディングボックスで早期スキップ） ──
+  const SL=stars.length
+  for(let i=0;i<SL;i++){
+    const a=stars[i]
+    for(let j=i+1;j<SL;j++){
+      const b=stars[j]
       const minD=(a.r+b.r)*2.4
-      if(d<minD){
+      const dx=b.x-a.x; if(dx>minD||dx<-minD) continue
+      const dy=b.y-a.y; if(dy>minD||dy<-minD) continue
+      const d2=dx*dx+dy*dy
+      if(d2<minD*minD){
+        const d=Math.sqrt(d2)||.1
         const f=(minD-d)/minD*0.7
         const nx=dx/d, ny=dy/d
         if(i!==dragId){ a.vx-=nx*f; a.vy-=ny*f }
