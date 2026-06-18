@@ -939,27 +939,26 @@ const CONNECTIONS = [
 // ════════════════ 銀河重力（BFS距離ベース） ════════════════
 // gravWeight: 1.0=お気に入り(中心引力), 0.4=直接つながり, 0.1=2hop, -(0.2~0.4)=無関係(外周)
 function updateGravityWeights(){
-  const dist = new Array(stars.length).fill(Infinity)
-  const queue = []
-  stars.forEach(function(s,i){ if(s.fav){ dist[i]=0; queue.push(i) } })
-  var qi=0
-  while(qi<queue.length){
-    const cur=queue[qi++]
-    CONNECTIONS.forEach(function(pair){
-      const a=pair[0],b=pair[1]
-      let next=-1
-      if(a===cur && dist[b]===Infinity) next=b
-      else if(b===cur && dist[a]===Infinity) next=a
-      if(next>=0){ dist[next]=dist[cur]+1; queue.push(next) }
-    })
-  }
+  // お気に入りと「直接つながっている本数」をカウント
+  // 本数が多いほど中心寄り → お気に入りハブを見つけやすく
+  const favLinks = new Array(stars.length).fill(0)
+  let anyFav = false
+  for(let i=0;i<stars.length;i++){ if(stars[i].fav){ anyFav=true; break } }
+  CONNECTIONS.forEach(function(pair){
+    const a=pair[0], b=pair[1]
+    if(a>=stars.length||b>=stars.length) return
+    if(stars[a].fav && !stars[b].fav) favLinks[b]++
+    if(stars[b].fav && !stars[a].fav) favLinks[a]++
+  })
   stars.forEach(function(s,i){
-    const d=dist[i]
-    if(d===0)        s.gravWeight= 1.6   // お気に入り → 強く中心へ
-    else if(d===1)   s.gravWeight= 0.50  // 直接つながり
-    else if(d===2)   s.gravWeight= 0.16  // 2hop
-    else if(d===3)   s.gravWeight=-0.08  // 遠い
-    else             s.gravWeight=-0.22  // 無関係 → 外周へ
+    if(!anyFav){ s.gravWeight = 0; return }     // お気に入りゼロなら通常配置
+    if(s.fav){ s.gravWeight = 2.0; return }     // お気に入り → 中心に強く密集
+    const c = favLinks[i]
+    if(c>=4)        s.gravWeight =  0.30         // 多数つながり → 中心寄りの内側リング
+    else if(c===3)  s.gravWeight =  0.12
+    else if(c===2)  s.gravWeight = -0.05
+    else if(c===1)  s.gravWeight = -0.25         // 1本だけ → 中心の外側
+    else            s.gravWeight = -0.60         // 無関係 → 外周へ（中心とギャップ）
   })
 }
 
