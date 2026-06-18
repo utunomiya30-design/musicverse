@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0254)file:///C:/Users/utuno/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/3175886f-be01-4b33-b11a-321dea257dc9/cd7bd682-1012-4652-9ea2-783d9a359f49/local_a83c4484-d268-4ece-96b2-90b9442fb35e/outputs/index.html -->
-<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MUSIC VERSE — 音楽の宇宙を探検しよう</title>
 
@@ -27,8 +27,8 @@
 <meta name="twitter:image" content="og-image.png">
 
 <!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="file:///C:/Users/utuno/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/3175886f-be01-4b33-b11a-321dea257dc9/cd7bd682-1012-4652-9ea2-783d9a359f49/local_a83c4484-d268-4ece-96b2-90b9442fb35e/outputs/favicon.svg">
-<link rel="apple-touch-icon" href="file:///C:/Users/utuno/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/3175886f-be01-4b33-b11a-321dea257dc9/cd7bd682-1012-4652-9ea2-783d9a359f49/local_a83c4484-d268-4ece-96b2-90b9442fb35e/outputs/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
 
 <!-- JSON-LD -->
 <script type="application/ld+json">
@@ -54,7 +54,7 @@
 <meta name="apple-mobile-web-app-title" content="MUSIC VERSE">
 
 <!-- Google Analytics -->
-<script async="" src="./index_files/js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KDCYXR6FG7"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -313,38 +313,15 @@ body {
 @media (max-width:520px) {
   #panel {
     right:auto !important; top:auto !important; bottom:-100vh;
-    left:0; width:100%; max-height:78vh;
+    left:0; width:100%; max-height:48vh;
+    padding:16px 18px;
     transform:none; border-radius:22px 22px 0 0;
     transition:bottom .42s cubic-bezier(.4,0,.2,1);
-    padding:16px 16px 24px;
   }
   #panel.open { bottom:0; right:auto !important; }
-
-  /* ── パネル内コンパクト化 ── */
-  #p-photo-wrap { width:52px; height:52px; margin:0; flex-shrink:0; }
-  #p-photo-init { font-size:18px; }
-  .p-header { gap:10px; margin-bottom:8px; }
-  .p-header-text #p-name { font-size:18px; margin:4px 0 4px; }
-  #p-tags { margin-bottom:6px; }
-  .tag { font-size:9px; padding:2px 8px; }
-  .pop-row { margin-bottom:8px; }
-  #p-desc {
-    font-size:12px; line-height:1.6; margin-bottom:10px;
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-  }
-  .btn { padding:9px; font-size:12px; margin-bottom:6px; border-radius:10px; }
-  /* シェアボタンはモバイルで非表示 */
-  #btn-share-artist { display:none; }
-  .songs-hd { margin:10px 0 5px; }
-  .song-item { padding:5px 6px; }
-  .song-title { font-size:12px; }
-  .related-hd { margin:10px 0 6px; }
-  .rel-item { padding:6px 4px; }
-  .rel-name { font-size:12px; }
-  .rel-pop { font-size:10px; }
-  /* YouTube/Apple Musicボタンも1行に */
-  .btn-link { padding:8px; font-size:11px; }
-
+  #p-photo-wrap { width:56px; height:56px; margin:0 auto 10px; }
+  #p-name, .p-header-text #p-name { font-size:19px; }
+  .songs-hd { margin:12px 0 6px; }
   #fav-panel {
     left:auto !important; top:auto !important; bottom:-100vh;
     right:0; width:100%; max-height:65vh;
@@ -428,7 +405,7 @@ body {
 
   <!-- 検索バー -->
   <div id="search-wrap">
-    <input id="search-input" type="text" placeholder="🔍 アーティスト検索..." autocomplete="off">
+    <input id="search-input" type="text" placeholder="🔍 アーティスト検索..." autocomplete="off" />
     <div id="search-results"></div>
   </div>
 
@@ -453,7 +430,7 @@ body {
   <div class="p-header">
     <div id="p-photo-wrap">
       <span id="p-photo-init">♪</span>
-      <img id="p-photo" src="file:///C:/Users/utuno/AppData/Local/Packages/Claude_pzs8sxrjxfjjc/LocalCache/Roaming/Claude/local-agent-mode-sessions/3175886f-be01-4b33-b11a-321dea257dc9/cd7bd682-1012-4652-9ea2-783d9a359f49/local_a83c4484-d268-4ece-96b2-90b9442fb35e/outputs/index.html" alt="">
+      <img id="p-photo" src="" alt="" />
     </div>
     <div class="p-header-text">
       <div class="p-eyebrow">ARTIST</div>
@@ -480,7 +457,7 @@ body {
 <div id="controls">
   <button class="ctrl-btn" onclick="resetView()" title="全体を表示">⌂</button>
   <button class="ctrl-btn" onclick="doZoom(1.25)" title="ズームイン">＋</button>
-  <button class="ctrl-btn" onclick="doZoom(0.8)" title="ズームアウト">－</button>
+  <button class="ctrl-btn" onclick="doZoom(0.8)"  title="ズームアウト">－</button>
 </div>
 
 <!-- モバイル用全体表示ボタン（星から迷子になったとき） -->
@@ -542,25 +519,7 @@ const LF_NAMES = [
   'ZUTOMAYO','Yuuri','ano','Kaneko Ayano','Young Skinny',
   'Kami wa Saikoro wo Furanai','Sakura Fujiwara','DISH','Marcyy','Frederic',
   'Reol','Kafu','Polkadot Stingray','Straightener','sumika',
-  'moon drop','Wasurarenneeyo','SHISHAMO','Yabaitshatsuya','Kengo Kawanishi',
-  // 75-99
-  'LiSA','Saucy Dog','UNISON SQUARE GARDEN','KANA-BOON','Vickeblanka',
-  'yama','Anna Takeuchi','the peggies','Homecomings','Odotte Bakari no Kuni',
-  'Oishiikuru Melonpan','Passepied','androp','SHE\'S','Akai Koen',
-  'bonobos','Ohashi Trio','Cornelius','4s4ki','HIRAIDAI',
-  'wacci','go!go!vanillas','The Oral Cigarettes','Motoaki Hata','Kuhaku Gokko',
-  // 100-124
-  'Tokyo Incidents','indigo la End','Gesu no Kiwami Otome','Fujifabric','Suchmos',
-  'amazarashi','Creep Hyp','Ellegarden','WANIMA','10-FEET',
-  'Maximum the Hormone','Soutaiseiriron','Base Ball Bear','Chatmonchy','Tokyo Ska Paradise Orchestra',
-  'Lucky Tapes','Yogee New Waves','Nakamura Kaho','aiko','Marie Ueda',
-  '04 Limited Sazabys','BLUE ENCOUNT','Sambomaster','Hanaregumi','Kimishima Ozora',
-  // 125-149
-  'Kirinji','Lamp','Shogo Hamada','Sekai no Owari','Superfly',
-  'Nakamori Akina','Matsutoya Yumi','Okazaki Taiiku','Reina Ueda','Suda Masaki',
-  'Kiyoe Yoshioka','mol-74','Haruka to Miyuki','Sayuri','Fujikawa Chiai',
-  'Tatsuya Mashima','Takayan','Tani Yuuki','Omoinotake','Rinne',
-  'Tohji','Kid Fresino','BIM','Budamunk','Dos Monos'
+  'moon drop','Wasurarenneeyo','SHISHAMO','Yabaitshatsuya','Kengo Kawanishi'
 ]
 
 function lfJsonp(method, params, cb) {
@@ -840,238 +799,44 @@ const ARTISTS = [
     songs:['あつまれ！パーティーピーポー','ハッピーウェディング前ソング','どうぶつえんにいこうよ'] },
   { id:74, name:'川西蓮',             pop:40, genre:'インディー',   col:0xaaddbb, fav:false, rising:true,
     desc:'ネット発の若手シンガーソングライター。繊細なギターと透き通る歌声で次世代インディーシーンを牽引。TikTokで発掘された注目株。',
-    songs:['二十歳の恋','瞬き','花束'] },
-
-  // ─────── 75-99 ───────
-  { id:75, name:'LiSA',              pop:82, genre:'J-POP',        col:0xff4499, fav:false, rising:false,
-    desc:'三重出身の女性シンガー。「鬼滅の刃」「SAO」など大型アニメ主題歌を連発しアニソン界の女王に。「紅蓮華」は社会現象となった。',
-    songs:['紅蓮華','炎','crossing field'] },
-  { id:76, name:'Saucy Dog',         pop:72, genre:'ロック',        col:0xddaa55, fav:false, rising:true,
-    desc:'石川出身バンド。「シンデレラボーイ」がTikTokで爆発的ヒット。切ない恋愛ソングと哀愁のあるボーカルで若者に人気急上昇。',
-    songs:['シンデレラボーイ','いつか','置き手紙'] },
-  { id:77, name:'UNISON SQUARE GARDEN', pop:70, genre:'ロック',     col:0x44bbff, fav:false, rising:false,
-    desc:'東京出身3人組バンド。変拍子・高速ギターリフと歌詞の独自世界観が特徴。「オリオンをなぞる」「シュガーソングとビターステップ」など。',
-    songs:['オリオンをなぞる','シュガーソングとビターステップ','mix juiceのいうとおり'] },
-  { id:78, name:'KANA-BOON',         pop:68, genre:'ロック',        col:0xff8833, fav:false, rising:false,
-    desc:'大阪出身4人組バンド。「シルエット」がNARUTO主題歌で海外にも知名度。疾走感あふれるギターロックでフェスの常連。',
-    songs:['シルエット','spiral','ないものねだり'] },
-  { id:79, name:'ビッケブランカ',      pop:58, genre:'J-POP',        col:0x55eebb, fav:false, rising:false,
-    desc:'大阪出身のシンガーソングライター。ピアノを中心としたポップサウンドと高い演奏力が魅力。「Ca Va?」など耳に残る楽曲多数。',
-    songs:['Ca Va?','まっしろ','ウォーリーを探さないで'] },
-  { id:80, name:'yama',              pop:73, genre:'J-POP',        col:0xbbaaff, fav:false, rising:true,
-    desc:'顔出しなしで活動するシンガー。「春を告げる」がYouTubeで爆発的再生数。独特のハスキーボイスと感情的な歌唱で次世代を代表するアーティスト。',
-    songs:['春を告げる','麻痺','TRUE'] },
-  { id:81, name:'竹内アンナ',          pop:55, genre:'ソウル/R&B',   col:0xffbb77, fav:false, rising:true,
-    desc:'神奈川出身のシンガーソングライター。英語・日本語を自在に操るファンキーなポップR&Bで注目。「MONEY」など洗練されたサウンド。',
-    songs:['MONEY','SUPERORGANISM','Gimme!'] },
-  { id:82, name:'the peggies',       pop:55, genre:'ロック',        col:0xff77aa, fav:false, rising:false,
-    desc:'東京出身3人組ガールズバンド。パワフルなギターロックとポップなメロディが魅力。「ノーダウト」「夏のせい」などアニメタイアップも多い。',
-    songs:['ノーダウト','夏のせい','青い春と西へ'] },
-  { id:83, name:'Homecomings',       pop:46, genre:'インディー',   col:0x88ffcc, fav:false, rising:false,
-    desc:'京都出身4人組バンド。英語詞を中心としたドリームポップとインディーロックが特徴。映画「映画 聲の形」主題歌でも知られる。',
-    songs:['Songbirds','Moving Days','Blue Hour'] },
-  { id:84, name:'踊ってばかりの国',    pop:50, genre:'インディー',   col:0x99ccaa, fav:false, rising:false,
-    desc:'大阪出身バンド。下津光史の独特なサイケデリックポップスとシュールな歌詞世界が唯一無二。インディー界の重要バンドの一つ。',
-    songs:['光の中に','オカルト','大人になってもこわい世の中はこわい'] },
-  { id:85, name:'おいしくるメロンパン',  pop:44, genre:'インディー',  col:0xeecc77, fav:false, rising:false,
-    desc:'東京出身3人組バンド。ドラマチックな曲展開と感情的な歌詞が特徴。インディーシーンで熱狂的なファンを獲得する実力派。',
-    songs:['サーカス','名前を呼ぶよ','ストーリー'] },
-  { id:86, name:'パスピエ',            pop:52, genre:'エレクトロ',   col:0xddccff, fav:false, rising:false,
-    desc:'東京出身バンド。ニューウェーブ・テクノポップを現代に甦らせた独自サウンド。大原ゆい子のキュートな歌声とキャッチーな楽曲が人気。',
-    songs:['素敵なダイナマイトスキャンダル','S.S.","更新を押してくれ'] },
-  { id:87, name:'androp',             pop:48, genre:'J-POP',        col:0x66ddff, fav:false, rising:false,
-    desc:'東京出身4人組バンド。エモーショナルなバラードからダンスナンバーまで幅広いスタイル。「Prism」「You」などアニメタイアップも多い。',
-    songs:['Prism','You','One'] },
-  { id:88, name:"SHE'S",              pop:58, genre:'J-POP',        col:0x88bbff, fav:false, rising:false,
-    desc:'大阪出身4人組バンド。ピアノを軸にした美しいメロディと感情的な歌声が特徴。「In the Morning」「Letter」など洗練されたポップソング。',
-    songs:['In the Morning','Letter','Wandering'] },
-  { id:89, name:'赤い公園',            pop:54, genre:'ロック',        col:0xff3355, fav:false, rising:false,
-    desc:'東京出身バンド。元メンバーを含む実力派ガールズロックバンド。実験的なサウンドと骨太なギターが特徴。解散後も楽曲が愛され続ける。',
-    songs:['NOW ON AIR','消えない','のぞき穴'] },
-  { id:90, name:'bonobos',            pop:46, genre:'インディー',   col:0x77ddaa, fav:false, rising:false,
-    desc:'大阪出身バンド。アフロビート・ジャズ・ポップを独自に融合したジャンルレスなサウンドが特徴。蔡忠浩の洗練されたセンスが光る。',
-    songs:['celluloid','Gypsy','ウツクシキヒト'] },
-  { id:91, name:'大橋トリオ',           pop:50, genre:'ソウル/R&B',   col:0xffddaa, fav:false, rising:false,
-    desc:'マルチプレイヤー・シンガーソングライター。ジャズ・ボサノバをベースにした心地よいサウンドと独自の世界観。CMや映像作品への楽曲提供も多数。',
-    songs:['LIFE','どこかで日が暮れて','ありがとう'] },
-  { id:92, name:'Cornelius',           pop:55, genre:'エレクトロ',   col:0xaaffdd, fav:false, rising:false,
-    desc:'小山田圭吾によるソロプロジェクト。90年代から日本の音楽シーンを牽引するサウンドデザインの鬼才。海外での評価も高い実験的ポップ。',
-    songs:['MUSIC','Drop','Fit Song'] },
-  { id:93, name:'4s4ki',              pop:48, genre:'エレクトロ',   col:0xff55cc, fav:false, rising:true,
-    desc:'ネット発の女性アーティスト。ハイパーポップ・エレクトロを融合した刺激的なサウンドと個性的なビジュアルで次世代シーンを牽引。',
-    songs:['Deathsaber','ってか','Maboroshi Echo'] },
-  { id:94, name:'HIRAIDAI',           pop:62, genre:'J-POP',        col:0xffcc44, fav:false, rising:true,
-    desc:'ネット発のシンガーソングライター。「彼女」「ビリーヴ」などTikTok経由でバイラルヒット。温かみのある声と誠実な歌詞で人気急上昇。',
-    songs:['ビリーヴ','彼女','曖昧な灰色の世界で'] },
-  { id:95, name:'wacci',              pop:60, genre:'J-POP',        col:0x66ccee, fav:false, rising:false,
-    desc:'大阪出身5人組バンド。「恋だろ」がTikTokで話題に。日常を大切にした温かいJ-POPで幅広い世代に親しまれるバンド。',
-    songs:['恋だろ','別の人の彼女になったよ','プリズム'] },
-  { id:96, name:'go!go!vanillas',     pop:52, genre:'ロック',        col:0x44ddbb, fav:false, rising:false,
-    desc:'東京出身4人組バンド。ブリティッシュロックの影響を受けたスピーディーなロックサウンド。「FOX」「カウンターアクション」など疾走感が魅力。',
-    songs:['FOX','カウンターアクション','Maboroshi Holiday'] },
-  { id:97, name:'THE ORAL CIGARETTES', pop:58, genre:'ロック',      col:0xcc5577, fav:false, rising:false,
-    desc:'奈良出身4人組バンド。アニメ主題歌を多数手がける。「狂乱 Hey Kids!!」「カモフラージュ」などドラマチックなロックサウンド。',
-    songs:['狂乱 Hey Kids!!','カモフラージュ','Wasted Nights'] },
-  { id:98, name:'秦基博',              pop:68, genre:'J-POP',        col:0xaaccdd, fav:false, rising:false,
-    desc:'宮崎出身のシンガーソングライター。「ひまわりの約束」「鱗」などアニメ・映画タイアップで幅広く知られる。温かく柔らかな歌声が特徴。',
-    songs:['ひまわりの約束','鱗','アイ'] },
-  { id:99, name:'空白ごっこ',           pop:50, genre:'インディー',   col:0xccddff, fav:false, rising:true,
-    desc:'ネット発の男女ユニット。「ユーレイ」などサブカル層に刺さる繊細でエモーショナルな楽曲。インディーとネット音楽の境界に立つ独自存在。',
-    songs:['ユーレイ','大人になっても','どうしようもない'] },
-
-  // ─────── 100-124 ───────
-  { id:100, name:'東京事変',           pop:72, genre:'ロック',        col:0xff6688, fav:false, rising:false,
-    desc:'椎名林檎率いるバンド。高い演奏技術と実験的なアレンジで邦ロック史に刻まれる。2021年再結成後も精力的に活動中。',
-    songs:['群青日和','OSCA','能動的三分間'] },
-  { id:101, name:'indigo la End',      pop:58, genre:'インディー',   col:0x6699ee, fav:false, rising:false,
-    desc:'川谷絵音率いる4人組バンド。切ない恋愛を描いた歌詞と美しいサウンドが特徴。ゲスの極み乙女と並ぶ川谷の代表バンド。',
-    songs:['夏夜のマジック','チューリップ','名前は片想い'] },
-  { id:102, name:'ゲスの極み乙女',      pop:62, genre:'ロック',        col:0xee44aa, fav:false, rising:false,
-    desc:'川谷絵音を中心とした4人組バンド。変拍子・複雑なコード進行を取り入れたポップロックでデビュー当初から話題に。「私以外私じゃないの」がヒット。',
-    songs:['私以外私じゃないの','ロマンスがありあまる','ドレスを脱げ'] },
-  { id:103, name:'フジファブリック',     pop:60, genre:'ロック',        col:0xffaa33, fav:false, rising:false,
-    desc:'故・志村正彦が率いたバンド。ポップでありながら独自の世界観を持つ楽曲が多数。「若者のすべて」は時代を超えて愛されるアンセム。',
-    songs:['若者のすべて','銀河','茜色の夕日'] },
-  { id:104, name:'Suchmos',            pop:58, genre:'ソウル/R&B',   col:0x55ccbb, fav:false, rising:false,
-    desc:'神奈川出身バンド。シティポップ・ソウル・ファンクを融合した洗練されたサウンドで2010年代後半の音楽シーンを牽引。',
-    songs:['STAY TUNE','YMM','A.G.I.T.'] },
-  { id:105, name:'amazarashi',          pop:62, genre:'ロック',        col:0x8899cc, fav:false, rising:false,
-    desc:'青森出身の秋田ひろむによるバンド。社会問題や生きづらさをテーマにした深い歌詞と轟音ロックで熱狂的なファンを持つ。',
-    songs:['空に歌えば','スターライト','季節は次々死んでいく'] },
-  { id:106, name:'クリープハイプ',       pop:64, genre:'ロック',        col:0xdd6677, fav:false, rising:false,
-    desc:'東京出身バンド。尾崎世界観の独特な高音ボーカルと赤裸々な歌詞が特徴。恋愛と日常を鋭く切り取る歌詞世界が唯一無二。',
-    songs:['社会の窓','栞','OSS'] },
-  { id:107, name:'ELLEGARDEN',          pop:66, genre:'ロック',        col:0x4488ff, fav:false, rising:false,
-    desc:'千葉出身バンド。日本のメロディックパンクの先駆者。2008年活動休止後2018年に電撃復活。「Space Sonic」「Missing」など名曲多数。',
-    songs:['Space Sonic','Missing','Make A Wish'] },
-  { id:108, name:'WANIMA',              pop:60, genre:'ロック',        col:0xff9922, fav:false, rising:false,
-    desc:'熊本出身3人組バンド。ハイスピードなポップパンクと前向きな歌詞で若者を中心に人気。「やってみよう」「ともに」などライブで盛り上がる楽曲が多い。',
-    songs:['やってみよう','ともに','CHARM'] },
-  { id:109, name:'10-FEET',             pop:58, genre:'ロック',        col:0x33bbaa, fav:false, rising:false,
-    desc:'京都出身3人組バンド。スカ・パンク・ヒップホップを融合した独自スタイル。「RIVER」「hammer ska」など野外フェスの定番。',
-    songs:['RIVER','hammer ska','その向こうへ'] },
-  { id:110, name:'マキシマム ザ ホルモン', pop:62, genre:'ロック',      col:0xcc3344, fav:false, rising:false,
-    desc:'東京出身バンド。ヘヴィメタル・ポップ・コアを縦横無尽に横断する唯一無二の音楽性。「ロッキュン ロール」「爪爪爪」など破天荒な楽曲が人気。',
-    songs:['ロッキュン ロール♡','爪爪爪','恋のスペルマ'] },
-  { id:111, name:'相対性理論',           pop:55, genre:'インディー',   col:0xbbccdd, fav:false, rising:false,
-    desc:'やくしまるえつこを擁する謎多きバンド。シュールな歌詞と無機質なポップサウンドが独特の世界観を生む。「LOVEずっきゅん」「わたしは人類」など。',
-    songs:['LOVEずっきゅん','わたしは人類','地獄先生'] },
-  { id:112, name:'Base Ball Bear',      pop:58, genre:'ロック',        col:0x5599ff, fav:false, rising:false,
-    desc:'東京出身バンド。青春ギターポップから実験的なサウンドへと進化を続ける。「PERFECT BLUE」「SAYONARA-NOSTALGIA」など世代を超えた名曲。',
-    songs:['PERFECT BLUE','SAYONARA-NOSTALGIA','short hair'] },
-  { id:113, name:'チャットモンチー',     pop:58, genre:'ロック',        col:0xffaacc, fav:false, rising:false,
-    desc:'徳島出身ガールズバンド。パワフルなロックサウンドと等身大の歌詞で多くのファンを獲得。2018年に完結。「シャングリラ」「橙」などが代表曲。',
-    songs:['シャングリラ','橙','風吹けば恋'] },
-  { id:114, name:'東京スカパラダイスオーケストラ', pop:65, genre:'ソウル/R&B', col:0xffcc22, fav:false, rising:false,
-    desc:'1988年結成の9人組スカバンド。日本のスカシーンを牽引し続ける重鎮。多彩なコラボレーションでも知られ、若いアーティストとの化学反応が話題に。',
-    songs:['Paradise Has No Border','Down Beat Stomp','ルパン三世 PART5 ～italiano～'] },
-  { id:115, name:'Lucky Tapes',         pop:46, genre:'ソウル/R&B',   col:0xeebb55, fav:false, rising:false,
-    desc:'東京出身バンド。70〜80年代のシティポップ・ソウルを現代に甦らせたサウンド。高橋海のハスキーボイスと洗練されたグルーヴが特徴。',
-    songs:['Day Tripper','GHOST','Mind Your Business'] },
-  { id:116, name:'Yogee New Waves',     pop:46, genre:'インディー',   col:0x88ddcc, fav:false, rising:false,
-    desc:'東京出身バンド。ドリーミーなサイケポップとインディーロックを融合。海辺や夏を思わせる浮遊感あるサウンドが心地よい。',
-    songs:['to the moon and back','Climax Night','Ride On Wave'] },
-  { id:117, name:'中村佳穂',            pop:52, genre:'インディー',   col:0xccbbee, fav:false, rising:false,
-    desc:'京都出身シンガーソングライター。ピアノ・歌・声を自在に操る鬼才。映画「竜とそばかすの姫」主演でも注目を集める。ライブでの圧倒的な存在感が伝説的。',
-    songs:['LOVE','またね宇宙','その群青に感情は反射する'] },
-  { id:118, name:'aiko',               pop:72, genre:'J-POP',        col:0xff99cc, fav:false, rising:false,
-    desc:'大阪出身のシンガーソングライター。独自の恋愛観を綴った歌詞と伸びやかな歌声で30年近く第一線で活躍。「カブトムシ」「花火」など名曲多数。',
-    songs:['カブトムシ','花火','ボーイフレンド'] },
-  { id:119, name:'植田真梨恵',           pop:48, genre:'J-POP',        col:0xffbbdd, fav:false, rising:false,
-    desc:'大阪出身のシンガーソングライター。エモーショナルなバラードとロックを行き来する独自スタイル。アニメタイアップなども多く、幅広いファンを持つ。',
-    songs:['プレイボール','共鳴','エンドロール'] },
-  { id:120, name:'04 Limited Sazabys',  pop:56, genre:'ロック',        col:0x44aaee, fav:false, rising:false,
-    desc:'名古屋出身4人組バンド。ポップパンク・エモをベースにした疾走感あふれるサウンド。「monolith」「swim」など高速チューンで知られる。',
+    songs:['二十歳の恋', '瞬き','花束'] },
+  // 追加 75-86
+  { id:75, name:'LiSA',               pop:84, genre:'ロック',        col:0xff5577, fav:false, rising:false,
+    desc:'アニソンシーンを牽引するシンガー。「紅蓮華」「炎」が鬼滅の刃とともに世界的ヒット。パワフルかつ繊細な歌声が魅力。',
+    songs:['紅蓮華','炎','Catch the Moment'] },
+  { id:76, name:'milet',              pop:80, genre:'ソウル/R&B',   col:0xaa66dd, fav:false, rising:false,
+    desc:'ハスキーで力強い歌声を持つシンガーソングライター。ドラマ主題歌を多数担当。洋楽的なサウンドと圧倒的な表現力。',
+    songs:['Us','inside you','Ordinary days'] },
+  { id:77, name:'Saucy Dog',          pop:78, genre:'ロック',        col:0xff8844, fav:false, rising:false,
+    desc:'大阪発3人組バンド。切ない歌詞と石原慎也の伸びやかな歌声が支持を集める。「シンデレラボーイ」がTikTokで大ヒット。',
+    songs:['シンデレラボーイ','いつか','結'] },
+  { id:78, name:'yama',               pop:74, genre:'J-POP',        col:0x66bbff, fav:false, rising:false,
+    desc:'歌い手出身の覆面シンガー。「春を告げる」でブレイク。性別を感じさせない中性的で透明感のある歌声が特徴。',
+    songs:['春を告げる','色彩','麻痺'] },
+  { id:79, name:'須田景凪',           pop:72, genre:'J-POP',        col:0x88ccdd, fav:false, rising:false,
+    desc:'ボカロP「バルーン」としても活躍するシンガーソングライター。「シャルル」が大ヒット。文学的で繊細な楽曲世界。',
+    songs:['シャルル','MOIL','veil'] },
+  { id:80, name:'WANIMA',             pop:76, genre:'ロック',        col:0xffbb33, fav:false, rising:false,
+    desc:'熊本発のパンクロックトリオ。前向きで力強いメッセージとメロディアスな楽曲でライブシーンを席巻。',
+    songs:['ともに','やってみよう','シグナル'] },
+  { id:81, name:'THE ORAL CIGARETTES',pop:73, genre:'ロック',        col:0xff4499, fav:false, rising:false,
+    desc:'奈良発4人組ロックバンド。ダークでスリリングなサウンドと中毒性のあるメロディ。「狂乱 Hey Kids!!」など。',
+    songs:['狂乱 Hey Kids!!','ReI','容疑者'] },
+  { id:82, name:'04 Limited Sazabys', pop:70, genre:'ロック',        col:0x55ddff, fav:false, rising:false,
+    desc:'名古屋発のメロディックパンクバンド。疾走感あるサウンドとキャッチーなメロディ。フェスシーンの常連。',
     songs:['monolith','swim','Squall'] },
-  { id:121, name:'BLUE ENCOUNT',        pop:55, genre:'ロック',        col:0x2266dd, fav:false, rising:false,
-    desc:'福岡出身4人組バンド。アニメタイアップを多数持つエモーショナルなロックバンド。「THANKS」「VS」など感動的な楽曲が多い。',
-    songs:['THANKS','VS','もっと光を'] },
-  { id:122, name:'サンボマスター',       pop:58, genre:'ロック',        col:0xee5533, fav:false, rising:false,
-    desc:'東京出身3人組バンド。魂の叫びのようなボーカルと熱狂的なライブパフォーマンスで知られる。「できっこないをやらなくちゃ」は多くの場面で使われる応援歌。',
-    songs:['できっこないをやらなくちゃ','世界はそれを愛と呼ぶんだぜ','花束'] },
-  { id:123, name:'ハナレグミ',           pop:50, genre:'ソウル/R&B',   col:0xccaa77, fav:false, rising:false,
-    desc:'永積タカシによるソロプロジェクト。SUPER BUTTER DOGのボーカリストとして活動後ソロへ。温かみのある声と心地よいグルーヴで唯一無二の存在感。',
-    songs:['サヨナラCOLOR','家族の風景','いのちの歌'] },
-  { id:124, name:'君島大空',            pop:44, genre:'インディー',   col:0xaabbdd, fav:false, rising:true,
-    desc:'東京出身のシンガーソングライター。繊細なギターと詩的な歌詞、重層的なサウンドスケープが特徴。次世代のインディーシーンを担う注目株。',
-    songs:['彼方','午前10時の映画祭','オーロラ'] },
-
-  // ─────── 125-149 ───────
-  { id:125, name:'キリンジ',            pop:58, genre:'J-POP',        col:0x88ddaa, fav:false, rising:false,
-    desc:'堀込高樹・泰行兄弟によるデュオ出身バンド。洗練されたコード進行とポップセンスで「エイリアンズ」は名曲中の名曲として語り継がれる。',
-    songs:['エイリアンズ','Drifter','時間がない'] },
-  { id:126, name:'Lamp',               pop:46, genre:'インディー',   col:0xffeeaa, fav:false, rising:false,
-    desc:'東京出身3人組。シティポップとボサノバを融合した繊細で美しいサウンドが特徴。近年の「シティポップリバイバル」でも再評価が高まる。',
-    songs:['さち子','恋人へ','木漏れ日通り'] },
-  { id:127, name:'浜田省吾',            pop:65, genre:'ロック',        col:0xee8833, fav:false, rising:false,
-    desc:'広島出身のロックミュージシャン。40年以上第一線で活躍する伝説的アーティスト。「J.BOY」「もうひとつの土曜日」など時代を超えた名曲多数。',
-    songs:['J.BOY','もうひとつの土曜日','MONEY'] },
-  { id:128, name:'SEKAI NO OWARI',     pop:82, genre:'J-POP',        col:0xaa77ff, fav:false, rising:false,
-    desc:'ファンタジックな世界観とポップなサウンドで国民的人気を誇る4人組バンド。「RPG」「Dragon Night」など大ヒット多数。海外でも活動展開。',
-    songs:['RPG','Dragon Night','Habit'] },
-  { id:129, name:'Superfly',            pop:72, genre:'ソウル/R&B',   col:0xff6633, fav:false, rising:false,
-    desc:'越智志帆の圧倒的な歌唱力を武器にするバンド。力強いロックソウルから繊細なバラードまで幅広い。「愛をこめて花束を」は卒業式の定番曲。',
-    songs:['愛をこめて花束を','Dancing on the Fire','Beautiful'] },
-  { id:130, name:'中森明菜',            pop:72, genre:'J-POP',        col:0xff5599, fav:false, rising:false,
-    desc:'80年代を代表するアイドル・歌手。「スローモーション」「少女A」「DESIRE」など数々のヒット曲で時代を彩った伝説的アーティスト。',
-    songs:['DESIRE','少女A','飾りじゃないのよ涙は'] },
-  { id:131, name:'松任谷由実',           pop:70, genre:'J-POP',        col:0xffaadd, fav:false, rising:false,
-    desc:'荒井由実時代から50年以上活躍する日本のポップス女王。「ひこうき雲」「ルージュの伝言」「春よ、来い」など数え切れないほどの名曲。',
-    songs:['春よ、来い','ルージュの伝言','やさしさに包まれたなら'] },
-  { id:132, name:'岡崎体育',            pop:62, genre:'J-POP',        col:0x33ccee, fav:false, rising:false,
-    desc:'京都出身のシンガーソングライター。ユーモアあふれる歌詞とMVが話題を呼ぶ。「MUSIC VIDEO」はMVあるあるを歌った作品として社会現象に。',
-    songs:['MUSIC VIDEO','感情のピクセル','Natural Lips'] },
-  { id:133, name:'上田麗奈',            pop:44, genre:'J-POP',        col:0xccaaff, fav:false, rising:false,
-    desc:'声優・歌手。繊細な歌声と文学的な歌詞が特徴。アニメ・ゲーム音楽シーンで独自の地位を確立。アコースティックサウンドを基調とした楽曲が多い。',
-    songs:['シフォン','金木犀の夜','refrain'] },
-  { id:134, name:'菅田将暉',            pop:75, genre:'J-POP',        col:0x6677dd, fav:false, rising:false,
-    desc:'俳優・シンガーソングライター。「まちがいさがし」は2019年の大ヒット。石崎ひゅーいや米津玄師との楽曲でも注目を集める本格派。',
-    songs:['まちがいさがし','虹','ここへ'] },
-  { id:135, name:'吉岡聖恵',            pop:52, genre:'J-POP',        col:0xffddaa, fav:false, rising:false,
-    desc:'ikimono-gakariのボーカリストとして活動後、ソロへ。伸びやかな声と明るいポップソングで長年愛されるアーティスト。',
-    songs:['ブルーバード','YELL','じょいふる'] },
-  { id:136, name:'mol-74',              pop:48, genre:'インディー',   col:0x88aacc, fav:false, rising:false,
-    desc:'大阪出身4人組バンド。繊細なアルペジオと透き通る歌声が特徴のインディーポップバンド。「午前中に観た夢のこと」など心に響く楽曲が人気。',
-    songs:['午前中に観た夢のこと','雨が降る','グッド・バイ'] },
-  { id:137, name:'ハルカトミユキ',       pop:44, genre:'インディー',   col:0xdd99cc, fav:false, rising:false,
-    desc:'女性2人組バンド。パワフルなロックサウンドと繊細な詩世界を行き来する。インディーシーンで熱狂的な支持を受ける実力派。',
-    songs:['命短し恋せよ乙女','リバーシブル','さよなら、愛しい人よ'] },
-  { id:138, name:'さユり',              pop:50, genre:'J-POP',        col:0xbbaaee, fav:false, rising:false,
-    desc:'アニメ「君の名は。」などタイアップで知られる女性シンガー。エモーショナルな歌声と感情的な歌詞で若者を中心に支持を集める。',
-    songs:['フラレガイガール','ミカヅキ','コトバ'] },
-  { id:139, name:'藤川千愛',            pop:44, genre:'J-POP',        col:0xffbbbb, fav:false, rising:false,
-    desc:'lyrical schoolのメンバーとして活動後ソロへ。恋愛を赤裸々に描いた歌詞と透き通るボーカルが特徴。「トレモロ」が話題に。',
-    songs:['トレモロ','彼女になりたい','ひとりで生きていけそう'] },
-  { id:140, name:'真島昌利',            pop:48, genre:'ロック',        col:0xcc8844, fav:false, rising:false,
-    desc:'ブルーハーツ・ハイロウズ・クロマニヨンズのギタリスト。ロックンロールの哲学を歌い続ける伝説的ミュージシャン。ソロ作品も愛され続ける。',
-    songs:['夜の盗賊団','エンジェル','ドブネズミの詩'] },
-  { id:141, name:'たかやん',            pop:46, genre:'J-POP',        col:0xffcc88, fav:false, rising:true,
-    desc:'ネット発の若手シンガーソングライター。温かい声質と青春を切り取った歌詞でTikTokから人気が波及。「なんでもないや」などが話題に。',
-    songs:['なんでもないや','ゆらゆら','春の音'] },
-  { id:142, name:'谷 雄貴',             pop:56, genre:'J-POP',        col:0x66bbee, fav:false, rising:true,
-    desc:'「うた恋い。」「恋人へ」などTikTokでバイラルヒット。エモーショナルな歌声と切ない恋愛ソングで次世代の注目株。',
-    songs:['うた恋い。','恋人へ','ありふれた恋愛ソング'] },
-  { id:143, name:'Omoinotake',          pop:55, genre:'ソウル/R&B',   col:0x5588ff, fav:false, rising:true,
-    desc:'島根出身3人組バンド。洗練されたR&B・ポップサウンドと叙情的な歌詞が特徴。「One More Time」がアニメ主題歌でブレイク。',
-    songs:['One More Time','Dreamer','灯火'] },
-  { id:144, name:'凛として時雨',         pop:58, genre:'ロック',        col:0x9944cc, fav:false, rising:false,
-    desc:'東京出身3人組バンド。TKの独特なファルセットと複雑な変拍子・轟音ギターが特徴。アニメ「PSYCHO-PASS」主題歌などで知名度を上げる。',
-    songs:['abnormalize','telecastic fake show','inspiration'] },
-  { id:145, name:'tohji',               pop:50, genre:'ヒップホップ',  col:0x44eebb, fav:false, rising:true,
-    desc:'東京出身のラッパー・プロデューサー。ハイパーポップとラップを融合した独自サウンドで国内外の注目を集める次世代ヒップホップアーティスト。',
-    songs:['candy','angel','Gummy'] },
-  { id:146, name:'Kid Fresino',         pop:52, genre:'ヒップホップ',  col:0x33bb88, fav:false, rising:false,
-    desc:'東京出身のラッパー。精巧なライミングと哲学的な歌詞で日本語ラップシーンをリード。ISSUGI・Campanellaとのユニット5lack（5L）でも活動。',
-    songs:['ai qing','Tragedy','20,Stop.'] },
-  { id:147, name:'BIM',                 pop:48, genre:'ヒップホップ',  col:0x55ddaa, fav:false, rising:false,
-    desc:'福岡出身のラッパー。THINK GOOD所属。メロディアスなフロウと繊細な感情表現が特徴。シーンの中では珍しい温かみのあるラップスタイル。',
-    songs:['Shinin\'','FLY','Hyper Summer'] },
-  { id:148, name:'Budamunk',            pop:42, genre:'ヒップホップ',  col:0x77aa55, fav:false, rising:false,
-    desc:'東京・ニューヨークを拠点とするビートメイカー・ラッパー。ジャズ・ソウルを取り込んだ濃厚なサンプリングビートが国内外で高評価。',
-    songs:['Vibe Check','Smokin\' Signals','Meditation'] },
-  { id:149, name:'Dos Monos',           pop:44, genre:'ヒップホップ',  col:0xaacc44, fav:false, rising:false,
-    desc:'東京出身3人組ヒップホップグループ。前衛的なサウンドと知的な歌詞で海外のレーベルからも注目。実験音楽とラップを融合した唯一無二の存在。',
-    songs:['Larderello','Fz Thriller','Mirror Mirror'] },
+  { id:83, name:'リーガルリリー',     pop:62, genre:'インディー',   col:0x99eecc, fav:false, rising:true,
+    desc:'たかはしほのか率いる3人組オルタナバンド。轟音ギターと文学的な歌詞、儚い歌声のコントラストが魅力。',
+    songs:['リッケンバッカー','ハンシンハンギ','1997'] },
+  { id:84, name:'折坂悠太',           pop:60, genre:'インディー',   col:0xccbb88, fav:false, rising:false,
+    desc:'独特の節回しと民謡・フォーク・ジャズを横断する唯一無二のシンガーソングライター。「朝顔」で高い評価を獲得。',
+    songs:['朝顔','春','トーチ'] },
+  { id:85, name:'フジファブリック',   pop:71, genre:'ロック',        col:0x77ccff, fav:false, rising:false,
+    desc:'四季を歌う名曲で愛され続けるロックバンド。「若者のすべて」は世代を超えて歌い継がれる夏の名曲。',
+    songs:['若者のすべて','茜色の夕日','銀河'] },
+  { id:86, name:'きゃりーぱみゅぱみゅ',pop:75, genre:'エレクトロ',   col:0xff77cc, fav:false, rising:false,
+    desc:'原宿カルチャーを世界に発信したアーティスト。中田ヤスタカプロデュースのカラフルでポップなエレクトロサウンド。',
+    songs:['にんじゃりばんばん','つけまつける','ファッションモンスター'] },
 ]
 
 const CONNECTIONS = [
@@ -1151,165 +916,24 @@ const CONNECTIONS = [
   [1,72],[6,72],[11,72],[47,72],[62,72],
   [1,73],[13,73],[26,73],[47,73],[72,73],
   [17,74],[39,74],[58,74],[70,74],
-  // 75 LiSA
-  [75,1],[75,9],[75,15],[75,33],[75,80],
-  // 76 Saucy Dog
-  [76,2],[76,5],[76,24],[76,87],[76,95],
-  // 77 UNISON SQUARE GARDEN
-  [77,5],[77,6],[77,24],[77,78],[77,96],
-  // 78 KANA-BOON
-  [78,5],[78,24],[78,77],[78,82],[78,97],
-  // 79 ビッケブランカ
-  [79,0],[79,2],[79,16],[79,88],[79,95],
-  // 80 yama
-  [80,0],[80,21],[80,75],[80,93],[80,94],
-  // 81 竹内アンナ
-  [81,3],[81,18],[81,22],[81,44],[81,91],
-  // 82 the peggies
-  [82,62],[82,78],[82,89],[82,96],[82,97],
-  // 83 Homecomings
-  [83,8],[83,48],[83,51],[83,84],[83,90],
-  // 84 踊ってばかりの国
-  [84,8],[84,52],[84,83],[84,85],[84,90],
-  // 85 おいしくるメロンパン
-  [85,8],[85,48],[85,51],[85,84],[85,99],
-  // 86 パスピエ
-  [86,31],[86,36],[86,43],[86,92],[86,93],
-  // 87 androp
-  [87,2],[87,16],[87,24],[87,76],[87,88],
-  // 88 SHE'S
-  [88,2],[88,16],[88,79],[88,87],[88,95],
-  // 89 赤い公園
-  [89,5],[89,6],[89,82],[89,96],[89,97],
-  // 90 bonobos
-  [90,7],[90,30],[90,83],[90,84],[90,91],
-  // 91 大橋トリオ
-  [91,7],[91,30],[91,32],[91,81],[91,90],
-  // 92 Cornelius
-  [92,7],[92,31],[92,86],[92,36],[92,43],
-  // 93 4s4ki
-  [93,21],[93,37],[93,44],[93,80],[93,86],
-  // 94 HIRAIDAI
-  [94,0],[94,2],[94,80],[94,95],[94,98],
-  // 95 wacci
-  [95,0],[95,2],[95,76],[95,79],[95,94],
-  // 96 go!go!vanillas
-  [96,5],[96,24],[96,77],[96,82],[96,89],
-  // 97 THE ORAL CIGARETTES
-  [97,5],[97,24],[97,78],[97,82],[97,89],
-  // 98 秦基博
-  [98,0],[98,16],[98,28],[98,94],[98,99],
-  // 99 空白ごっこ
-  [99,8],[99,42],[99,51],[99,85],[99,98],
-  // 100 東京事変
-  [100,9],[100,6],[100,13],[100,101],[100,102],
-  // 101 indigo la End
-  [101,102],[101,32],[101,48],[101,83],[101,124],
-  // 102 ゲスの極み乙女
-  [102,100],[102,101],[102,13],[102,47],[102,106],
-  // 103 フジファブリック
-  [103,27],[103,16],[103,24],[103,112],[103,113],
-  // 104 Suchmos
-  [104,30],[104,31],[104,115],[104,116],[104,45],
-  // 105 amazarashi
-  [105,19],[105,39],[105,106],[105,111],
-  // 106 クリープハイプ
-  [106,13],[106,102],[106,47],[106,112],[106,122],
-  // 107 ELLEGARDEN
-  [107,25],[107,108],[107,109],[107,120],[107,121],
-  // 108 WANIMA
-  [108,107],[108,109],[108,110],[108,120],[108,96],
-  // 109 10-FEET
-  [109,107],[109,108],[109,110],[109,114],[109,26],
-  // 110 マキシマム ザ ホルモン
-  [110,108],[110,109],[110,107],[110,96],[110,97],
-  // 111 相対性理論
-  [111,36],[111,51],[111,84],[111,113],[111,116],
-  // 112 Base Ball Bear
-  [112,103],[112,106],[112,113],[112,78],[112,77],
-  // 113 チャットモンチー
-  [113,82],[113,103],[113,111],[113,112],[113,89],
-  // 114 東京スカパラダイスオーケストラ
-  [114,109],[114,7],[114,122],[114,123],[114,27],
-  // 115 Lucky Tapes
-  [115,30],[115,31],[115,104],[115,116],[115,91],
-  // 116 Yogee New Waves
-  [116,38],[116,104],[116,115],[116,83],[116,117],
-  // 117 中村佳穂
-  [117,43],[117,14],[117,90],[117,116],[117,124],
-  // 118 aiko
-  [118,6],[118,15],[118,98],[118,119],[118,95],
-  // 119 植田真梨恵
-  [119,15],[119,118],[119,87],[119,88],[119,75],
-  // 120 04 Limited Sazabys
-  [120,107],[120,108],[120,121],[120,96],[120,78],
-  // 121 BLUE ENCOUNT
-  [121,120],[121,107],[121,78],[121,97],[121,105],
-  // 122 サンボマスター
-  [122,106],[122,114],[122,103],[122,5],[122,47],
-  // 123 ハナレグミ
-  [123,7],[123,90],[123,91],[123,114],[123,30],
-  // 124 君島大空
-  [124,39],[124,101],[124,117],[124,99],[124,83],
-  // 125 キリンジ
-  [125,10],[125,30],[125,45],[125,115],[125,126],
-  // 126 Lamp
-  [126,45],[126,115],[126,125],[126,116],[126,90],
-  // 127 浜田省吾
-  [127,11],[127,16],[127,19],[127,103],[127,140],
-  // 128 SEKAI NO OWARI
-  [128,0],[128,12],[128,3],[128,75],[128,134],
-  // 129 Superfly
-  [129,9],[129,14],[129,8],[129,118],[129,135],
-  // 130 中森明菜
-  [130,131],[130,118],[130,9],[130,6],[130,135],
-  // 131 松任谷由実
-  [131,130],[131,118],[131,6],[131,10],[131,127],
-  // 132 岡崎体育
-  [132,0],[132,10],[132,20],[132,79],[132,134],
-  // 133 上田麗奈
-  [133,15],[133,75],[133,119],[133,138],[133,43],
-  // 134 菅田将暉
-  [134,0],[134,10],[134,128],[134,132],[134,20],
-  // 135 吉岡聖恵
-  [135,6],[135,118],[135,129],[135,15],[135,98],
-  // 136 mol-74
-  [136,32],[136,48],[136,83],[136,85],[136,137],
-  // 137 ハルカトミユキ
-  [137,136],[137,51],[137,82],[137,89],[137,113],
-  // 138 さユり
-  [138,15],[138,75],[138,133],[138,119],[138,18],
-  // 139 藤川千愛
-  [139,14],[139,138],[139,50],[139,81],[139,119],
-  // 140 真島昌利
-  [140,127],[140,16],[140,19],[140,103],[140,106],
-  // 141 たかやん
-  [141,0],[141,94],[141,95],[141,142],[141,80],
-  // 142 谷 雄貴
-  [142,141],[142,76],[142,80],[142,94],[142,56],
-  // 143 Omoinotake
-  [143,29],[143,30],[143,5],[143,31],[143,104],
-  // 144 凛として時雨
-  [144,105],[144,100],[144,102],[144,106],[144,7],
-  // 145 tohji
-  [145,93],[145,44],[145,52],[145,146],[145,21],
-  // 146 Kid Fresino
-  [146,52],[146,44],[146,145],[146,147],[146,148],
-  // 147 BIM
-  [147,146],[147,52],[147,145],[147,148],[147,21],
-  // 148 Budamunk
-  [148,146],[148,147],[148,52],[148,149],[148,44],
-  // 149 Dos Monos
-  [149,148],[149,146],[149,93],[149,44],[149,52],
+  // 75-86 の新接続
+  [25,75],[1,75],[15,75],[24,75],[19,75],
+  [30,76],[31,76],[14,76],[5,76],[15,76],
+  [11,77],[69,77],[13,77],[64,77],
+  [22,78],[41,78],[2,78],[55,78],[79,78],
+  [22,79],[55,79],[41,79],[2,79],[78,79],
+  [25,80],[73,80],[72,80],[26,80],
+  [25,81],[60,81],[71,81],[82,81],
+  [25,82],[26,82],[80,82],[81,82],[73,82],
+  [28,83],[46,83],[67,83],[51,83],
+  [16,84],[45,84],[49,84],[58,84],[74,84],
+  [27,85],[26,85],[1,85],[7,85],[16,85],
+  [2,86],[22,86],[34,86],[65,86],[41,86],
 ]
 
 // ════════════════ 銀河重力（BFS距離ベース） ════════════════
 // gravWeight: 1.0=お気に入り(中心引力), 0.4=直接つながり, 0.1=2hop, -(0.2~0.4)=無関係(外周)
 function updateGravityWeights(){
-  // お気に入りが0件なら重力なし（全星が外に押し出されるバグ防止）
-  const hasFav = stars.some(function(s){ return s.fav })
-  if(!hasFav){ stars.forEach(function(s){ s.gravWeight=0 }); return }
-
   const dist = new Array(stars.length).fill(Infinity)
   const queue = []
   stars.forEach(function(s,i){ if(s.fav){ dist[i]=0; queue.push(i) } })
@@ -1326,9 +950,9 @@ function updateGravityWeights(){
   }
   stars.forEach(function(s,i){
     const d=dist[i]
-    if(d===0)        s.gravWeight= 1.0   // お気に入り → 強く中心へ
-    else if(d===1)   s.gravWeight= 0.45  // 直接つながり
-    else if(d===2)   s.gravWeight= 0.15  // 2hop
+    if(d===0)        s.gravWeight= 1.8   // お気に入り → 強く中心へ
+    else if(d===1)   s.gravWeight= 0.55  // 直接つながり
+    else if(d===2)   s.gravWeight= 0.18  // 2hop
     else if(d===3)   s.gravWeight=-0.08  // 遠い
     else             s.gravWeight=-0.22  // 無関係 → 外周へ
   })
@@ -1647,105 +1271,104 @@ function drawComets(s, sx, sy, sr, op){
       ctx.beginPath(); ctx.arc(tx_,ty_,r_,0,Math.PI*2); ctx.fill()
     }
     const hx_=sx+Math.cos(angle)*orbitR
+    const hy_=sy+Math.sin(angle)*orbitR*c.tilt
     const depth=.4+.6*(Math.sin(angle-Math.PI*.5)*.5+.5)
-    const r_=Math.max(.6,(sr*.06+sr*.14)*zoom)
-    ctx.globalAlpha=op*c.bright*depth
-    ctx.fillStyle='#e8f0ff'
-    ctx.beginPath(); ctx.arc(hx_,hy_,r_,0,Math.PI*2); ctx.fill()
+    const hr=Math.max(.6,sr*.14*zoom)
+    const hg=ctx.createRadialGradient(hx_,hy_,0,hx_,hy_,hr*3.2)
+    hg.addColorStop(0,`rgba(255,255,255,${op*c.bright*depth})`)
+    hg.addColorStop(.4,`rgba(190,215,255,${op*c.bright*depth*.55})`)
+    hg.addColorStop(1,'rgba(150,190,255,0)')
+    ctx.globalAlpha=1
+    ctx.fillStyle=hg
+    ctx.beginPath(); ctx.arc(hx_,hy_,hr*3.2,0,Math.PI*2); ctx.fill()
   })
   ctx.globalAlpha=1
 }
 
 function drawStar(s){
-  const {dx:x,dy:y,r,col,opacity,fav,name,pulse,rising} = s
-  if(opacity<0.02) return
+  if(s.opacity<0.02) return
+  const [sx,sy]=w2s(s.dx,s.dy)
+  const sr=s.r*zoom*(1+s.pulse*.25)
+  if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
+  const op=s.opacity
 
-  const [sx,sy] = w2s(x,y)
-  const sr = Math.max(2, r*zoom)
-  const pScale = 1 + pulse*.25
-
-  // rising artist: red-orange radial glow behind star
-  if(rising){
-    const t=frame*.016
-    const pulseA = 0.35 + 0.22*Math.sin(t*2.2)
-    const rg = ctx.createRadialGradient(sx,sy,0,sx,sy,sr*5*pScale)
-    rg.addColorStop(0,`rgba(255,80,30,${pulseA*opacity})`)
-    rg.addColorStop(0.5,`rgba(255,40,10,${0.15*opacity})`)
-    rg.addColorStop(1,'rgba(255,20,0,0)')
-    ctx.fillStyle=rg
-    ctx.beginPath(); ctx.arc(sx,sy,sr*5*pScale,0,Math.PI*2); ctx.fill()
+  // ─ 急上昇アーティスト: 赤オレンジの脈動グロー ─
+  if(s.rising){
+    const pulse=Math.sin(frame*.045+s.fpx)*.5+.5
+    const risingR=sr*(3.8+pulse*1.2)
+    const rg=ctx.createRadialGradient(sx,sy,sr,sx,sy,risingR)
+    rg.addColorStop(0,`rgba(255,80,20,${.25*op*(.6+pulse*.4)})`)
+    rg.addColorStop(0.5,`rgba(255,140,30,${.12*op})`)
+    rg.addColorStop(1,'rgba(255,60,0,0)')
+    ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(sx,sy,risingR,0,Math.PI*2); ctx.fill()
   }
 
-  // outer glow
-  const g1 = ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5*pScale)
-  g1.addColorStop(0, hx(col,.28*opacity))
-  g1.addColorStop(1, hx(col,0))
-  ctx.fillStyle=g1
-  ctx.beginPath(); ctx.arc(sx,sy,sr*3.5*pScale,0,Math.PI*2); ctx.fill()
+  const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
+  g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)')
+  ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(sx,sy,sr*3.5,0,Math.PI*2); ctx.fill()
 
-  // core body
-  const g2 = ctx.createRadialGradient(sx,sy,0,sx,sy,sr*pScale)
-  g2.addColorStop(0,   hx(col, opacity))
-  g2.addColorStop(0.6, hx(col, .9*opacity))
-  g2.addColorStop(1,   hx(col, .35*opacity))
-  ctx.fillStyle=g2
-  ctx.beginPath(); ctx.arc(sx,sy,sr*pScale,0,Math.PI*2); ctx.fill()
+  const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sr)
+  g2.addColorStop(0,`rgba(255,255,255,${op})`)
+  g2.addColorStop(.6,`rgba(230,240,255,${.9*op})`)
+  g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
+  ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
 
-  // specular highlight
-  const g3 = ctx.createRadialGradient(sx-sr*.28,sy-sr*.28,0,sx,sy,sr*.7*pScale)
-  g3.addColorStop(0,`rgba(255,255,255,${.55*opacity})`)
-  g3.addColorStop(1,'rgba(255,255,255,0)')
-  ctx.fillStyle=g3
-  ctx.beginPath(); ctx.arc(sx,sy,sr*pScale,0,Math.PI*2); ctx.fill()
+  const photo=s.img
+  if(photo && photo.complete && photo.naturalWidth>0 && sr>=9){
+    ctx.save()
+    ctx.globalAlpha=op
+    const pr=sr*.9
+    ctx.beginPath(); ctx.arc(sx,sy,pr,0,Math.PI*2); ctx.clip()
+    ctx.drawImage(photo, sx-pr, sy-pr, pr*2, pr*2)
+    const vg=ctx.createRadialGradient(sx,sy,pr*.25,sx,sy,pr)
+    vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,15,.55)')
+    ctx.fillStyle=vg; ctx.fillRect(sx-pr,sy-pr,pr*2,pr*2)
+    ctx.restore()
+  }
 
-  // favourite ring
-  if(fav){
-    ctx.strokeStyle=`rgba(255,205,55,${.7*opacity})`
-    ctx.lineWidth=1.8
-    ctx.shadowColor=`rgba(255,180,30,${opacity})`
-    ctx.shadowBlur=10
-    ctx.beginPath(); ctx.arc(sx,sy,sr*1.7*pScale,0,Math.PI*2); ctx.stroke()
+  const specOp = photo && photo.complete ? .22 : .55
+  const g3=ctx.createRadialGradient(sx-sr*.28,sy-sr*.28,0,sx,sy,sr*.7)
+  g3.addColorStop(0,`rgba(255,255,255,${specOp*op})`); g3.addColorStop(1,'rgba(255,255,255,0)')
+  ctx.fillStyle=g3; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
+
+  if(s.fav){
+    ctx.strokeStyle=`rgba(255,205,55,${.7*op})`
+    ctx.lineWidth=Math.max(1,1.8*zoom)
+    ctx.shadowColor=`rgba(255,180,30,${op})`; ctx.shadowBlur=10
+    ctx.beginPath(); ctx.arc(sx,sy,sr*1.7,0,Math.PI*2); ctx.stroke()
     ctx.shadowBlur=0
+    if(sr>=5) drawComets(s,sx,sy,sr,op)
   }
 
-  // comets
-  drawComets(s, sx, sy, sr, opacity)
-
-  // label
-  ctx.shadowColor = fav ? `rgba(255,175,30,${opacity})` : `rgba(70,115,255,${opacity*.8})`
-  ctx.shadowBlur=7
-  ctx.fillStyle = fav ? `rgba(255,205,70,${opacity})` : `rgba(190,215,255,${opacity*.88})`
-  ctx.font=`500 11px -apple-system,'Helvetica Neue',sans-serif`
+  const fs=Math.max(9,Math.min(14,11*zoom))
+  ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
   ctx.textAlign='center'
-  ctx.fillText(name, sx, sy+sr*pScale+17)
+  // 急上昇アーティストは名前をオレンジに
+  if(s.rising){
+    ctx.shadowColor=`rgba(255,100,20,${op*.9})`
+    ctx.shadowBlur=8
+    ctx.fillStyle=`rgba(255,175,100,${op*.9})`
+  } else {
+    ctx.shadowColor=s.fav?`rgba(255,175,30,${op})`:`rgba(70,115,255,${op*.8})`
+    ctx.shadowBlur=7
+    ctx.fillStyle=s.fav?`rgba(255,205,70,${op})`:`rgba(190,215,255,${op*.88})`
+  }
+  ctx.fillText(s.name, sx, sy+sr+Math.max(12,17*zoom))
+
   ctx.shadowBlur=0
 }
 
-// ════════════════ MAIN LOOP ════════════════
 function loop(){
   requestAnimationFrame(loop)
   frame++
   const t = frame*.016
 
-  // physics
-  const LERP = .075
-  stars.forEach((s,i)=>{
-    s.opacity += (s.topacity-s.opacity)*LERP
-    if(s.pulse>0) s.pulse=Math.max(0,s.pulse-.04)
-    if(i===dragId){
-      s.vx=(s.vx+(s.tx-s.x)*.10)*.80
-      s.vy=(s.vy+(s.ty-s.y)*.10)*.80
-    } else {
-      s.vx=(s.vx+(s.tx-s.x)*.015)*.88
-      s.vy=(s.vy+(s.ty-s.y)*.015)*.88
-    }
-    s.x+=s.vx; s.y+=s.vy
-    const fa=(i===dragId)?0:(i===selId)?.25:1
-    s.dx=s.x+Math.sin(t*s.ffx+s.fpx)*s.fax*fa
-    s.dy=s.y+Math.cos(t*s.ffy+s.fpy)*s.fay*fa
-  })
+  if(!isPanning){
+    viewX+=panVX; viewY+=panVY
+    panVX*=.92; panVY*=.92
+  }
 
-  // repulsion
+  // ── 斥力 ──
   for(let i=0;i<stars.length;i++){
     for(let j=i+1;j<stars.length;j++){
       const a=stars[i], b=stars[j]
@@ -1761,61 +1384,77 @@ function loop(){
     }
   }
 
-  // BFS galaxy gravity (favorites → center, unrelated → periphery)
+  // ── 銀河重力（お気に入りBFSベース） ──
+  // selId<0（ホームモード）のときだけ作用
   if(selId < 0){
     stars.forEach(function(s,i){
       if(i===dragId) return
       const gw = s.gravWeight
       if(gw === undefined || gw === 0) return
+      // 原点(銀河中心)に向かう方向
       const d = Math.hypot(s.x, s.y) || 0.1
-      const f = gw * Math.min(d, 600) * 0.000032
+      // gw>0 → 中心引力、gw<0 → 外周への反発
+      // 強さは距離に比例（遠いほど強い引力/反発）
+      const f = gw * Math.min(d, 600) * 0.000025
       s.vx -= (s.x/d) * f * d
       s.vy -= (s.y/d) * f * d
     })
 
-    // お気に入り同士の直接スプリング（互いに引き合う）
-    const favIds = []
-    stars.forEach(function(s,i){ if(s.fav) favIds.push(i) })
-    for(var fi=0; fi<favIds.length-1; fi++){
-      for(var fj=fi+1; fj<favIds.length; fj++){
-        const ia=favIds[fi], ib=favIds[fj]
-        const a=stars[ia], b=stars[ib]
+    // ── お気に入り同士の直接引力（互いに引き合ってクラスター化） ──
+    const favIdx=[]
+    for(let i=0;i<stars.length;i++){ if(stars[i].fav) favIdx.push(i) }
+    for(let m=0;m<favIdx.length;m++){
+      for(let n=m+1;n<favIdx.length;n++){
+        const a=stars[favIdx[m]], b=stars[favIdx[n]]
+        if(favIdx[m]===dragId && favIdx[n]===dragId) continue
         const dx=b.x-a.x, dy=b.y-a.y
         const d=Math.hypot(dx,dy)||0.1
-        const target=240
-        if(d>target){
-          const f=(d-target)/d*0.035
-          if(ia!==dragId){ a.vx+=dx/d*f; a.vy+=dy/d*f }
-          if(ib!==dragId){ b.vx-=dx/d*f; b.vy-=dy/d*f }
+        const minD=(a.r+b.r)*3.2
+        if(d>minD){                       // 近すぎなければ引き合う
+          const f=Math.min(d,500)*0.00055
+          const nx=dx/d, ny=dy/d
+          if(favIdx[m]!==dragId){ a.vx+=nx*f*d; a.vy+=ny*f*d }
+          if(favIdx[n]!==dragId){ b.vx-=nx*f*d; b.vy-=ny*f*d }
         }
       }
     }
   }
 
-  // pan inertia
-  if(!isPanning){
-    viewX+=panVX; viewY+=panVY
-    panVX*=.92; panVY*=.92
-  }
-
-  // return button: show when <3 stars visible
-  if(frame % 60 === 0){
-    let visible=0
-    stars.forEach(function(s){
-      if(s.opacity<0.1) return
-      const sc=w2s(s.dx,s.dy)
-      if(sc[0]>-50&&sc[0]<W+50&&sc[1]>-50&&sc[1]<H+50) visible++
-    })
-    const rb=document.getElementById('return-btn')
-    if(visible<3) rb.classList.add('visible')
-    else rb.classList.remove('visible')
-  }
+  // ── 位置・速度更新 ──
+  stars.forEach((s,i)=>{
+    s.opacity += (s.topacity-s.opacity)*.07
+    if(s.pulse>0) s.pulse=Math.max(0,s.pulse-.04)
+    if(i===dragId){
+      s.vx=(s.vx+(s.tx-s.x)*.10)*.80
+      s.vy=(s.vy+(s.ty-s.y)*.10)*.80
+    } else {
+      s.vx=(s.vx+(s.tx-s.x)*.015)*.88
+      s.vy=(s.vy+(s.ty-s.y)*.015)*.88
+    }
+    s.x+=s.vx; s.y+=s.vy
+    const fa=(i===dragId)?0:(i===selId)?.25:1
+    s.dx=s.x+Math.sin(t*s.ffx+s.fpx)*s.fax*fa
+    s.dy=s.y+Math.cos(t*s.ffy+s.fpy)*s.fay*fa
+  })
 
   ctx.fillStyle='#000008'
   ctx.fillRect(0,0,W,H)
   drawBg(t)
   drawConnections()
   stars.forEach(drawStar)
+
+  // 復帰ボタン: 画面内の星が3つ未満なら表示
+  if(frame % 60 === 0){
+    var visible=0
+    stars.forEach(function(s){
+      if(s.opacity<0.1) return
+      var sc=w2s(s.dx,s.dy)
+      if(sc[0]>-50&&sc[0]<W+50&&sc[1]>-50&&sc[1]<H+50) visible++
+    })
+    var rb=document.getElementById('return-btn')
+    if(visible<3) rb.classList.add('visible')
+    else rb.classList.remove('visible')
+  }
 }
 
 // ════════════════ INTERACTION ════════════════
@@ -1892,7 +1531,6 @@ canvas.addEventListener('click',e=>{
   } else { if(selId>=0) clearSel() }
 })
 
-// touch
 let pinchStart=0, pinchZoomStart=1, pinchCX=0, pinchCY=0, pinchVX=0, pinchVY=0
 canvas.addEventListener('touchstart',e=>{
   if(e.touches.length===2){
@@ -1963,7 +1601,8 @@ function loadArtistPhoto(i){
   window[fn]=data=>{
     try{delete window[fn];sc.remove()}catch(e){}
     const pages=data?.query?.pages
-ages)[0]]
+    if(!pages) return
+    const page=pages[Object.keys(pages)[0]]
     const url=page?.thumbnail?.source
     if(!url) return
     const img=new Image()
@@ -2015,11 +1654,14 @@ function openPanel(id){
   document.getElementById('p-popbar').style.width = a.pop+'%'
   document.getElementById('p-popnum').textContent = a.pop
   const c='#'+a.col.toString(16).padStart(6,'0')
-  document.getElementById('p-tags').innerHTML='<span class="tag" style="border-color:'+c+'44;color:'+c+'">'+a.genre+'</span>'
-    +(a.rising?'<span class="tag tag-rising">急上昇</span>':'')
+  let tags='<span class="tag" style="border-color:'+c+'44;color:'+c+'">'+a.genre+'</span>'
+  if(a.rising) tags+='<span class="tag tag-rising">🔥 急上昇</span>'
+  document.getElementById('p-tags').innerHTML=tags
+
   const btn=document.getElementById('btn-reg')
   if(a.fav){btn.textContent='✓ 登録済み（解除）';btn.classList.add('on')}
   else     {btn.textContent='＋ お気に入りに登録';btn.classList.remove('on')}
+
   const ranks=['①','②','③']
   document.getElementById('p-songs').innerHTML=(a.songs||[]).map(function(s,i){
     const q=encodeURIComponent(a.name+' '+s)
@@ -2028,6 +1670,7 @@ function openPanel(id){
       +'<span class="song-title">'+s+'</span>'
       +'<span class="song-play">▶ YT</span></div>'
   }).join('')
+
   const rels=getRelated(id)
   document.getElementById('p-related').innerHTML=rels.map(function(rid){
     if(rid>=ARTISTS.length) return ''
@@ -2038,6 +1681,7 @@ function openPanel(id){
       +'<div class="rel-name">'+ra.name+'</div>'
       +'<div class="rel-pop">人気 '+ra.pop+'</div></div>'
   }).join('')
+
   updatePanelPhoto(id)
   loadArtistPhoto(id)
   getRelated(id).forEach(function(rid){ if(rid<ARTISTS.length) loadArtistPhoto(rid) })
@@ -2047,31 +1691,6 @@ function openPanel(id){
 
 function closePanel(){
   document.getElementById('panel').classList.remove('open')
-}
-
-// ════════════════ FAVORITES ════════════════
-function saveFavs(){
-  try{
-    const favIds = stars.map(function(s,i){return s.fav?i:-1}).filter(function(i){return i>=0})
-    localStorage.setItem('mv_favs', JSON.stringify(favIds))
-  }catch(e){ console.warn('saveFavs failed',e) }
-}
-
-function loadFavs(){
-  try{
-    const raw = localStorage.getItem('mv_favs')
-    if(!raw) return
-    const saved = JSON.parse(raw)
-    if(!Array.isArray(saved)) return
-    saved.forEach(function(i){
-      if(typeof i==='number' && i>=0 && i<stars.length){
-        stars[i].fav=true
-        ARTISTS[i].fav=true
-      }
-    })
-    document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
-    updateGravityWeights()
-  }catch(e){ console.warn('loadFavs failed',e) }
 }
 
 function toggleReg(){
@@ -2084,9 +1703,30 @@ function toggleReg(){
   else     {btn.textContent='＋ お気に入りに登録';btn.classList.remove('on')}
   document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
   if(a.fav) stars[selId].pulse=1
-  updateGravityWeights()
+  updateGravityWeights()   // BFS再計算
   renderFavList()
-  saveFavs()
+  saveFavs()               // localStorageへ永続化
+}
+
+// ════════════════ お気に入りの永続化（localStorage） ════════════════
+function saveFavs(){
+  try{
+    const ids = ARTISTS.filter(function(a){return a.fav}).map(function(a){return a.id})
+    localStorage.setItem('mv_favs', JSON.stringify(ids))
+  }catch(e){}
+}
+function loadFavs(){
+  try{
+    const raw = localStorage.getItem('mv_favs')
+    if(!raw) return
+    const ids = JSON.parse(raw)
+    if(!Array.isArray(ids)) return
+    const set = {}
+    ids.forEach(function(id){ set[id]=true })
+    ARTISTS.forEach(function(a,i){
+      if(set[a.id]){ a.fav=true; if(stars[i]) stars[i].fav=true }
+    })
+  }catch(e){}
 }
 
 function openYT(){
@@ -2098,7 +1738,7 @@ function openAM(){
   open('https://music.apple.com/jp/search?term='+encodeURIComponent(ARTISTS[selId].name),'_blank')
 }
 
-// ════════════════ SEARCH ════════════════
+// ════════════════ 検索機能 ════════════════
 const searchInput = document.getElementById('search-input')
 const searchResults = document.getElementById('search-results')
 
@@ -2114,11 +1754,12 @@ searchInput.addEventListener('input', function(){
     const c='#'+x.a.col.toString(16).padStart(6,'0')
     return '<div class="s-result" onclick="jumpToArtist('+x.i+')">'
       +'<div class="s-dot" style="background:'+c+'"></div>'
-      +'<div style="flex:1">'+x.a.name+(x.a.rising?' <span style="color:#f44">▲</span>':'')+'</div>'
+      +'<div style="flex:1">'+x.a.name+'</div>'
       +'<div class="s-genre">'+x.a.genre+'</div></div>'
   }).join('')
   searchResults.style.display='block'
 })
+
 searchInput.addEventListener('keydown', function(e){
   if(e.key==='Escape'){ searchInput.value=''; searchResults.style.display='none'; searchInput.blur() }
   if(e.key==='Enter'){
@@ -2128,31 +1769,36 @@ searchInput.addEventListener('keydown', function(e){
     if(idx>=0) jumpToArtist(idx)
   }
 })
+
 document.addEventListener('click', function(e){
   if(!e.target.closest('#search-wrap')) searchResults.style.display='none'
 })
+
 function jumpToArtist(id){
   searchResults.style.display='none'
-  searchInput.value=''; searchInput.blur()
+  searchInput.value=''
+  searchInput.blur()
   viewX=stars[id].x; viewY=stars[id].y
   zoom=1.2; panVX=0; panVY=0
   selectArtist(id)
   stars[id].pulse=1.2
 }
 
-// ════════════════ FAVORITES PANEL ════════════════
+// ════════════════ お気に入り一覧パネル ════════════════
 var favPanelOpen = false
+
 function toggleFavPanel(){
   favPanelOpen = !favPanelOpen
   const panel=document.getElementById('fav-panel')
   if(favPanelOpen){ renderFavList(); panel.classList.add('open') }
   else panel.classList.remove('open')
 }
+
 function renderFavList(){
   const favs = stars.map(function(s,i){return {s:s,i:i}}).filter(function(x){return x.s.fav})
   const list=document.getElementById('fav-list')
   if(!favs.length){
-    list.innerHTML='<div class="fp-empty">まだお気に入りがいません。<br>アーティストをクリックして登録してみましょう！</div>'
+    list.innerHTML='<div class="fp-empty">まだお気に入りがいません。<br>アーティストをクリックして<br>登録してみましょう！</div>'
     return
   }
   list.innerHTML=favs.map(function(x){
@@ -2165,17 +1811,18 @@ function renderFavList(){
   document.getElementById('fav-count').textContent=favs.length
 }
 
-// ════════════════ SNS SHARE ════════════════
+// ════════════════ SNSシェア ════════════════
 function shareApp(){
   const url=encodeURIComponent('https://musicvarce.vercel.app')
   const text=encodeURIComponent('✦ MUSIC VERSE — 音楽の宇宙を探検しよう！好きなアーティストが星になる音楽発見アプリ🌌')
   open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
 }
+
 function shareArtist(){
   if(selId<0) return
   const a=ARTISTS[selId]
   const url=encodeURIComponent('https://musicvarce.vercel.app')
-  const text=encodeURIComponent('✦ MUSIC VERSE で '+a.name+' を発見！音楽の宇宙を一緒に探検しよう🌌'+(a.rising?' ▲急上昇中！':''))
+  const text=encodeURIComponent('✦ MUSIC VERSE で '+a.name+' を発見！音楽の宇宙を一緒に探検しよう🌌'+(a.rising?' 🔥急上昇中！':''))
   open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
 }
 
@@ -2183,11 +1830,14 @@ function shareArtist(){
 function resetView(){
   viewX=0; viewY=0; zoom=0.60; panVX=0; panVY=0
   if(selId>=0) clearSel()
+  document.getElementById('return-btn').classList.remove('visible')
 }
+
 function doZoom(factor){
   zoom=Math.max(.15,Math.min(5,zoom*factor))
   panVX=0; panVY=0
 }
+
 addEventListener('keydown',function(e){
   if(document.activeElement===searchInput) return
   if(e.key==='Escape'){ if(selId>=0) clearSel(); if(favPanelOpen) toggleFavPanel() }
@@ -2196,6 +1846,7 @@ addEventListener('keydown',function(e){
   if(e.key==='0'){ resetView() }
   if(e.key==='f'||e.key==='F'){ toggleFavPanel() }
 })
+
 addEventListener('resize',function(){
   W=innerWidth; H=innerHeight
   canvas.width=W; canvas.height=H
@@ -2206,31 +1857,32 @@ function closeWelcome(){
   const el=document.getElementById('welcome')
   el.style.opacity='0'; el.style.pointerEvents='none'
   setTimeout(function(){el.style.display='none'},400)
-  try{localStorage.setItem('mv_welcomed','2')}catch(e){}
+  localStorage.setItem('mv_welcomed','2')
 }
 function maybeShowWelcome(){
-  try{ if(!localStorage.getItem('mv_welcomed')){
+  if(!localStorage.getItem('mv_welcomed')){
     const el=document.getElementById('welcome')
     el.style.display='flex'
     requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('show')})})
-  } }catch(e){}
+  }
 }
 
-// SW不要のため古いキャッシュを全消去
+// ════════════════ 旧Service Worker・キャッシュの完全除去 ════════════════
+// 以前のSWが古いHTMLをキャッシュし「更新が戻る／永久ローディング」の原因だったため除去
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    regs.forEach(function(r){ r.unregister() })
-  })
-  caches.keys().then(function(ks){ ks.forEach(function(k){ caches.delete(k) }) })
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    rs.forEach(function(r){ r.unregister() })
+  }).catch(function(){})
 }
-// ページを離れる直前にも保存
-window.addEventListener('beforeunload', saveFavs)
+if(window.caches && caches.keys){
+  caches.keys().then(function(ks){ ks.forEach(function(k){ caches.delete(k) }) }).catch(function(){})
+}
 
 // ════════════════ BOOT ════════════════
+loadFavs()               // 保存済みお気に入りを復元
+updateGravityWeights()   // 復元したお気に入りで重力を再計算
 placeHome()
 stars.forEach(function(s){ s.opacity=0 })
-loadFavs()
-updateGravityWeights()
 loop()
 
 setTimeout(function(){document.getElementById('load-sub').textContent='星間航路を確立中...'},700)
@@ -2242,14 +1894,15 @@ setTimeout(function(){
 },1800)
 
 setTimeout(function(){selectArtist(0)}, 2600)
+
 setTimeout(function(){
   ARTISTS.forEach(function(_,i){setTimeout(function(){loadArtistPhoto(i)}, i*140)})
 }, 3000)
+
 setTimeout(function(){maybeShowWelcome()}, 4500)
 setTimeout(function(){initLastFm()}, 5000)
 
 document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
 </script>
-
-
-</body></html>
+</body>
+</html>
