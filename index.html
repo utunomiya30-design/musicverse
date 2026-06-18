@@ -955,10 +955,10 @@ function updateGravityWeights(){
     if(s.fav){ s.gravWeight = 2.0; return }     // お気に入り → 中心に強く密集
     const c = favLinks[i]
     if(c>=4)        s.gravWeight =  0.30         // 多数つながり → 中心寄りの内側リング
-    else if(c===3)  s.gravWeight =  0.12
-    else if(c===2)  s.gravWeight = -0.05
-    else if(c===1)  s.gravWeight = -0.25         // 1本だけ → 中心の外側
-    else            s.gravWeight = -0.60         // 無関係 → 外周へ（中心とギャップ）
+    else if(c===3)  s.gravWeight =  0.10
+    else if(c===2)  s.gravWeight = -0.20
+    else if(c===1)  s.gravWeight = -0.55         // 1本だけ → 中心の外側
+    else            s.gravWeight = -1.05         // 無関係 → 外周へ大きく離す
   })
 }
 
@@ -1120,7 +1120,7 @@ const stars = ARTISTS.map((a,i)=>({
   opacity:0, topacity:1,
   fpx:Math.random()*Math.PI*2, fpy:Math.random()*Math.PI*2,
   fax:3+Math.random()*4, fay:3+Math.random()*4,
-  ffx:.06+Math.random()*.06, ffy:.06+Math.random()*.06,
+  ffx:.028+Math.random()*.028, ffy:.028+Math.random()*.028,
   vx:0, vy:0,
   pulse:0,
   comets: Array.from({length:3},(_,j)=>({
@@ -1432,8 +1432,9 @@ function loop(){
       s.vx=(s.vx+(s.tx-s.x)*.10)*.80
       s.vy=(s.vy+(s.ty-s.y)*.10)*.80
     } else {
-      s.vx=(s.vx+(s.tx-s.x)*.015)*.88
-      s.vy=(s.vy+(s.ty-s.y)*.015)*.88
+      // 油の中のような粘性のあるゆっくりした動き（弱いバネ＋強い摩擦）
+      s.vx=(s.vx+(s.tx-s.x)*.008)*.84
+      s.vy=(s.vy+(s.ty-s.y)*.008)*.84
     }
     s.x+=s.vx; s.y+=s.vy
     const fa=(i===dragId)?0:(i===selId)?.25:1
