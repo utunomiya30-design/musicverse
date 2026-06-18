@@ -1437,6 +1437,17 @@ function loop(){
       s.vy=(s.vy+(s.ty-s.y)*.008)*.84
     }
     s.x+=s.vx; s.y+=s.vy
+    // ── 外周のソフト境界：ある程度の距離でクッションのように減速して止める ──
+    if(i!==dragId){
+      const SOFT=900, RMAX=1250
+      const rr=Math.hypot(s.x,s.y)||0.1
+      if(rr>SOFT){
+        const nx=s.x/rr, ny=s.y/rr
+        const pull=(rr-SOFT)*0.06          // 外ほど強い内向きの力
+        s.vx-=nx*pull; s.vy-=ny*pull
+        if(rr>RMAX){ s.x=nx*RMAX; s.y=ny*RMAX } // 絶対上限（保険）
+      }
+    }
     const fa=(i===dragId)?0:(i===selId)?.25:1
     s.dx=s.x+Math.sin(t*s.ffx+s.fpx)*s.fax*fa
     s.dy=s.y+Math.cos(t*s.ffy+s.fpy)*s.fay*fa
