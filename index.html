@@ -2168,6 +2168,7 @@ function placeHome(){
 let selId = -1
 let favOnly = false        // お気に入りだけの宇宙モード
 let recommended = []       // おすすめTOP7（星インデックス配列）
+const repGrid = new Map()  // 斥力計算用の空間グリッド（毎フレーム再利用）
 
 function selectArtist(id){
   selId = id
@@ -2406,22 +2407,40 @@ function loop(){
     panVX*=.92; panVY*=.92
   }
 
-  // ── 斥力（近いペアのみ計算：高価なsqrt前にバウンディングボックスで早期スキップ） ──
+  // ── 斥力（空間グリッドで近傍セルだけ計算：結果は総当たりと同一・高速化のみ） ──
+  // CELL=160 は最大相互作用距離 (a.r+b.r)*2.4 ≒ 158 以上なので、隣接3×3セルで全ペアを網羅
   const SL=stars.length
+  const CELL=160
+  repGrid.clear()
   for(let i=0;i<SL;i++){
     const a=stars[i]
-    for(let j=i+1;j<SL;j++){
-      const b=stars[j]
-      const minD=(a.r+b.r)*2.4
-      const dx=b.x-a.x; if(dx>minD||dx<-minD) continue
-      const dy=b.y-a.y; if(dy>minD||dy<-minD) continue
-      const d2=dx*dx+dy*dy
-      if(d2<minD*minD){
-        const d=Math.sqrt(d2)||.1
-        const f=(minD-d)/minD*0.7
-        const nx=dx/d, ny=dy/d
-        if(i!==dragId){ a.vx-=nx*f; a.vy-=ny*f }
-        if(j!==dragId){ b.vx+=nx*f; b.vy+=ny*f }
+    const k=(Math.floor(a.x/CELL))*100000 + Math.floor(a.y/CELL)
+    let bk=repGrid.get(k); if(!bk){ bk=[]; repGrid.set(k,bk) }
+    bk.push(i)
+  }
+  for(let i=0;i<SL;i++){
+    const a=stars[i]
+    const cx=Math.floor(a.x/CELL), cy=Math.floor(a.y/CELL)
+    for(let gx=cx-1;gx<=cx+1;gx++){
+      for(let gy=cy-1;gy<=cy+1;gy++){
+        const bucket=repGrid.get(gx*100000+gy)
+        if(!bucket) continue
+        for(let bi=0;bi<bucket.length;bi++){
+          const j=bucket[bi]
+          if(j<=i) continue   // 各ペアを1回だけ・自分自身を除外
+          const b=stars[j]
+          const minD=(a.r+b.r)*2.4
+          const dx=b.x-a.x; if(dx>minD||dx<-minD) continue
+          const dy=b.y-a.y; if(dy>minD||dy<-minD) continue
+          const d2=dx*dx+dy*dy
+          if(d2<minD*minD){
+            const d=Math.sqrt(d2)||.1
+            const f=(minD-d)/minD*0.7
+            const nx=dx/d, ny=dy/d
+            if(i!==dragId){ a.vx-=nx*f; a.vy-=ny*f }
+            if(j!==dragId){ b.vx+=nx*f; b.vy+=ny*f }
+          }
+        }
       }
     }
   }
