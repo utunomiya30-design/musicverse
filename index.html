@@ -144,6 +144,36 @@ body {
 #universe-btn:hover { background:rgba(0,90,82,.4); border-color:rgba(60,220,200,.45); }
 #universe-btn.on { background:rgba(60,220,200,.32); color:#06201c; border-color:rgba(60,220,200,.7); }
 
+/* ジャンル色分けトグル */
+#genre-btn {
+  font-size:11px; color:rgba(210,200,255,.85); letter-spacing:.3px;
+  cursor:pointer; pointer-events:auto; flex-shrink:0;
+  padding:6px 12px; border-radius:16px;
+  background:rgba(40,30,70,.3); border:1px solid rgba(170,120,255,.22);
+  transition:all .18s; white-space:nowrap;
+}
+#genre-btn:hover { background:rgba(60,45,100,.45); border-color:rgba(170,120,255,.5); }
+#genre-btn.on { background:rgba(150,110,240,.34); color:#fff; border-color:rgba(190,150,255,.7); }
+
+/* ジャンル凡例バー */
+#genre-legend {
+  position:fixed; left:50%; bottom:62px; transform:translateX(-50%);
+  display:none; gap:6px; flex-wrap:wrap; justify-content:center;
+  max-width:94vw; z-index:160; pointer-events:auto;
+}
+#genre-legend.show { display:flex; }
+.gl-chip {
+  display:flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:11px; color:rgba(220,230,255,.82); cursor:pointer;
+  padding:5px 11px; border-radius:14px;
+  background:rgba(8,12,32,.72); border:1px solid rgba(120,150,255,.2);
+  backdrop-filter:blur(8px); transition:all .15s;
+}
+.gl-chip:hover { background:rgba(20,28,60,.85); }
+.gl-chip.on { border-color:rgba(255,255,255,.6); background:rgba(40,55,110,.85); color:#fff; }
+.gl-chip .sw { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+@media (max-width:520px){ #genre-legend{ bottom:74px; } .gl-chip{ font-size:10px; padding:4px 9px; } }
+
 /* ポスター保存ボタン（お気に入りパネル内） */
 #poster-btn {
   display:block; width:100%; margin-top:14px;
@@ -217,6 +247,17 @@ body {
 #btn-reg.on { background:linear-gradient(135deg,#ff8800,#ff3344); }
 .btn-link { background:rgba(255,255,255,.07); color:rgba(190,215,255,.85); border:1px solid rgba(255,255,255,.1); }
 .btn-link:hover { background:rgba(255,255,255,.11); }
+.listen-row { display:flex; gap:7px; margin-bottom:9px; }
+.svc {
+  flex:1; padding:11px 4px; border-radius:11px; border:none;
+  font-size:12px; font-weight:600; cursor:pointer; color:#fff; letter-spacing:.2px;
+  transition:opacity .15s, transform .1s; white-space:nowrap;
+}
+.svc:hover { opacity:.92; }
+.svc:active { transform:scale(.97); opacity:.85; }
+.svc-sp { background:#1DB954; }
+.svc-am { background:#fa233b; }
+.svc-yt { background:#FF0000; }
 #p-photo-wrap {
   width:82px; height:82px; border-radius:50%;
   margin:0 auto 16px; overflow:hidden; position:relative;
@@ -443,8 +484,22 @@ body {
   <!-- お気に入りの宇宙トグル -->
   <div id="universe-btn" onclick="toggleFavOnly()">✦ お気に入りの宇宙</div>
 
+  <!-- ジャンル色分けトグル -->
+  <div id="genre-btn" onclick="toggleGenreMode()">🎨 ジャンル</div>
+
   <!-- SNSシェアボタン -->
   <button id="share-btn" onclick="shareApp()">🐦 シェア</button>
+</div>
+
+<!-- ジャンル凡例＋フィルタ -->
+<div id="genre-legend">
+  <span class="gl-chip on" data-g="" onclick="setGenreFilter('')">すべて</span>
+  <span class="gl-chip" data-g="ロック" onclick="setGenreFilter('ロック')"><span class="sw" style="background:#ff5a5a"></span>ロック</span>
+  <span class="gl-chip" data-g="J-POP" onclick="setGenreFilter('J-POP')"><span class="sw" style="background:#4a9bff"></span>J-POP</span>
+  <span class="gl-chip" data-g="エレクトロ" onclick="setGenreFilter('エレクトロ')"><span class="sw" style="background:#b56cff"></span>エレクトロ</span>
+  <span class="gl-chip" data-g="ソウル/R&B" onclick="setGenreFilter('ソウル/R&B')"><span class="sw" style="background:#ffb13b"></span>ソウル/R&B</span>
+  <span class="gl-chip" data-g="インディー" onclick="setGenreFilter('インディー')"><span class="sw" style="background:#3fd68a"></span>インディー</span>
+  <span class="gl-chip" data-g="ヒップホップ" onclick="setGenreFilter('ヒップホップ')"><span class="sw" style="background:#9be23f"></span>ヒップホップ</span>
 </div>
 
 <!-- お気に入り一覧パネル -->
@@ -480,8 +535,12 @@ body {
   <button class="btn btn-link" id="btn-share-artist" onclick="shareArtist()">🐦 このアーティストをシェア</button>
   <div class="songs-hd">人気曲 TOP 3</div>
   <div id="p-songs"></div>
-  <button class="btn btn-link" onclick="openYT()">▶ YouTube で視聴</button>
-  <button class="btn btn-link" onclick="openAM()">♫ Apple Music で聴く</button>
+  <div class="songs-hd">今すぐ聴く</div>
+  <div class="listen-row">
+    <button class="svc svc-sp" onclick="openSpotify()">Spotify</button>
+    <button class="svc svc-am" onclick="openAM()">Apple Music</button>
+    <button class="svc svc-yt" onclick="openYT()">YouTube</button>
+  </div>
   <div class="related-hd">関連アーティスト</div>
   <div id="p-related"></div>
 </div>
@@ -1977,6 +2036,17 @@ const GENRE_ZONE = {
   'ヒップホップ':{ cx: 260, cy: 380, rx:220, ry:190 },
 }
 
+// ジャンル別カラー（凡例・色分け用）
+const GENRE_COLOR = {
+  'ロック':      0xff5a5a,
+  'J-POP':       0x4a9bff,
+  'エレクトロ':  0xb56cff,
+  'ソウル/R&B':  0xffb13b,
+  'インディー':  0x3fd68a,
+  'ヒップホップ':0x9be23f,
+}
+const GENRE_LIST = ['ロック','J-POP','エレクトロ','ソウル/R&B','インディー','ヒップホップ']
+
 // ════════════════ CANVAS SETUP ════════════════
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
@@ -2168,6 +2238,8 @@ function placeHome(){
 let selId = -1
 let favOnly = false        // お気に入りだけの宇宙モード
 let recommended = []       // おすすめTOP7（星インデックス配列）
+let genreMode = false      // ジャンル色分けモード
+let genreFilter = null     // 絞り込み中のジャンル（null=すべて）
 const repGrid = new Map()  // 斥力計算用の空間グリッド（毎フレーム再利用）
 
 function selectArtist(id){
@@ -2233,6 +2305,8 @@ function drawConnections(){
     const sa=stars[a], sb=stars[b]
     // お気に入り宇宙：お気に入り/おすすめ同士の線だけ表示
     if(favOnly && !((sa.fav||sa.recommended)&&(sb.fav||sb.recommended))) return
+    // ジャンル絞り込み：選択ジャンル内の線だけ表示
+    if(genreFilter && (sa.genre!==genreFilter || sb.genre!==genreFilter)) return
     const highlighted = selId>=0 && (a===selId||b===selId)
     const baseOp = Math.min(sa.opacity,sb.opacity)
     if(baseOp<0.02) return
@@ -2304,7 +2378,11 @@ function drawStar(s){
   const sx=s._sx, sy=s._sy                          // キャッシュ済み画面座標
   const sr=s.r*zoom*(1+s.pulse*.25)
   if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
-  const op=s.opacity
+  const dimmed = genreFilter && s.genre!==genreFilter
+  let op=s.opacity
+  if(dimmed) op*=0.10                                 // 絞り込み中は対象外をディム
+  const gc = genreMode ? (GENRE_COLOR[s.genre]||0x88aaff) : 0
+  const gR=(gc>>16)&255, gG=(gc>>8)&255, gB=gc&255
 
   // ─ 急上昇アーティスト: 赤オレンジの脈動グロー ─
   if(s.rising){
@@ -2320,14 +2398,20 @@ function drawStar(s){
   // 外側の柔らかいハロー（小さく表示される星では省略して軽量化）
   if(sr>3.4){
     const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
-    g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)')
+    if(genreMode){ g1.addColorStop(0,`rgba(${gR},${gG},${gB},${.32*op})`); g1.addColorStop(1,`rgba(${gR},${gG},${gB},0)`) }
+    else { g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)') }
     ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(sx,sy,sr*3.5,0,Math.PI*2); ctx.fill()
   }
 
   const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sr)
   g2.addColorStop(0,`rgba(255,255,255,${op})`)
-  g2.addColorStop(.6,`rgba(230,240,255,${.9*op})`)
-  g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
+  if(genreMode){
+    g2.addColorStop(.5,`rgba(${gR},${gG},${gB},${.95*op})`)
+    g2.addColorStop(1,`rgba(${gR},${gG},${gB},${.45*op})`)
+  } else {
+    g2.addColorStop(.6,`rgba(230,240,255,${.9*op})`)
+    g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
+  }
   ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
 
   const photo=s.img
@@ -2368,7 +2452,7 @@ function drawStar(s){
   }
 
   // ── 名前ラベル（ズームアウト時は重要な星以外を省略して軽量化） ──
-  const showLabel = zoom>0.5 || s.fav || s.rising || showRec || s===selStar()
+  const showLabel = !dimmed && (zoom>0.5 || s.fav || s.rising || showRec || s===selStar())
   if(showLabel){
     const fs=Math.max(9,Math.min(14,11*zoom))
     ctx.font=`500 ${fs}px -apple-system,'Helvetica Neue',sans-serif`
@@ -2833,6 +2917,28 @@ function toggleFavOnly(){
   document.getElementById('return-btn').classList.remove('visible')
 }
 
+// ════════════════ ジャンル色分け＋凡例フィルタ ════════════════
+function toggleGenreMode(){
+  genreMode=!genreMode
+  const btn=document.getElementById('genre-btn')
+  const leg=document.getElementById('genre-legend')
+  if(genreMode){ btn.classList.add('on'); leg.classList.add('show') }
+  else { btn.classList.remove('on'); leg.classList.remove('show'); genreFilter=null; updateLegendActive() }
+}
+function setGenreFilter(g){
+  if(!genreMode) return
+  genreFilter = (g==='' || genreFilter===g) ? null : g   // 同じジャンル再クリックで解除
+  updateLegendActive()
+}
+function updateLegendActive(){
+  const chips=document.querySelectorAll('#genre-legend .gl-chip')
+  for(let i=0;i<chips.length;i++){
+    const g=chips[i].getAttribute('data-g')
+    const active = (genreFilter===null && g==='') || (genreFilter===g)
+    chips[i].classList.toggle('on', active)
+  }
+}
+
 // ════════════════ お気に入りコレクションをポスター画像に書き出し ════════════════
 function rrect(c,x,y,w,h,r){
   c.beginPath()
@@ -2961,6 +3067,10 @@ function openYT(){
 function openAM(){
   if(selId<0) return
   open('https://music.apple.com/jp/search?term='+encodeURIComponent(ARTISTS[selId].name),'_blank')
+}
+function openSpotify(){
+  if(selId<0) return
+  open('https://open.spotify.com/search/'+encodeURIComponent(ARTISTS[selId].name),'_blank')
 }
 
 // ════════════════ 検索機能 ════════════════
