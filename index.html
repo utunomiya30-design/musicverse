@@ -2237,8 +2237,7 @@ function drawConnections(){
     const baseOp = Math.min(sa.opacity,sb.opacity)
     if(baseOp<0.02) return
 
-    const [ax,ay]=w2s(sa.dx,sa.dy)
-    const [bx,by]=w2s(sb.dx,sb.dy)
+    const ax=sa._sx, ay=sa._sy, bx=sb._sx, by=sb._sy   // キャッシュ済み画面座標
     if(Math.min(ax,bx)>W+60||Math.max(ax,bx)<-60||Math.min(ay,by)>H+60||Math.max(ay,by)<-60) return
 
     // お気に入り同士のラインは金色で強調
@@ -2302,7 +2301,7 @@ function drawComets(s, sx, sy, sr, op){
 function drawStar(s){
   if(s.opacity<0.02) return
   if(favOnly && !s.fav && !s.recommended) return   // お気に入り宇宙ではお気に入り＋おすすめのみ
-  const [sx,sy]=w2s(s.dx,s.dy)
+  const sx=s._sx, sy=s._sy                          // キャッシュ済み画面座標
   const sr=s.r*zoom*(1+s.pulse*.25)
   if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
   const op=s.opacity
@@ -2506,6 +2505,9 @@ function loop(){
     const fa=(i===dragId)?0:(i===selId)?.25:1
     s.dx=s.x+Math.sin(t*s.ffx+s.fpx)*s.fax*fa
     s.dy=s.y+Math.cos(t*s.ffy+s.fpy)*s.fay*fa
+    // 画面座標を1フレーム1回だけ数値でキャッシュ（描画でのw2s再計算と配列生成を回避）
+    s._sx=(s.dx-viewX)*zoom+W/2
+    s._sy=(s.dy-viewY)*zoom+H/2
   })
 
   ctx.fillStyle='#000008'
