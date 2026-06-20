@@ -2384,6 +2384,15 @@ function drawStar(s){
   const gc = genreMode ? (GENRE_COLOR[s.genre]||0x88aaff) : 0
   const gR=(gc>>16)&255, gG=(gc>>8)&255, gB=gc&255
 
+  // ── LOD：小さく見える星は1個の円で簡易描画（重いグラデ生成を省く） ──
+  // お気に入り/急上昇/おすすめは重要なので常にフル描画
+  if(sr<2.2 && !s.fav && !s.rising && !s.recommended){
+    ctx.globalAlpha=1
+    ctx.fillStyle = genreMode ? `rgba(${gR},${gG},${gB},${op})` : `rgba(226,236,255,${op})`
+    ctx.beginPath(); ctx.arc(sx,sy,Math.max(.8,sr),0,6.283); ctx.fill()
+    return
+  }
+
   // ─ 急上昇アーティスト: 赤オレンジの脈動グロー ─
   if(s.rising){
     const pulse=Math.sin(frame*.045+s.fpx)*.5+.5
@@ -2620,13 +2629,16 @@ let isPanning=false, panLX=0, panLY=0, panPrevLX=0, panPrevLY=0
 
 function findStar(mx,my){
   let found=-1,best=Infinity
-  stars.forEach((s,i)=>{
-    if(s.opacity<0.1) return
-    const [sx,sy]=w2s(s.dx,s.dy)
-    const d=Math.hypot(mx-sx,my-sy)
+  for(let i=0;i<stars.length;i++){
+    const s=stars[i]
+    if(s.opacity<0.1) continue
+    if(favOnly && !s.fav && !s.recommended) continue   // 表示中の星だけ選択可
+    if(genreFilter && s.genre!==genreFilter) continue
+    const dx=mx-s._sx, dy=my-s._sy
+    const d2=dx*dx+dy*dy
     const hitR=Math.max(14,s.r*zoom+10)
-    if(d<hitR&&d<best){best=d;found=i}
-  })
+    if(d2<hitR*hitR && d2<best){ best=d2; found=i }
+  }
   return found
 }
 
