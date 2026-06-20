@@ -2345,29 +2345,30 @@ function drawComets(s, sx, sy, sr, op){
     const angle=t*c.speed+c.phase
     const orbitR=sr*c.rMul
     const dir=Math.sign(c.speed)
-    const STEPS=12
+    const STEPS=8                       // 12→8（間隔を広げて尾の長さは維持）
+    ctx.fillStyle='#c8dcff'
     for(let i=STEPS;i>=0;i--){
-      const ta=angle-i*0.10*dir
+      const ta=angle-i*0.15*dir         // 0.10→0.15で同じ尾の長さ(0.8→1.2)を確保
       const tx_=sx+Math.cos(ta)*orbitR
       const ty_=sy+Math.sin(ta)*orbitR*c.tilt
       const ratio=(STEPS-i)/STEPS
       const depth=.38+.62*(Math.sin(ta-Math.PI*.5)*.5+.5)
       const r_=Math.max(.4,(sr*.04+ratio*sr*.11)*zoom)
       ctx.globalAlpha=ratio*ratio*op*c.bright*depth
-      ctx.fillStyle='#c8dcff'
-      ctx.beginPath(); ctx.arc(tx_,ty_,r_,0,Math.PI*2); ctx.fill()
+      ctx.beginPath(); ctx.arc(tx_,ty_,r_,0,6.283); ctx.fill()
     }
+    // 先端の光：グラデ生成をやめ、淡い円＋明るいコアの2枚で近似（見た目ほぼ同一）
     const hx_=sx+Math.cos(angle)*orbitR
     const hy_=sy+Math.sin(angle)*orbitR*c.tilt
     const depth=.4+.6*(Math.sin(angle-Math.PI*.5)*.5+.5)
     const hr=Math.max(.6,sr*.14*zoom)
-    const hg=ctx.createRadialGradient(hx_,hy_,0,hx_,hy_,hr*3.2)
-    hg.addColorStop(0,`rgba(255,255,255,${op*c.bright*depth})`)
-    hg.addColorStop(.4,`rgba(190,215,255,${op*c.bright*depth*.55})`)
-    hg.addColorStop(1,'rgba(150,190,255,0)')
-    ctx.globalAlpha=1
-    ctx.fillStyle=hg
-    ctx.beginPath(); ctx.arc(hx_,hy_,hr*3.2,0,Math.PI*2); ctx.fill()
+    const ha=op*c.bright*depth
+    ctx.globalAlpha=ha*.45
+    ctx.fillStyle='#bcd6ff'
+    ctx.beginPath(); ctx.arc(hx_,hy_,hr*2.6,0,6.283); ctx.fill()
+    ctx.globalAlpha=ha
+    ctx.fillStyle='#ffffff'
+    ctx.beginPath(); ctx.arc(hx_,hy_,hr*1.1,0,6.283); ctx.fill()
   })
   ctx.globalAlpha=1
 }
