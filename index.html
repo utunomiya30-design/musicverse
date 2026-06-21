@@ -383,6 +383,15 @@ body {
   #return-btn { bottom:14px; font-size:14px; padding:13px 30px; }
 }
 
+/* ══ パフォーマンス計測オーバーレイ（pキーで表示） ══ */
+#perf {
+  position:fixed; top:58px; left:14px; z-index:300; display:none;
+  font:11px/1.6 ui-monospace,Menlo,Consolas,monospace; color:#9af5c0;
+  background:rgba(0,8,20,.82); border:1px solid rgba(80,220,150,.35);
+  border-radius:8px; padding:6px 10px; pointer-events:none; white-space:pre;
+}
+#perf.on { display:block; }
+
 /* ══ HINT ══ */
 #hint {
   position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
@@ -571,6 +580,8 @@ body {
 
 <!-- モバイル用全体表示ボタン（星から迷子になったとき） -->
 <button id="return-btn" onclick="resetView()">⌂ 全体を表示</button>
+
+<div id="perf"></div>
 
 <div id="hint">クリックでアーティスト選択　・　スクロールでズーム　・　余白ドラッグで移動</div>
 
@@ -2357,6 +2368,32 @@ function drawConnections(){
   })
 }
 
+// 星本体スプライト（事前生成して使い回す＝毎フレームのグラデ生成を撤廃）
+let _sprites=null
+function buildStarSprites(){
+  const S=96, c2=S/2
+  function make(rgb){
+    const col=rgb||[180,200,255], cr=col[0],cg=col[1],cb=col[2]
+    const cv=document.createElement('canvas'); cv.width=cv.height=S
+    const x=cv.getContext('2d')
+    const g=x.createRadialGradient(c2,c2,0,c2,c2,c2)
+    g.addColorStop(0.00,'rgba(255,255,255,1)')
+    g.addColorStop(0.16,'rgba(238,244,255,0.96)')
+    g.addColorStop(0.275,'rgba('+cr+','+cg+','+cb+',0.55)')
+    g.addColorStop(0.30,'rgba('+cr+','+cg+','+cb+',0.22)')
+    g.addColorStop(1.00,'rgba('+cr+','+cg+','+cb+',0)')
+    x.fillStyle=g; x.fillRect(0,0,S,S)
+    const h=x.createRadialGradient(c2-7,c2-7,0,c2,c2,c2*0.275)
+    h.addColorStop(0,'rgba(255,255,255,0.5)'); h.addColorStop(1,'rgba(255,255,255,0)')
+    x.fillStyle=h; x.beginPath(); x.arc(c2,c2,c2*0.275,0,6.283); x.fill()
+    return cv
+  }
+  const genre={}
+  for(const k in GENRE_COLOR){ const v=GENRE_COLOR[k]; genre[k]=make([(v>>16)&255,(v>>8)&255,v&255]) }
+  _sprites={ base:make(null), genre:genre }
+}
+function spriteFor(s){ if(!_sprites) buildStarSprites(); return genreMode ? (_sprites.genre[s.genre]||_sprites.base) : _sprites.base }
+
 function drawStar(s){
   if(s.opacity<0.02) return
   if(favOnly && !s.fav && !s.recommended) return   // お気に入り宇宙ではお気に入り＋おすすめのみ
@@ -2389,43 +2426,35 @@ function drawStar(s){
     ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(sx,sy,risingR,0,Math.PI*2); ctx.fill()
   }
 
-  // 外側の柔らかいハロー（小さく表示される星では省略して軽量化）
-  if(sr>3.4){
-    const g1=ctx.createRadialGradient(sx,sy,0,sx,sy,sr*3.5)
-    if(genreMode){ g1.addColorStop(0,`rgba(${gR},${gG},${gB},${.32*op})`); g1.addColorStop(1,`rgba(${gR},${gG},${gB},0)`) }
-    else { g1.addColorStop(0,`rgba(210,225,255,${.22*op})`); g1.addColorStop(1,'rgba(180,200,255,0)') }
-    ctx.fillStyle=g1; ctx.beginPath(); ctx.arc(sx,sy,sr*3.5,0,Math.PI*2); ctx.fill()
-  }
-
-  const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sr)
-  g2.addColorStop(0,`rgba(255,255,255,${op})`)
-  if(genreMode){
-    g2.addColorStop(.5,`rgba(${gR},${gG},${gB},${.95*op})`)
-    g2.addColorStop(1,`rgba(${gR},${gG},${gB},${.45*op})`)
-  } else {
-    g2.addColorStop(.6,`rgba(230,240,255,${.9*op})`)
-    g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
-  }
-  ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
-
   if(sr>=9 && !s.imgTried) loadArtistPhoto(s.id)   // 表示サイズになった時だけ写真を取得
   const photo=s.img
-  if(photo && photo.complete && photo.naturalWidth>0 && sr>=9){
+  const photoReady = photo && photo.complete && photo.naturalWidth>0 && sr>=9
+  if(photoReady){
+    // 写真あり（拡大時・少数）：本体＋写真＋ハイライトを詳細描画
+    const g2=ctx.createRadialGradient(sx,sy,0,sx,sy,sr)
+    g2.addColorStop(0,`rgba(255,255,255,${op})`)
+    g2.addColorStop(.6,`rgba(230,240,255,${.9*op})`)
+    g2.addColorStop(1,`rgba(180,200,255,${.3*op})`)
+    ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(sx,sy,sr,0,6.283); ctx.fill()
     ctx.save()
     ctx.globalAlpha=op
     const pr=sr*.9
-    ctx.beginPath(); ctx.arc(sx,sy,pr,0,Math.PI*2); ctx.clip()
+    ctx.beginPath(); ctx.arc(sx,sy,pr,0,6.283); ctx.clip()
     ctx.drawImage(photo, sx-pr, sy-pr, pr*2, pr*2)
     const vg=ctx.createRadialGradient(sx,sy,pr*.25,sx,sy,pr)
     vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,15,.55)')
     ctx.fillStyle=vg; ctx.fillRect(sx-pr,sy-pr,pr*2,pr*2)
     ctx.restore()
+    const g3=ctx.createRadialGradient(sx-sr*.28,sy-sr*.28,0,sx,sy,sr*.7)
+    g3.addColorStop(0,`rgba(255,255,255,${.22*op})`); g3.addColorStop(1,'rgba(255,255,255,0)')
+    ctx.fillStyle=g3; ctx.beginPath(); ctx.arc(sx,sy,sr,0,6.283); ctx.fill()
+  } else {
+    // 写真なし（通常・大多数）：事前生成スプライトを1枚貼るだけ（グラデ生成ゼロ）
+    const R=sr*3.5
+    ctx.globalAlpha=op
+    ctx.drawImage(spriteFor(s), sx-R, sy-R, R*2, R*2)
+    ctx.globalAlpha=1
   }
-
-  const specOp = photo && photo.complete ? .22 : .55
-  const g3=ctx.createRadialGradient(sx-sr*.28,sy-sr*.28,0,sx,sy,sr*.7)
-  g3.addColorStop(0,`rgba(255,255,255,${specOp*op})`); g3.addColorStop(1,'rgba(255,255,255,0)')
-  ctx.fillStyle=g3; ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill()
 
   if(s.fav){
     ctx.strokeStyle=`rgba(255,205,55,${.7*op})`
@@ -2474,8 +2503,27 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
+const BUILD='build: 2026-06-21 perf4 (sprite+bg-layer+lazy-photo, no-comet)'
+console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
+let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
+function updatePerf(){
+  _fpsCount++
+  const now=performance.now()
+  if(now-_fpsLast>=500){
+    _fps=Math.round(_fpsCount*1000/(now-_fpsLast))
+    _fpsCount=0; _fpsLast=now
+    if(perfOn){
+      let vis=0; for(let i=0;i<stars.length;i++){ if(stars[i].opacity>=0.1) vis++ }
+      document.getElementById('perf').textContent=
+        _fps+' fps\n'+stars.length+' 星 / 表示'+vis+'\n線 '+CONNECTIONS.length+
+        '\nzoom '+zoom.toFixed(2)+(favOnly?'\nお気に入り宇宙':'')+(genreMode?'\nジャンル色':'')+'\n'+BUILD
+    }
+  }
+}
+
 function loop(){
   requestAnimationFrame(loop)
+  updatePerf()
   frame++
   const t = frame*.016
 
@@ -3191,6 +3239,7 @@ addEventListener('keydown',function(e){
   if(e.key==='-'||e.key==='_'){ doZoom(0.83) }
   if(e.key==='0'){ resetView() }
   if(e.key==='f'||e.key==='F'){ toggleFavPanel() }
+  if(e.key==='p'||e.key==='P'){ perfOn=!perfOn; document.getElementById('perf').classList.toggle('on',perfOn) }
 })
 
 addEventListener('resize',function(){
