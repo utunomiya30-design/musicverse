@@ -2348,22 +2348,22 @@ function drawConnections(){
     ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by)
 
     if(bothFav){
-      ctx.strokeStyle=`rgba(255,200,60,${.55*baseOp})`
-      ctx.lineWidth=Math.max(1,2.5*zoom)
-      ctx.shadowColor='rgba(255,160,20,.7)'; ctx.shadowBlur=10
-      ctx.stroke(); ctx.shadowBlur=0
+      // お気に入り同士（少数）：二重線でグロー感（shadowBlurは使わない）
+      ctx.strokeStyle=`rgba(255,180,40,${.3*baseOp})`
+      ctx.lineWidth=Math.max(2,4*zoom); ctx.stroke()
+      ctx.strokeStyle=`rgba(255,210,90,${.7*baseOp})`
+      ctx.lineWidth=Math.max(1,2*zoom); ctx.stroke()
     } else if(highlighted){
-      ctx.strokeStyle=`rgba(150,195,255,${.82*baseOp})`
-      ctx.lineWidth=Math.max(1.5,3*zoom)
-      ctx.shadowColor='rgba(100,170,255,.9)'; ctx.shadowBlur=14
-      ctx.stroke(); ctx.shadowBlur=0
-      ctx.strokeStyle=`rgba(220,235,255,${.55*baseOp})`
-      ctx.lineWidth=Math.max(.5,zoom); ctx.stroke()
+      // 選択中の関連線（少数）：二重線で強調
+      ctx.strokeStyle=`rgba(120,170,255,${.45*baseOp})`
+      ctx.lineWidth=Math.max(2,3.5*zoom); ctx.stroke()
+      ctx.strokeStyle=`rgba(210,230,255,${.85*baseOp})`
+      ctx.lineWidth=Math.max(.8,1.4*zoom); ctx.stroke()
     } else {
-      ctx.strokeStyle=`rgba(140,170,255,${.32*baseOp})`
+      // 通常線（大多数）：shadowBlurを廃止。明るさで視認性を確保
+      ctx.strokeStyle=`rgba(150,178,255,${.34*baseOp})`
       ctx.lineWidth=Math.max(.4,1.2*zoom)
-      ctx.shadowColor='rgba(100,140,255,.4)'; ctx.shadowBlur=3
-      ctx.stroke(); ctx.shadowBlur=0
+      ctx.stroke()
     }
   })
 }
@@ -2482,7 +2482,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-21 perf5 (photo-LOD17+no-shadow+label-LOD)'
+const BUILD='build: 2026-06-21 perf6 (connection shadowBlur removed)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
