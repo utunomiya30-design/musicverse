@@ -2551,6 +2551,7 @@ function drawStar(s){
   if(favOnly && !s.fav && !s.recommended) return   // お気に入り宇宙ではお気に入り＋おすすめのみ
   const sx=s._sx, sy=s._sy                          // キャッシュ済み画面座標
   const sr=s.r*zoom*(1+s.pulse*.25)
+  if(!isFinite(sx)||!isFinite(sy)||!isFinite(sr)) return   // NaN座標はdrawImage例外を防ぐためスキップ
   if(sx<-sr*5||sx>W+sr*5||sy<-sr*5||sy>H+sr*5) return
   const dimmed = genreFilter && s.genre!==genreFilter
   let op=s.opacity
@@ -2634,7 +2635,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-21 v8 (view-clamp fix + tuned slow-motion)'
+const BUILD='build: 2026-06-21 v9 (NaN self-heal: stars never vanish)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2662,6 +2663,10 @@ function loop(){
     viewX+=panVX; viewY+=panVY
     panVX*=.92; panVY*=.92
   }
+  // NaN安全網：view/zoom/panが非数になったら自動復帰（急に全星が消える不具合を防止）
+  if(!isFinite(viewX)||!isFinite(viewY)){ viewX=0; viewY=0; panVX=0; panVY=0 }
+  if(!isFinite(panVX)||!isFinite(panVY)){ panVX=0; panVY=0 }
+  if(!isFinite(zoom)||zoom<=0){ zoom=0.6 }
   // ビューを星の分布範囲内にクランプ（パンで「何もない空白」に出てしまうのを防止）
   const VLIM=1200
   if(viewX>VLIM){viewX=VLIM;panVX=0} else if(viewX<-VLIM){viewX=-VLIM;panVX=0}
@@ -2752,6 +2757,11 @@ function loop(){
       s.vy=(s.vy+(s.ty-s.y)*hk)*.82
     }
     s.x+=s.vx; s.y+=s.vy
+    // NaN自己修復：座標/速度/目標が非数になったらホーム（なければ原点）へ戻す
+    if(!isFinite(s.tx)) s.tx=0
+    if(!isFinite(s.ty)) s.ty=0
+    if(!isFinite(s.vx)||!isFinite(s.vy)){ s.vx=0; s.vy=0 }
+    if(!isFinite(s.x)||!isFinite(s.y)){ s.x=s.tx; s.y=s.ty; s.vx=0; s.vy=0 }
     // ── 外周のソフト境界：ある程度の距離でクッションのように減速して止める ──
     if(i!==dragId){
       const SOFT=1300, RMAX=1550            // リング(最大1180)の外側の保険境界
@@ -2872,7 +2882,7 @@ let pinchStart=0, pinchZoomStart=1, pinchCX=0, pinchCY=0, pinchVX=0, pinchVY=0
 canvas.addEventListener('touchstart',e=>{
   if(e.touches.length===2){
     const t0=e.touches[0],t1=e.touches[1]
-    pinchStart=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY)
+    pinchStart=Math.max(1,Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY))  // 0除算防止
     pinchZoomStart=zoom
     pinchCX=(t0.clientX+t1.clientX)/2; pinchCY=(t0.clientY+t1.clientY)/2
     pinchVX=viewX; pinchVY=viewY
