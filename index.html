@@ -2658,7 +2658,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v12 (auto-recover watchdog: stars come back)'
+const BUILD='build: 2026-06-22 v13 (watchdog v2: center-empty detection)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2812,18 +2812,17 @@ function loop(){
     s._sy=(s.dy-viewY)*zoom+H/2
   })
 
-  // ── 自動復活ウォッチドッグ：画面内に星が「完全にゼロ」の状態が約1.2秒続いたら復活 ──
-  // （起動直後のフェードインや、拡大表示で1個だけ見える状況では発動しない）
-  let onCount=0
+  // ── 自動復活ウォッチドッグ：画面の「中央領域」に星が1個も無い状態が約1.1秒続いたら復活 ──
+  // （端にかすった星は無視。拡大しすぎ＋端パンで星のない隙間を覗いた状態もこれで戻る）
+  let centerN=0
+  const mxL=W*0.15, mxR=W*0.85, myT=H*0.15, myB=H*0.85
   for(let i=0;i<SL;i++){ const s=stars[i]
-    if(isFinite(s._sx)&&isFinite(s._sy)&&s._sx>-60&&s._sx<W+60&&s._sy>-60&&s._sy<H+60&&s.opacity>0.04){
-      onCount++; break
-    }
+    if(s.opacity>0.1 && s._sx>mxL && s._sx<mxR && s._sy>myT && s._sy<myB){ centerN++; break }
   }
-  if(frame>240){
-    if(onCount===0) emptyFrames++; else emptyFrames=0
-    if(emptyFrames>72){ recoverStars(); emptyFrames=0 }
-  }
+  if(frame>240 && !isPanning && dragId<0){   // 操作中は発動しない（手を止めて空っぽの時だけ復活）
+    if(centerN===0) emptyFrames++; else emptyFrames=0
+    if(emptyFrames>66){ recoverStars(); emptyFrames=0 }
+  } else if(isPanning||dragId>=0){ emptyFrames=0 }
 
   ctx.fillStyle='#000008'
   ctx.fillRect(0,0,W,H)
