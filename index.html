@@ -2645,10 +2645,18 @@ function updatePerf(){
     _fps=Math.round(_fpsCount*1000/(now-_fpsLast))
     _fpsCount=0; _fpsLast=now
     if(perfOn){
-      let vis=0; for(let i=0;i<stars.length;i++){ if(stars[i].opacity>=0.1) vis++ }
+      let finiteN=0,onN=0
+      for(let i=0;i<stars.length;i++){ const s=stars[i]
+        if(isFinite(s._sx)&&isFinite(s._sy)){ finiteN++
+          if(s._sx>-50&&s._sx<W+50&&s._sy>-50&&s._sy<H+50&&s.opacity>0.05) onN++ }
+      }
+      const s0=stars[0]
       document.getElementById('perf').textContent=
-        _fps+' fps\n'+stars.length+' 星 / 表示'+vis+'\n線 '+CONNECTIONS.length+
-        '\nzoom '+zoom.toFixed(2)+(favOnly?'\nお気に入り宇宙':'')+(genreMode?'\nジャンル色':'')+'\n'+BUILD
+        _fps+' fps  '+stars.length+'星\n'+
+        'view '+Math.round(viewX)+','+Math.round(viewY)+'  z'+zoom.toFixed(2)+'\n'+
+        '有限座標 '+finiteN+' / 画面内 '+onN+'\n'+
+        's0 sx='+(isFinite(s0._sx)?Math.round(s0._sx):'NaN')+' x='+(isFinite(s0.x)?Math.round(s0.x):'NaN')+' op='+s0.opacity.toFixed(2)+'\n'+
+        (favOnly?'favのみ ':'')+(genreMode?'ジャンル色 ':'')+(selId>=0?'sel'+selId:'')+'\n'+BUILD
     }
   }
 }
