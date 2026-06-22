@@ -2450,6 +2450,29 @@ function clearSel(){
   document.getElementById('hint').textContent='クリックでアーティスト選択　・　スクロールでズーム　・　余白ドラッグで移動'
 }
 
+// ════════════════ 自動復活ウォッチドッグ ════════════════
+// 原因を問わず「星が画面から消えた状態」が続いたら、星をホームへ戻しビューを中心へ復帰
+let emptyFrames=0
+function recoverStars(){
+  for(let i=0;i<stars.length;i++){
+    const s=stars[i]
+    let hx=s.homeX, hy=s.homeY
+    if(!isFinite(hx)||!isFinite(hy)){
+      const z=GENRE_ZONE[s.genre]
+      hx=z?z.cx:0; hy=z?z.cy:0
+      // ゾーン内でばらけさせて重なりを避ける
+      hx+=(Math.random()-.5)*120; hy+=(Math.random()-.5)*120
+      s.homeX=hx; s.homeY=hy
+    }
+    s.x=hx; s.y=hy; s.tx=hx; s.ty=hy; s.dx=hx; s.dy=hy
+    s.vx=0; s.vy=0; s.topacity=1; s.opacity=Math.max(s.opacity,0.3)
+  }
+  selId=-1
+  viewX=0; viewY=0; zoom=0.6; panVX=0; panVY=0
+  if(typeof closePanel==='function') closePanel()
+  console.warn('watchdog: 星が消えたため自動復活しました')
+}
+
 // ════════════════ DRAW ════════════════
 let frame=0
 
@@ -2635,7 +2658,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v11 (draw try/catch net — canvas can never die)'
+const BUILD='build: 2026-06-22 v12 (auto-recover watchdog: stars come back)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2788,6 +2811,19 @@ function loop(){
     s._sx=(s.dx-viewX)*zoom+W/2
     s._sy=(s.dy-viewY)*zoom+H/2
   })
+
+  // ── 自動復活ウォッチドッグ：画面内に星が「完全にゼロ」の状態が約1.2秒続いたら復活 ──
+  // （起動直後のフェードインや、拡大表示で1個だけ見える状況では発動しない）
+  let onCount=0
+  for(let i=0;i<SL;i++){ const s=stars[i]
+    if(isFinite(s._sx)&&isFinite(s._sy)&&s._sx>-60&&s._sx<W+60&&s._sy>-60&&s._sy<H+60&&s.opacity>0.04){
+      onCount++; break
+    }
+  }
+  if(frame>240){
+    if(onCount===0) emptyFrames++; else emptyFrames=0
+    if(emptyFrames>72){ recoverStars(); emptyFrames=0 }
+  }
 
   ctx.fillStyle='#000008'
   ctx.fillRect(0,0,W,H)
