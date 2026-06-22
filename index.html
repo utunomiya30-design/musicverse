@@ -2634,7 +2634,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-21 v7 (song-fix + slow-motion + 450 artists)'
+const BUILD='build: 2026-06-21 v8 (view-clamp fix + tuned slow-motion)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2662,6 +2662,10 @@ function loop(){
     viewX+=panVX; viewY+=panVY
     panVX*=.92; panVY*=.92
   }
+  // ビューを星の分布範囲内にクランプ（パンで「何もない空白」に出てしまうのを防止）
+  const VLIM=1200
+  if(viewX>VLIM){viewX=VLIM;panVX=0} else if(viewX<-VLIM){viewX=-VLIM;panVX=0}
+  if(viewY>VLIM){viewY=VLIM;panVY=0} else if(viewY<-VLIM){viewY=-VLIM;panVY=0}
 
   // ── 斥力（空間グリッドで近傍セルだけ計算：結果は総当たりと同一・高速化のみ） ──
   // CELL=160 は最大相互作用距離 (a.r+b.r)*2.4 ≒ 158 以上なので、隣接3×3セルで全ペアを網羅
@@ -2743,9 +2747,9 @@ function loop(){
     } else {
       // 油の中のような粘性のあるゆっくりした動き（弱いバネ＋強い摩擦）
       // リング配置中は所属ゾーンの引力を弱め、半径はリングに、角度はジャンルに委ねる
-      const hk = (selId<0 && s.targetR!==undefined && s.targetR>=0) ? .0022 : .0045
-      s.vx=(s.vx+(s.tx-s.x)*hk)*.80
-      s.vy=(s.vy+(s.ty-s.y)*hk)*.80
+      const hk = (selId<0 && s.targetR!==undefined && s.targetR>=0) ? .003 : .006
+      s.vx=(s.vx+(s.tx-s.x)*hk)*.82
+      s.vy=(s.vy+(s.ty-s.y)*hk)*.82
     }
     s.x+=s.vx; s.y+=s.vy
     // ── 外周のソフト境界：ある程度の距離でクッションのように減速して止める ──
