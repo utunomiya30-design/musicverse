@@ -2635,7 +2635,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-21 v9 (NaN self-heal: stars never vanish)'
+const BUILD='build: 2026-06-22 v10 (pinch-zoom NaN fixed at source + self-heal)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2906,10 +2906,14 @@ canvas.addEventListener('touchmove',e=>{
   if(e.touches.length===2){
     const t0=e.touches[0],t1=e.touches[1]
     const d=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY)
-    const newZoom=Math.max(.15,Math.min(5,pinchZoomStart*d/pinchStart))
-    const wx=(pinchCX-W/2)/pinchZoomStart+pinchVX
-    const wy=(pinchCY-H/2)/pinchZoomStart+pinchVY
-    zoom=newZoom
+    // 0除算・NaNを徹底排除（ピンチで全星が消える不具合の根本対策）
+    const ps=(pinchStart>0)?pinchStart:(d||1)
+    const pzs=(isFinite(pinchZoomStart)&&pinchZoomStart>0)?pinchZoomStart:zoom
+    let nz=pzs*d/ps
+    if(!isFinite(nz)||nz<=0) nz=zoom
+    zoom=Math.max(.15,Math.min(5,nz))
+    const wx=(pinchCX-W/2)/pzs+pinchVX
+    const wy=(pinchCY-H/2)/pzs+pinchVY
     viewX=wx-(pinchCX-W/2)/zoom
     viewY=wy-(pinchCY-H/2)/zoom
     e.preventDefault(); return
