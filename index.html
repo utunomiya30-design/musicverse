@@ -2333,17 +2333,19 @@ function updateGravityWeights(){
       if(nx>=0){ dist[nx]=dist[cur]+1; queue.push(nx) }
     })
   }
-  // 中心コア＋5重リングの半径テーブル（好みが近いほど内側）
-  const RING=[360,560,760,960,1180]
+  // 中心コア＋7重リングの半径テーブル（好みが近いほど内側）
+  const RING=[300,440,580,720,870,1030,1200]
   stars.forEach(function(s,i){
     if(!anyFav){ s.targetR = -1; return }       // お気に入りゼロ → リング無効（通常配置）
     if(s.fav){ s.targetR = 0; s.radK = 0.007; return }  // 中心コア
     const h = dist[i]
-    if(h===1)      s.targetR = RING[0] - Math.min(favLinks[i],5)*16  // 直接つながり（ハブほど内側）
+    if(h===1)      s.targetR = RING[0] - Math.min(favLinks[i],5)*14  // 直接つながり（ハブほど内側）
     else if(h===2) s.targetR = RING[1]
     else if(h===3) s.targetR = RING[2]
     else if(h===4) s.targetR = RING[3]
-    else           s.targetR = RING[4]          // 5ホップ以上 or 到達不可 → 最外周
+    else if(h===5) s.targetR = RING[4]
+    else if(h===6) s.targetR = RING[5]
+    else           s.targetR = RING[6]          // 7ホップ以上 or 到達不可 → 最外周
     s.radK = 0.009
   })
 
@@ -2543,13 +2545,15 @@ function placeHome(){
     let x,y,ok=false,n=0
     while(!ok && n<150){
       if(zone && n<100){
-        // ジャンルゾーン内でランダム
-        x = zone.cx + (Math.random()-.5)*zone.rx*2
-        y = zone.cy + (Math.random()-.5)*zone.ry*2
+        // ジャンルゾーン内（楕円分布）
+        const ang=Math.random()*6.283, rr=Math.sqrt(Math.random())
+        x = zone.cx + Math.cos(ang)*zone.rx*rr
+        y = zone.cy + Math.sin(ang)*zone.ry*rr
       } else {
-        // フォールバック：全体ランダム
-        x = (Math.random()-.5)*1600
-        y = (Math.random()-.5)*1600
+        // フォールバック：横長の楕円ディスク（四角ではなく銀河っぽい円盤に）
+        const ang=Math.random()*6.283, rr=Math.sqrt(Math.random())
+        x = Math.cos(ang)*1000*rr
+        y = Math.sin(ang)*640*rr
       }
       ok = placed.every(p=>Math.hypot(p.x-x,p.y-y) > minD)
       n++
@@ -2819,7 +2823,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v17 (500 artists)'
+const BUILD='build: 2026-06-22 v18 (elliptical galaxy + 7 rings)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
