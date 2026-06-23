@@ -465,31 +465,30 @@ body {
 }
 #welcome-btn:hover { opacity:.88; }
 
-/* ══ LOADING ══ */
+/* ══ LOADING（コックピット＋ワープ演出） ══ */
 #loading {
-  position:fixed; inset:0; background:#000008;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  z-index:9999; transition:opacity 1s;
+  position:fixed; inset:0; background:#01030c; overflow:hidden;
+  z-index:9999; transition:opacity .9s ease;
 }
-.warp-wrap { position:relative; width:180px; height:180px; }
-.wring {
-  position:absolute; border-radius:50%;
-  border:1px solid rgba(90,140,255,.5);
-  top:0; left:0; width:100%; height:100%;
-  animation:wexpand 1.6s ease-out infinite;
-}
-.wring:nth-child(2){ animation-delay:.53s; }
-.wring:nth-child(3){ animation-delay:1.06s; }
-@keyframes wexpand {
-  0%  { transform:scale(0); opacity:.9; }
-  100%{ transform:scale(1); opacity:0; }
-}
-#load-title {
-  margin-top:36px; font-size:20px; font-weight:800; letter-spacing:5px;
-  background:linear-gradient(135deg,#88aaff,#bb66ff);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-}
-#load-sub { margin-top:8px; font-size:11px; color:rgba(168,192,255,.8); letter-spacing:2px; }
+#warpcv { position:absolute; inset:0; width:100%; height:100%; display:block; }
+/* 操縦席の窓枠（ビネット）＋HUD */
+#cockpit { position:absolute; inset:0; pointer-events:none;
+  box-shadow: inset 0 0 220px 60px rgba(0,2,12,.9), inset 0 0 60px 10px rgba(20,40,90,.25); }
+.hud-corner { position:absolute; width:54px; height:54px; border:2px solid rgba(120,180,255,.5); }
+.hud-corner.tl{ top:22px; left:22px; border-right:none; border-bottom:none; }
+.hud-corner.tr{ top:22px; right:22px; border-left:none; border-bottom:none; }
+.hud-corner.bl{ bottom:22px; left:22px; border-right:none; border-top:none; }
+.hud-corner.br{ bottom:22px; right:22px; border-left:none; border-top:none; }
+#hud-title { position:absolute; top:28px; left:50%; transform:translateX(-50%);
+  font:600 13px/1 ui-monospace,Menlo,Consolas,monospace; letter-spacing:3px;
+  color:rgba(150,200,255,.85); white-space:nowrap; }
+#hud-status { position:absolute; bottom:62px; left:50%; transform:translateX(-50%);
+  font:500 14px/1.4 ui-monospace,Menlo,Consolas,monospace; letter-spacing:1px; text-align:center;
+  color:rgba(175,218,255,.97); text-shadow:0 0 14px rgba(80,160,255,.6); white-space:nowrap; }
+#hud-readout { position:absolute; bottom:34px; left:50%; transform:translateX(-50%);
+  font:400 10px/1 ui-monospace,Menlo,Consolas,monospace; letter-spacing:2px;
+  color:rgba(110,150,255,.5); white-space:nowrap; }
+@media (max-width:520px){ #hud-title{font-size:11px;letter-spacing:2px} #hud-status{font-size:12px} #hud-readout{font-size:9px} }
 </style>
 </head>
 <body>
@@ -610,12 +609,14 @@ body {
 </div>
 
 <div id="loading">
-  <div class="warp-wrap">
-    <div class="wring"></div><div class="wring"></div><div class="wring"></div>
+  <canvas id="warpcv"></canvas>
+  <div id="cockpit">
+    <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
+    <div class="hud-corner bl"></div><div class="hud-corner br"></div>
+    <div id="hud-title">✦ MUSIC VERSE — NAVIGATION SYSTEM</div>
+    <div id="hud-status">SYSTEMS ONLINE ▸ 起動中...</div>
+    <div id="hud-readout">SECTOR: J-MUSIC · STARS: 500 · DRIVE: HYPER-A</div>
   </div>
-  <div id="load-title">MUSIC VERSE</div>
-  <div id="load-sub">音楽の宇宙を初期化中...</div>
-  <div style="margin-top:28px;font-size:10px;color:rgba(100,130,255,.3);letter-spacing:1.5px">DISCOVER YOUR MUSIC UNIVERSE</div>
 </div>
 
 <script>
@@ -2828,7 +2829,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v19 (recommendations up to 20, pop<80)'
+const BUILD='build: 2026-06-22 v20 (cockpit + hyperspace warp intro)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3669,20 +3670,65 @@ placeHome()
 stars.forEach(function(s){ s.opacity=0 })
 loop()
 
-setTimeout(function(){document.getElementById('load-sub').textContent='星間航路を確立中...'},700)
-setTimeout(function(){
-  const el=document.getElementById('loading')
-  el.style.opacity='0'
-  setTimeout(function(){el.style.display='none'},1000)
-  stars.forEach(function(s){s.topacity=1})
-},1800)
-
-setTimeout(function(){selectArtist(0)}, 2600)
+// ════════════════ イントロ：コックピット → ハイパースペース → 銀河到着 ════════════════
+function runIntro(){
+  const lo=document.getElementById('loading')
+  const cv=document.getElementById('warpcv')
+  if(!lo||!cv){ stars.forEach(function(s){s.topacity=1}); selectArtist(0); return }
+  const c=cv.getContext('2d')
+  let WW=innerWidth, WH=innerHeight
+  cv.width=WW; cv.height=WH
+  const hud=document.getElementById('hud-status')
+  const N=Math.min(520, Math.round(WW*WH/3200))   // 画面サイズに応じた星数
+  const S=[]
+  for(let i=0;i<N;i++) S.push({x:(Math.random()-.5)*WW, y:(Math.random()-.5)*WH, z:Math.random()*WW})
+  const onResize=function(){ WW=innerWidth; WH=innerHeight; cv.width=WW; cv.height=WH }
+  addEventListener('resize', onResize)
+  const t0=performance.now()
+  let done=false
+  function frame(){
+    const e=(performance.now()-t0)/1000
+    let speed
+    if(e<1.5) speed=0.8+e*0.7                 // 巡航（ゆっくり）
+    else      speed=2.4+Math.pow(e-1.5,2)*55  // ワープ加速
+    const cx=WW/2, cy=WH/2
+    c.fillStyle = e<1.5 ? 'rgba(1,3,14,0.55)' : 'rgba(1,3,14,0.22)'  // 残像トレイル
+    c.fillRect(0,0,WW,WH)
+    for(let i=0;i<N;i++){
+      const st=S[i], pz=st.z
+      st.z -= speed*7
+      if(st.z<1){ st.x=(Math.random()-.5)*WW; st.y=(Math.random()-.5)*WH; st.z=WW; continue }
+      const k1=170/pz, k2=170/st.z
+      const x1=cx+st.x*k1, y1=cy+st.y*k1
+      const x2=cx+st.x*k2, y2=cy+st.y*k2
+      const op=Math.min(1,(WW-st.z)/WW*1.3)
+      c.strokeStyle='rgba(195,222,255,'+op+')'
+      c.lineWidth=Math.min(3.6, k2*2)
+      c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke()
+    }
+    if(hud){
+      if(e<1.5)      hud.textContent='SYSTEMS ONLINE ▸ 銀河座標をロック中...'
+      else if(e<2.7) hud.innerHTML='⚡ HYPERSPACE JUMP ▸ ワープ中...'
+      else           hud.textContent='▸ 到着 — MUSIC VERSE'
+    }
+    if(e>2.55){ const f=Math.min(1,(e-2.55)/0.4); c.fillStyle='rgba(255,255,255,'+f+')'; c.fillRect(0,0,WW,WH) }
+    if(e<3.15){ requestAnimationFrame(frame) }
+    else if(!done){ done=true; endIntro() }
+  }
+  function endIntro(){
+    removeEventListener('resize', onResize)
+    stars.forEach(function(s){ s.topacity=1 })       // 銀河を出現させる（フェードイン）
+    lo.style.opacity='0'
+    setTimeout(function(){ lo.style.display='none' }, 900)
+    setTimeout(function(){ selectArtist(0) }, 650)
+    setTimeout(function(){ maybeShowWelcome() }, 1600)
+    setTimeout(function(){ initLastFm() }, 2200)
+  }
+  requestAnimationFrame(frame)
+}
+runIntro()
 
 // 写真は「画面内で十分大きく表示される星」だけ必要時に読み込む（起動時の400枚一括取得を廃止）
-
-setTimeout(function(){maybeShowWelcome()}, 4500)
-setTimeout(function(){initLastFm()}, 5000)
 
 document.getElementById('fav-count').textContent=stars.filter(function(s){return s.fav}).length
 </script>
