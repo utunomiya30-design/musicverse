@@ -2345,9 +2345,9 @@ function updateUFO(){
   ctx.beginPath(); ctx.ellipse(ux,uy,24,9,0,0,Math.PI*2); ctx.fill()
   // ドーム
   ctx.fillStyle='rgba(160,190,255,0.7)'
-  ctx.beginPath(); ctx.ellipse(ux,uy-7,12,8,0,Math.PI,0); ctx.fill()
-  // ライト
-  [-10,-4,2,8,14].forEach((lx,i)=>{
+  ctx.beginPath(); ctx.ellipse(ux,uy-7,12,8,0,Math.PI,0); ctx.fill();
+  // ライト（先頭にセミコロン必須：直前の ctx.fill() と [ がASIで繋がり undefined[14] になる事故を防ぐ）
+  ;[-10,-4,2,8,14].forEach((lx,i)=>{
     ctx.fillStyle=`hsl(${(frame*4+i*55)%360},90%,72%)`
     ctx.beginPath(); ctx.arc(ux+lx,uy+4,2.2,0,Math.PI*2); ctx.fill()
   })
@@ -2667,7 +2667,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v15 (surface hidden draw errors in p-overlay)'
+const BUILD='build: 2026-06-22 v16 (ROOT FIX: UFO ASI bug — undefined[14])'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
