@@ -2350,11 +2350,15 @@ function updateGravityWeights(){
   })
 
   // ── おすすめTOP7：お気に入りと最も多くつながる非お気に入りを抽出 ──
+  // 「みんな知ってる有名アーティスト」は発見にならないので人気度が高すぎるものは除外
+  const REC_MAX_POP = 80   // この人気度以上は除外（発見性重視）
   stars.forEach(function(s){ s.recommended=false; s.recRank=0 })
   recommended = []
   if(anyFav){
     const cand=[]
-    for(let i=0;i<N;i++){ if(!stars[i].fav && favLinks[i]>0) cand.push({i:i, c:favLinks[i], p:stars[i].pop}) }
+    for(let i=0;i<N;i++){
+      if(!stars[i].fav && favLinks[i]>0 && stars[i].pop < REC_MAX_POP) cand.push({i:i, c:favLinks[i], p:stars[i].pop})
+    }
     cand.sort(function(a,b){ return (b.c-a.c) || (b.p-a.p) })  // つながり数→人気度の順
     recommended = cand.slice(0,7).map(function(x){ return x.i })
     recommended.forEach(function(idx,rank){ stars[idx].recommended=true; stars[idx].recRank=rank+1 })
