@@ -2454,22 +2454,31 @@ function clearSel(){
 // 原因を問わず「星が画面から消えた状態」が続いたら、星をホームへ戻しビューを中心へ復帰
 let emptyFrames=0
 function recoverStars(){
-  for(let i=0;i<stars.length;i++){
-    const s=stars[i]
-    let hx=s.homeX, hy=s.homeY
-    if(!isFinite(hx)||!isFinite(hy)){
-      const z=GENRE_ZONE[s.genre]
-      hx=z?z.cx:0; hy=z?z.cy:0
-      // ゾーン内でばらけさせて重なりを避ける
-      hx+=(Math.random()-.5)*120; hy+=(Math.random()-.5)*120
-      s.homeX=hx; s.homeY=hy
-    }
-    s.x=hx; s.y=hy; s.tx=hx; s.ty=hy; s.dx=hx; s.dy=hy
-    s.vx=0; s.vy=0; s.topacity=1; s.opacity=Math.max(s.opacity,0.3)
-  }
   selId=-1
   viewX=0; viewY=0; zoom=0.6; panVX=0; panVY=0
   if(typeof closePanel==='function') closePanel()
+  // ホーム座標が壊れていたらジャンルゾーンから作り直す
+  for(let i=0;i<stars.length;i++){ const s=stars[i]
+    if(!isFinite(s.homeX)||!isFinite(s.homeY)){
+      const z=GENRE_ZONE[s.genre]
+      s.homeX=(z?z.cx:0)+(Math.random()-.5)*120
+      s.homeY=(z?z.cy:0)+(Math.random()-.5)*120
+    }
+  }
+  if(typeof updateGravityWeights==='function') updateGravityWeights()  // fav/recommendedを再計算
+  for(let i=0;i<stars.length;i++){ const s=stars[i]
+    let hx, hy, op=1
+    if(favOnly){
+      // お気に入りの宇宙：お気に入りは中心、おすすめはその周囲、他は隠す
+      if(s.fav){ hx=(Math.random()-.5)*160; hy=(Math.random()-.5)*160 }
+      else if(s.recommended){ const a=Math.random()*6.283; hx=Math.cos(a)*360; hy=Math.sin(a)*360 }
+      else { hx=s.homeX; hy=s.homeY; op=0.18 }
+    } else {
+      hx=s.homeX; hy=s.homeY
+    }
+    s.x=hx; s.y=hy; s.tx=hx; s.ty=hy; s.dx=hx; s.dy=hy
+    s.vx=0; s.vy=0; s.topacity=op; s.opacity=op
+  }
   console.warn('watchdog: 星が消えたため自動復活しました')
 }
 
@@ -2658,7 +2667,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v13 (watchdog v2: center-empty detection)'
+const BUILD='build: 2026-06-22 v14 (watchdog favOnly-aware + recover centers favs)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 function updatePerf(){
@@ -2817,6 +2826,8 @@ function loop(){
   let centerN=0
   const mxL=W*0.15, mxR=W*0.85, myT=H*0.15, myB=H*0.85
   for(let i=0;i<SL;i++){ const s=stars[i]
+    if(favOnly && !s.fav && !s.recommended) continue   // そのモードで実際に描かれる星だけ数える
+    if(genreFilter && s.genre!==genreFilter) continue
     if(s.opacity>0.1 && s._sx>mxL && s._sx<mxR && s._sy>myT && s._sy<myB){ centerN++; break }
   }
   if(frame>240 && !isPanning && dragId<0){   // 操作中は発動しない（手を止めて空っぽの時だけ復活）
