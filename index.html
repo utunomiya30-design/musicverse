@@ -2829,7 +2829,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v20 (cockpit + hyperspace warp intro)'
+const BUILD='build: 2026-06-22 v21 (Wikipedia-search artist images)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3170,45 +3170,38 @@ canvas.addEventListener('touchend',e=>{
 })
 
 // ════════════════ ARTIST PHOTOS ════════════════
+// Wikipedia検索で「一番それらしいページ」を見つけて画像を取得（タイトル完全一致に依存しない）
 function loadArtistPhoto(i){
   if(stars[i].imgTried) return
   stars[i].imgTried=true
-  const fn='_wp'+i+'x'+Math.random().toString(36).slice(2)
-  const q=encodeURIComponent(ARTISTS[i].name)
+  tryWikiPhoto(i, 'ja')
+}
+function tryWikiPhoto(i, lang){
+  const fn='_wp'+lang+i+'_'+Math.random().toString(36).slice(2)
+  const name=ARTISTS[i].name
   const sc=document.createElement('script')
+  const cleanup=()=>{ try{delete window[fn]}catch(e){} try{sc.remove()}catch(e){} }
   window[fn]=data=>{
-    try{delete window[fn];sc.remove()}catch(e){}
-    const pages=data?.query?.pages
-    if(!pages) return
-    const page=pages[Object.keys(pages)[0]]
-    const url=page?.thumbnail?.source
-    if(!url) return
-    const img=new Image()
-    img.crossOrigin='anonymous'; img.src=url
-    img.onload=()=>{ stars[i].img=img; if(i===selId) updatePanelPhoto(i) }
-  }
-  sc.onerror=()=>{
-    try{delete window[fn];sc.remove()}catch(e){}
-    if(!stars[i].imgTriedEn){
-      stars[i].imgTriedEn=true
-      const fn2='_we'+i+'x'+Math.random().toString(36).slice(2)
-      const sc2=document.createElement('script')
-      window[fn2]=data=>{
-        try{delete window[fn2];sc2.remove()}catch(e){}
-        const pages=data?.query?.pages
-        if(!pages) return
-        const page=pages[Object.keys(pages)[0]]
-        const url=page?.thumbnail?.source
-        if(!url) return
-        const img=new Image()
-        img.crossOrigin='anonymous'; img.src=url
-        img.onload=()=>{ stars[i].img=img; if(i===selId) updatePanelPhoto(i) }
-      }
-      sc2.src='https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(ARTISTS[i].name)+'&prop=pageimages&format=json&pithumbsize=300&callback='+fn2
-      document.head.appendChild(sc2)
+    cleanup()
+    let url=null
+    const pages=data&&data.query&&data.query.pages
+    if(pages){
+      // 検索順位(index)が上のページから順に、サムネを持つ最初のものを採用
+      const arr=Object.keys(pages).map(k=>pages[k]).sort((a,b)=>(a.index||99)-(b.index||99))
+      for(let j=0;j<arr.length;j++){ const t=arr[j]&&arr[j].thumbnail; if(t&&t.source){ url=t.source; break } }
+    }
+    if(url){
+      const img=new Image()
+      img.crossOrigin='anonymous'; img.src=url
+      img.onload=()=>{ stars[i].img=img; if(i===selId) updatePanelPhoto(i) }
+    } else if(lang==='ja'){
+      tryWikiPhoto(i,'en')   // 日本語版で見つからなければ英語版を検索
     }
   }
-  sc.src='https://ja.wikipedia.org/w/api.php?action=query&titles='+q+'&prop=pageimages&format=json&pithumbsize=300&callback='+fn
+  sc.onerror=()=>{ cleanup(); if(lang==='ja') tryWikiPhoto(i,'en') }
+  const base = lang==='ja' ? 'https://ja.wikipedia.org' : 'https://en.wikipedia.org'
+  sc.src=base+'/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(name)+
+         '&gsrlimit=4&prop=pageimages&piprop=thumbnail&pithumbsize=320&format=json&redirects=1&callback='+fn
   document.head.appendChild(sc)
 }
 
