@@ -2667,9 +2667,10 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v14 (watchdog favOnly-aware + recover centers favs)'
+const BUILD='build: 2026-06-22 v15 (surface hidden draw errors in p-overlay)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
+let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
 function updatePerf(){
   _fpsCount++
   const now=performance.now()
@@ -2688,7 +2689,8 @@ function updatePerf(){
         'view '+Math.round(viewX)+','+Math.round(viewY)+'  z'+zoom.toFixed(2)+'\n'+
         '有限座標 '+finiteN+' / 画面内 '+onN+'\n'+
         's0 sx='+(isFinite(s0._sx)?Math.round(s0._sx):'NaN')+' x='+(isFinite(s0.x)?Math.round(s0.x):'NaN')+' op='+s0.opacity.toFixed(2)+'\n'+
-        (favOnly?'favのみ ':'')+(genreMode?'ジャンル色 ':'')+(selId>=0?'sel'+selId:'')+'\n'+BUILD
+        (favOnly?'favのみ ':'')+(genreMode?'ジャンル色 ':'')+(selId>=0?'sel'+selId:'')+'\n'+
+        (_drawErrN>0?('⚠描画エラー'+_drawErrN+': '+_lastDrawErr+'\n'):'')+BUILD
     }
   }
 }
@@ -2839,11 +2841,15 @@ function loop(){
   ctx.fillRect(0,0,W,H)
   // 描画は最終防御で囲う：万一どこかで例外が出ても画面を死なせず、次フレームで自己修復
   try {
-    drawBg(t)
-    drawConnections()
-    for(let i=0;i<stars.length;i++){ try{ drawStar(stars[i]) }catch(e){} }
+    try{ drawBg(t) }catch(e){ _drawErrN++; _lastDrawErr='bg: '+((e&&e.message)||e) }
+    try{ drawConnections() }catch(e){ _drawErrN++; _lastDrawErr='conn: '+((e&&e.message)||e) }
+    for(let i=0;i<stars.length;i++){
+      try{ drawStar(stars[i]) }
+      catch(e){ _drawErrN++; _lastDrawErr='star'+i+'('+(stars[i]&&stars[i].name)+'): '+((e&&e.message)||e)
+        if(_drawErrN<=3) console.error('drawStar error', i, stars[i]&&stars[i].name, e) }
+    }
   } catch(err){
-    if(!window._drawErrLogged){ window._drawErrLogged=true; console.warn('draw error (self-recovering):', err) }
+    _drawErrN++; _lastDrawErr='loop: '+((err&&err.message)||err)
   }
 
   // 復帰ボタン: 画面内の星が3つ未満なら表示
