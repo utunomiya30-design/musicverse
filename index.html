@@ -607,6 +607,8 @@ body {
 
 <button type="button" id="discover-fab" onclick="discoverRandom()" aria-label="ランダムにアーティストを発見">🎲 発見</button>
 
+<div id="ad-slot" aria-hidden="true" style="display:none"></div>
+
 <div id="welcome">
   <div id="welcome-box">
     <h2>✦ MUSIC VERSE</h2>
@@ -3008,7 +3010,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-24 v24 (discover+rising filter)'
+const BUILD='build: 2026-06-24 v25 (monetize scaffold)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3678,6 +3680,42 @@ function esc(str){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]
   })
 }
+
+// ════════════════ 収益化(受け皿): 値を入れると有効化。空なら従来通り ════════════════
+// 取得は社長。Apple Musicアフィリ=at= / Amazonアソシエイト=tag= / AdSense=ca-pub-
+const MONETIZE = {
+  appleMusicToken: '',   // 例: 'xxxxxxxx'(Apple Music アフィリエイト at トークン)
+  amazonTag: '',         // 例: 'yourtag-22'(Amazon アソシエイトタグ)
+  adsense: { client:'', slot:'', enabled:false }  // 例: client:'ca-pub-XXXX', slot:'1234567890'
+}
+function withParam(url, key, val){
+  if(!val) return url
+  return url + (url.indexOf('?')>=0 ? '&' : '?') + key + '=' + encodeURIComponent(val)
+}
+function amURL(name){
+  return withParam('https://music.apple.com/jp/search?term='+encodeURIComponent(name), 'at', MONETIZE.appleMusicToken)
+}
+function amazonMusicURL(name){
+  return withParam('https://www.amazon.co.jp/s?k='+encodeURIComponent(name+' 音楽')+'&i=digital-music', 'tag', MONETIZE.amazonTag)
+}
+function initAds(){
+  var a=MONETIZE.adsense
+  if(!a || !a.enabled || !a.client || !a.slot) return   // 受け皿: 未設定なら何もしない(広告を一切読み込まない)
+  try{
+    var s=document.createElement('script')
+    s.async=true
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+encodeURIComponent(a.client)
+    s.crossOrigin='anonymous'
+    document.head.appendChild(s)
+    var box=document.getElementById('ad-slot')
+    if(box){
+      box.style.display='block'
+      box.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+a.client+'" data-ad-slot="'+a.slot+'" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+      ;(window.adsbygoogle=window.adsbygoogle||[]).push({})
+    }
+  }catch(e){}
+}
+
 // 曲をYouTube検索で開く（インデックス渡しで文字列エスケープ事故を防止）
 function playSong(aid, si){
   const a=ARTISTS[aid]
@@ -3691,7 +3729,7 @@ function openYT(){
 }
 function openAM(){
   if(selId<0) return
-  open('https://music.apple.com/jp/search?term='+encodeURIComponent(ARTISTS[selId].name),'_blank')
+  open(amURL(ARTISTS[selId].name),'_blank')
 }
 function openSpotify(){
   if(selId<0) return
@@ -3875,6 +3913,7 @@ updateGravityWeights()   // 復元したお気に入りで重力を再計算
 placeHome()
 stars.forEach(function(s){ s.opacity=0 })
 loop();
+initAds();
 
 (function(){
   var h=document.getElementById('hint')
