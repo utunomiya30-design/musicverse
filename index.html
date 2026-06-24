@@ -400,6 +400,14 @@ body {
   transition:opacity .4s; white-space:nowrap;
 }
 
+#help-fab{
+  position:fixed; left:14px; bottom:16px; z-index:60;
+  font-size:12px; padding:7px 12px; border-radius:999px;
+  border:1px solid rgba(150,180,255,.35);
+  background:rgba(10,16,40,.72); color:rgba(200,218,255,.95);
+  cursor:pointer; font-family:inherit;
+}
+
 /* ══ MOBILE ══ */
 @media (max-width:520px) {
   #panel {
@@ -426,7 +434,7 @@ body {
   }
   #fav-panel.open { bottom:0; left:auto !important; }
   #controls { bottom:20px; right:12px; }
-  #hint { display:none; }
+  #hint { display:block; bottom:64px; font-size:10px; white-space:normal; max-width:86vw; line-height:1.5; }
   #search-wrap { max-width:130px; }
   #logo { font-size:13px; letter-spacing:2px; }
 }
@@ -583,6 +591,8 @@ body {
 <div id="perf"></div>
 
 <div id="hint">クリックでアーティスト選択　・　スクロールでズーム　・　余白ドラッグで移動</div>
+
+<button type="button" id="help-fab" onclick="openWelcome()" aria-label="使い方を見る">？ 使い方</button>
 
 <div id="welcome">
   <div id="welcome-box">
@@ -2981,7 +2991,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-22 v22 (550 artists)'
+const BUILD='build: 2026-06-24 v23 (SEO+intro skip+help)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3797,6 +3807,13 @@ function maybeShowWelcome(){
   }
 }
 
+function openWelcome(){
+  var el=document.getElementById('welcome')
+  if(!el) return
+  el.style.display='flex'
+  requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('show')})})
+}
+
 // ════════════════ 旧Service Worker・キャッシュの完全除去 ════════════════
 // 以前のSWが古いHTMLをキャッシュし「更新が戻る／永久ローディング」の原因だったため除去
 if('serviceWorker' in navigator){
@@ -3813,7 +3830,14 @@ loadFavs()               // 保存済みお気に入りを復元
 updateGravityWeights()   // 復元したお気に入りで重力を再計算
 placeHome()
 stars.forEach(function(s){ s.opacity=0 })
-loop()
+loop();
+
+(function(){
+  var h=document.getElementById('hint')
+  if(h && window.matchMedia && matchMedia('(pointer:coarse)').matches){
+    h.textContent='タップで選択　・　ピンチでズーム　・　ドラッグで移動'
+  }
+})()
 
 // ════════════════ イントロ：コックピット → ハイパースペース → 銀河到着 ════════════════
 function runIntro(){
