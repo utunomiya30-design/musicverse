@@ -400,6 +400,14 @@ body {
   transition:opacity .4s; white-space:nowrap;
 }
 
+#discover-fab{
+  position:fixed; left:14px; bottom:58px; z-index:60;
+  font-size:12px; padding:7px 12px; border-radius:999px;
+  border:1px solid rgba(150,180,255,.35);
+  background:rgba(10,16,40,.72); color:rgba(200,218,255,.95);
+  cursor:pointer; font-family:inherit;
+}
+
 #help-fab{
   position:fixed; left:14px; bottom:16px; z-index:60;
   font-size:12px; padding:7px 12px; border-radius:999px;
@@ -521,6 +529,9 @@ body {
   <!-- ジャンル色分けトグル -->
   <button type="button" id="genre-btn" onclick="toggleGenreMode()" aria-pressed="false"><span aria-hidden="true">🎨</span> ジャンル</button>
 
+  <!-- 急上昇だけトグル -->
+  <button type="button" id="rising-btn" onclick="toggleRisingOnly()" aria-pressed="false"><span aria-hidden="true">🔥</span> 急上昇だけ</button>
+
   <!-- SNSシェアボタン -->
   <button type="button" id="share-btn" onclick="shareApp()"><span aria-hidden="true">🐦</span> シェア</button>
 </div>
@@ -593,6 +604,8 @@ body {
 <div id="hint">クリックでアーティスト選択　・　スクロールでズーム　・　余白ドラッグで移動</div>
 
 <button type="button" id="help-fab" onclick="openWelcome()" aria-label="使い方を見る">？ 使い方</button>
+
+<button type="button" id="discover-fab" onclick="discoverRandom()" aria-label="ランダムにアーティストを発見">🎲 発見</button>
 
 <div id="welcome">
   <div id="welcome-box">
@@ -2735,6 +2748,7 @@ function placeHome(){
 // ════════════════ LAYOUT ════════════════
 let selId = -1
 let favOnly = false        // お気に入りだけの宇宙モード
+let risingOnly = false     // 急上昇だけのモード
 let recommended = []       // おすすめTOP7（星インデックス配列）
 let genreMode = false      // ジャンル色分けモード
 let genreFilter = null     // 絞り込み中のジャンル（null=すべて）
@@ -2842,6 +2856,8 @@ function drawConnections(){
     const sa=stars[a], sb=stars[b]
     // お気に入り宇宙：お気に入り/おすすめ同士の線だけ表示
     if(favOnly && !((sa.fav||sa.recommended)&&(sb.fav||sb.recommended))) return
+    // 急上昇だけ：rising同士の線だけ表示
+    if(risingOnly && !(sa.rising && sb.rising)) return
     // ジャンル絞り込み：選択ジャンル内の線だけ表示
     if(genreFilter && (sa.genre!==genreFilter || sb.genre!==genreFilter)) return
     const highlighted = selId>=0 && (a===selId||b===selId)
@@ -2905,6 +2921,7 @@ function spriteFor(s){ if(!_sprites) buildStarSprites(); return genreMode ? (_sp
 function drawStar(s){
   if(s.opacity<0.02) return
   if(favOnly && !s.fav && !s.recommended) return   // お気に入り宇宙ではお気に入り＋おすすめのみ
+  if(risingOnly && !s.rising) return   // 急上昇だけモードではrisingのみ
   const sx=s._sx, sy=s._sy                          // キャッシュ済み画面座標
   const sr=s.r*zoom*(1+s.pulse*.25)
   if(!isFinite(sx)||!isFinite(sy)||!isFinite(sr)) return   // NaN座標はdrawImage例外を防ぐためスキップ
@@ -2991,7 +3008,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-24 v23 (SEO+intro skip+help)'
+const BUILD='build: 2026-06-24 v24 (discover+rising filter)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3153,6 +3170,7 @@ function loop(){
   const mxL=W*0.15, mxR=W*0.85, myT=H*0.15, myB=H*0.85
   for(let i=0;i<SL;i++){ const s=stars[i]
     if(favOnly && !s.fav && !s.recommended) continue   // そのモードで実際に描かれる星だけ数える
+    if(risingOnly && !s.rising) continue
     if(genreFilter && s.genre!==genreFilter) continue
     if(s.opacity>0.1 && s._sx>mxL && s._sx<mxR && s._sy>myT && s._sy<myB){ centerN++; break }
   }
@@ -3200,6 +3218,7 @@ function findStar(mx,my){
     const s=stars[i]
     if(s.opacity<0.1) continue
     if(favOnly && !s.fav && !s.recommended) continue   // 表示中の星だけ選択可
+    if(risingOnly && !s.rising) continue
     if(genreFilter && s.genre!==genreFilter) continue
     const dx=mx-s._sx, dy=my-s._sy
     const d2=dx*dx+dy*dy
@@ -3518,6 +3537,20 @@ function updateLegendActive(){
   }
 }
 
+// ════════════════ 急上昇だけ表示モード ════════════════
+function toggleRisingOnly(){
+  risingOnly=!risingOnly
+  const btn=document.getElementById('rising-btn')
+  if(btn){
+    btn.setAttribute('aria-pressed', risingOnly?'true':'false')
+    if(risingOnly){ btn.classList.add('on'); btn.innerHTML='<span aria-hidden="true">🔥</span> 全体に戻す' }
+    else { btn.classList.remove('on'); btn.innerHTML='<span aria-hidden="true">🔥</span> 急上昇だけ' }
+  }
+  if(typeof clearSel==='function' && selId>=0) clearSel()
+  viewX=0; viewY=0; zoom=0.60; panVX=0; panVY=0
+  const rb=document.getElementById('return-btn'); if(rb) rb.classList.remove('visible')
+}
+
 // ════════════════ お気に入りコレクションをポスター画像に書き出し ════════════════
 function rrect(c,x,y,w,h,r){
   c.beginPath()
@@ -3709,6 +3742,17 @@ function jumpToArtist(id){
   zoom=1.2; panVX=0; panVY=0
   selectArtist(id)
   stars[id].pulse=1.2
+}
+
+// ════════════════ ランダム発見 ════════════════
+function discoverRandom(){
+  if(!stars||!stars.length) return
+  let pool
+  if(risingOnly){ pool=stars.map(function(s,i){return i}).filter(function(i){return stars[i].rising}) }
+  else { pool=stars.map(function(s,i){return i}).filter(function(i){return stars[i].rising || stars[i].pop<80}) }
+  if(!pool.length) pool=stars.map(function(s,i){return i})
+  const id=pool[Math.floor(Math.random()*pool.length)]
+  jumpToArtist(id)
 }
 
 // ════════════════ お気に入り一覧パネル ════════════════
