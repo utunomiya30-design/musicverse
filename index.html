@@ -3831,6 +3831,15 @@ function runIntro(){
   addEventListener('resize', onResize)
   const t0=performance.now()
   let done=false
+  let ended=false                       // endIntro 実行済みフラグを新設
+  // === localStorage 訪問判定と記録 ===
+  let seen=false
+  try { seen=(localStorage.getItem('mv_intro_seen')==='1') } catch(e){}
+  try { localStorage.setItem('mv_intro_seen','1') } catch(e){}
+  // === スキップ機能 ===
+  function skip(){ if(done) return; done=true; endIntro() }
+  addEventListener('pointerdown', skip, {once:true})
+  addEventListener('keydown', skip, {once:true})
   function frame(){
     const e=(performance.now()-t0)/1000
     let speed
@@ -3861,6 +3870,7 @@ function runIntro(){
     else if(!done){ done=true; endIntro() }
   }
   function endIntro(){
+    if(ended) return; ended=true      // done ではなく ended で判定・実行済みマーク
     removeEventListener('resize', onResize)
     stars.forEach(function(s){ s.topacity=1 })       // 銀河を出現させる（フェードイン）
     lo.style.opacity='0'
@@ -3869,7 +3879,9 @@ function runIntro(){
     setTimeout(function(){ maybeShowWelcome() }, 1600)
     setTimeout(function(){ initLastFm() }, 2200)
   }
-  requestAnimationFrame(frame)
+  // === 2回目以降は短縮 ===
+  if(seen){ setTimeout(skip, 700) }
+  else{ requestAnimationFrame(frame) }
 }
 runIntro()
 
