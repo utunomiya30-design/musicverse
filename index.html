@@ -276,6 +276,7 @@ body {
 .svc-sp { background:#1DB954; }
 .svc-am { background:#fa233b; }
 .svc-yt { background:#FF0000; }
+.svc-az { background:#FF9900; color:#111; }
 #p-photo-wrap {
   width:82px; height:82px; border-radius:50%;
   margin:0 auto 16px; overflow:hidden; position:relative;
@@ -585,6 +586,7 @@ body {
     <button class="svc svc-sp" onclick="openSpotify()">Spotify</button>
     <button class="svc svc-am" onclick="openAM()">Apple Music</button>
     <button class="svc svc-yt" onclick="openYT()">YouTube</button>
+    <button class="svc svc-az" onclick="openAmazon()">Amazon Music</button>
   </div>
   <div class="related-hd">関連アーティスト</div>
   <div id="p-related"></div>
@@ -3010,7 +3012,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-24 v25 (monetize scaffold)'
+const BUILD='build: 2026-06-27 v26 (amazon associate ON)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3685,7 +3687,7 @@ function esc(str){
 // 取得は社長。Apple Musicアフィリ=at= / Amazonアソシエイト=tag= / AdSense=ca-pub-
 const MONETIZE = {
   appleMusicToken: '',   // 例: 'xxxxxxxx'(Apple Music アフィリエイト at トークン)
-  amazonTag: '',         // 例: 'yourtag-22'(Amazon アソシエイトタグ)
+  amazonTag: 'utunomiya30-22',         // 例: 'yourtag-22'(Amazon アソシエイトタグ)
   adsense: { client:'', slot:'', enabled:false }  // 例: client:'ca-pub-XXXX', slot:'1234567890'
 }
 function withParam(url, key, val){
@@ -3734,6 +3736,10 @@ function openAM(){
 function openSpotify(){
   if(selId<0) return
   open('https://open.spotify.com/search/'+encodeURIComponent(ARTISTS[selId].name),'_blank')
+}
+function openAmazon(){
+  if(selId<0) return
+  open(amazonMusicURL(ARTISTS[selId].name),'_blank')
 }
 
 // ════════════════ 検索機能 ════════════════
