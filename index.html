@@ -590,6 +590,9 @@ body {
   </div>
   <div class="related-hd">関連アーティスト</div>
   <div id="p-related"></div>
+  <div id="ad-slot" style="display:none; margin-top:18px;">
+    <div style="font-size:9px; color:rgba(165,190,255,.55); letter-spacing:1px; margin-bottom:4px;">広告</div>
+  </div>
 </div>
 
 <div id="controls">
@@ -609,7 +612,6 @@ body {
 
 <button type="button" id="discover-fab" onclick="discoverRandom()" aria-label="ランダムにアーティストを発見">🎲 発見</button>
 
-<div id="ad-slot" aria-hidden="true" style="display:none"></div>
 
 <div id="welcome">
   <div id="welcome-box">
@@ -3015,7 +3017,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-27 v27 (privacy policy)'
+const BUILD='build: 2026-06-27 v28 (adsense ON)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3691,7 +3693,7 @@ function esc(str){
 const MONETIZE = {
   appleMusicToken: '',   // 例: 'xxxxxxxx'(Apple Music アフィリエイト at トークン)
   amazonTag: 'utunomiya30-22',         // 例: 'yourtag-22'(Amazon アソシエイトタグ)
-  adsense: { client:'', slot:'', enabled:false }  // 例: client:'ca-pub-XXXX', slot:'1234567890'
+  adsense: { client:'ca-pub-1361559686394936', slot:'1578769579', enabled:true }  // 例: client:'ca-pub-XXXX', slot:'1234567890'
 }
 function withParam(url, key, val){
   if(!val) return url
@@ -3715,7 +3717,7 @@ function initAds(){
     var box=document.getElementById('ad-slot')
     if(box){
       box.style.display='block'
-      box.innerHTML='<ins class="adsbygoogle" style="display:block" data-ad-client="'+a.client+'" data-ad-slot="'+a.slot+'" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+      box.insertAdjacentHTML('beforeend','<ins class="adsbygoogle" style="display:block" data-ad-client="'+a.client+'" data-ad-slot="'+a.slot+'" data-ad-format="auto" data-full-width-responsive="true"></ins>')
       ;(window.adsbygoogle=window.adsbygoogle||[]).push({})
     }
   }catch(e){}
