@@ -280,6 +280,7 @@ body {
 .svc-am { background:#fa233b; }
 .svc-yt { background:#FF0000; }
 .svc-az { background:#FF9900; color:#111; }
+.svc-fes { background:linear-gradient(90deg,#6d8bff,#a06dff); }
 #p-photo-wrap {
   width:82px; height:82px; border-radius:50%;
   margin:0 auto 16px; overflow:hidden; position:relative;
@@ -591,6 +592,11 @@ body {
     <button class="svc svc-yt" onclick="openYT()">YouTube</button>
     <button class="svc svc-az" onclick="openAmazon()">Amazon Music</button>
   </div>
+  <!-- KDS-001-S1 ① MUSIC VERSE → Fest-Log 相互リンク -->
+  <div class="listen-row">
+    <button class="svc svc-fes" onclick="openFestLog()">🎪 このアーティストが出るフェスは？</button>
+  </div>
+  <div style="font-size:10px;color:rgba(165,190,255,.7);text-align:center;margin:-4px 0 9px;">タイテを組んで被りをチェック → Fest-Log</div>
   <div class="related-hd">関連アーティスト</div>
   <div id="p-related"></div>
   <div id="ad-slot" style="display:none; margin-top:18px;">
@@ -3655,7 +3661,7 @@ function exportPoster(){
     if(!blob){ alert('画像の生成に失敗しました'); return }
     const file=new File([blob],'music-verse-favorites.png',{type:'image/png'})
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      navigator.share({files:[file], title:'MY FAVORITE ARTISTS', text:'私の好きなアーティスト宇宙 #MUSICVERSE'})
+      navigator.share({files:[file], title:'MY FAVORITE ARTISTS', text:'私が見つけた音楽の宇宙🌌 あなたの好きなアーティストはどこにいる？ #音楽発見 #MUSICVERSE'})
         .catch(function(){ downloadBlob(blob,'music-verse-favorites.png') })
     } else {
       downloadBlob(blob,'music-verse-favorites.png')
@@ -3743,6 +3749,11 @@ function openSpotify(){
 function openAmazon(){
   if(selId<0) return
   open(amazonMusicURL(ARTISTS[selId].name),'_blank')
+}
+// KDS-001-S1 ① MUSIC VERSE → Fest-Log（このアーティストが出るフェスを探す導線）
+function openFestLog(){
+  if(selId<0) return
+  open('https://fest-log2.vercel.app/?utm_source=mv&utm_campaign=kds2026','_blank')
 }
 
 // ════════════════ 検索機能 ════════════════
@@ -3832,7 +3843,7 @@ function renderFavList(){
 // ════════════════ SNSシェア ════════════════
 function shareApp(){
   const url=encodeURIComponent('https://musicvarce.vercel.app')
-  const text=encodeURIComponent('✦ MUSIC VERSE — 音楽の宇宙を探検しよう！好きなアーティストが星になる音楽発見アプリ🌌')
+  const text=encodeURIComponent('好きなアーティストが星になる音楽の宇宙🌌 次に聴く1曲がここで見つかる。 #音楽発見 #MUSICVERSE')
   open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
 }
 
@@ -3840,7 +3851,23 @@ function shareArtist(){
   if(selId<0) return
   const a=ARTISTS[selId]
   const url=encodeURIComponent('https://musicvarce.vercel.app')
-  const text=encodeURIComponent('✦ MUSIC VERSE で '+a.name+' を発見！音楽の宇宙を一緒に探検しよう🌌'+(a.rising?' 🔥急上昇中！':''))
+  let text
+
+  if(a.rising){
+    // 急上昇バリエーション
+    text=encodeURIComponent('🔥 '+a.name+' が今熱い！MUSIC VERSEで見つけた急上昇の星✨ あなたの「次の1曲」はここに🌌 #音楽発見 #MUSICVERSE')
+  } else {
+    const related=getRelated(selId)
+    if(related && related.length>0){
+      // 関連アーティストあり
+      const relatedName=ARTISTS[related[0]].name
+      text=encodeURIComponent('MUSIC VERSEで '+a.name+' を発見✨ 隣に光っていたのは '+relatedName+'。「次の1曲」はここで見つかる🌌 #音楽発見 #MUSICVERSE')
+    } else {
+      // フォールバック（関連なし）
+      text=encodeURIComponent('MUSIC VERSEで '+a.name+' の星を見つけた🌟 音楽の宇宙、あなたも探検してみて🌌 #音楽発見 #MUSICVERSE')
+    }
+  }
+
   open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank')
 }
 
