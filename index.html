@@ -632,6 +632,9 @@ body {
       <div class="w-tip-text"><strong>赤く輝く星</strong>は急上昇中のアーティスト。新しい発見を楽しんで！</div>
     </div>
     <button id="welcome-btn" onclick="closeWelcome()">宇宙へ出発する　→</button>
+    <div style="margin-top:16px; text-align:center; font-size:12px;">
+      <a href="/privacy.html" style="color:rgba(150,180,255,0.7); text-decoration:none; border:none;">プライバシーポリシー</a>
+    </div>
   </div>
 </div>
 
@@ -3012,7 +3015,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-27 v26 (amazon associate ON)'
+const BUILD='build: 2026-06-27 v27 (privacy policy)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
