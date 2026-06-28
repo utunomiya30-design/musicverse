@@ -76,7 +76,7 @@ body {
 #canvas.hover { cursor:pointer; }
 
 /* ══ アクセシビリティ：ボタン化要素の体裁を統一＋キーボードフォーカス可視化 ══ */
-#fav-badge, #universe-btn, #genre-btn, #share-btn {
+#fav-badge, #universe-btn, #genre-btn, #share-btn, #rising-btn {
   font-family:inherit; -webkit-appearance:none; appearance:none;
   display:inline-flex; align-items:center; justify-content:center; gap:4px;
 }
@@ -90,7 +90,7 @@ body {
   outline:2px solid #8fbcff !important; outline-offset:2px;
 }
 /* タッチターゲットの確保（最低40px相当） */
-#fav-badge, #universe-btn, #genre-btn, #share-btn { min-height:34px; padding:8px 13px; }
+#fav-badge, #universe-btn, #genre-btn, #share-btn, #rising-btn { min-height:34px; padding:8px 13px; }
 .gl-chip { min-height:34px; }
 
 /* ══ TOP BAR ══ */
@@ -175,6 +175,17 @@ body {
 }
 #genre-btn:hover { background:rgba(60,45,100,.45); border-color:rgba(170,120,255,.5); }
 #genre-btn.on { background:rgba(150,110,240,.34); color:#fff; border-color:rgba(190,150,255,.7); }
+
+/* 急上昇だけトグル（BL-4④: 他のトグルと馴染む見た目に統一。🔥 のオレンジ系） */
+#rising-btn {
+  font-size:11px; color:rgba(255,180,140,.9); letter-spacing:.3px;
+  cursor:pointer; pointer-events:auto; flex-shrink:0;
+  padding:6px 12px; border-radius:16px;
+  background:rgba(70,35,20,.3); border:1px solid rgba(255,140,90,.22);
+  transition:all .18s; white-space:nowrap;
+}
+#rising-btn:hover { background:rgba(100,50,25,.45); border-color:rgba(255,150,100,.5); }
+#rising-btn.on { background:rgba(255,130,80,.34); color:#fff; border-color:rgba(255,160,110,.7); }
 
 /* ジャンル凡例バー */
 #genre-legend {
@@ -3240,7 +3251,7 @@ function findStar(mx,my){
     if(genreFilter && s.genre!==genreFilter) continue
     const dx=mx-s._sx, dy=my-s._sy
     const d2=dx*dx+dy*dy
-    const hitR=Math.max(14,s.r*zoom+10)
+    const hitR=Math.max(22,s.r*zoom+14)   // BL-4①: タップ判定を拡大（最低44px相当でクリックしやすく）
     if(d2<hitR*hitR && d2<best){ best=d2; found=i }
   }
   return found
@@ -3962,7 +3973,7 @@ initAds();
 function runIntro(){
   const lo=document.getElementById('loading')
   const cv=document.getElementById('warpcv')
-  if(!lo||!cv){ stars.forEach(function(s){s.topacity=1}); selectArtist(0); return }
+  if(!lo||!cv){ stars.forEach(function(s){s.topacity=1}); selectArtist(Math.floor(Math.random()*stars.length)); return }   // BL-4②: フォールバックもランダム選択
   const c=cv.getContext('2d')
   let WW=innerWidth, WH=innerHeight
   cv.width=WW; cv.height=WH
@@ -4018,7 +4029,7 @@ function runIntro(){
     stars.forEach(function(s){ s.topacity=1 })       // 銀河を出現させる（フェードイン）
     lo.style.opacity='0'
     setTimeout(function(){ lo.style.display='none' }, 900)
-    setTimeout(function(){ selectArtist(0) }, 650)
+    setTimeout(function(){ selectArtist(Math.floor(Math.random()*stars.length)) }, 650)   // BL-4②: 毎回ランダムなアーティストから始める（米津固定をやめる＝発見アプリらしく）
     setTimeout(function(){ maybeShowWelcome() }, 1600)
     setTimeout(function(){ initLastFm() }, 2200)
   }
