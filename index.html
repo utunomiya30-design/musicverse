@@ -4025,19 +4025,19 @@ function openWelcome(){
 
     // ---- DOM ----
     var st=document.createElement('style')
-    st.textContent='#pola-wrap{position:fixed;right:14px;bottom:16px;z-index:1400;width:96px;display:flex;flex-direction:column;align-items:center;font-family:inherit;pointer-events:none}'
+    st.textContent='#pola-wrap{position:fixed;left:10px;bottom:96px;z-index:1400;width:96px;display:flex;flex-direction:column;align-items:center;font-family:inherit;pointer-events:none;touch-action:none}'
       +'#pola-wrap.hidden{display:none}'
       +'#pola-bubble{pointer-events:auto;max-width:230px;background:#eef4ff;color:#16223f;font-size:13px;line-height:1.5;border-radius:14px;padding:9px 12px;margin-bottom:6px;box-shadow:0 4px 16px rgba(0,0,0,.35);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;position:relative}'
       +'#pola-bubble.show{opacity:1;transform:none}'
-      +'#pola-bubble:after{content:"";position:absolute;right:32px;bottom:-7px;border:7px solid transparent;border-top-color:#eef4ff;border-bottom:0}'
+      +'#pola-bubble:after{content:"";position:absolute;left:50%;margin-left:-7px;bottom:-7px;border:7px solid transparent;border-top-color:#eef4ff;border-bottom:0}'
       +'#pola-bubble .x{position:absolute;top:3px;right:7px;cursor:pointer;color:#7d89a8;font-size:13px;line-height:1}'
-      +'#pola-body{pointer-events:auto;width:84px;height:96px;background:none;border:0;padding:0;cursor:pointer;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));transition:transform .15s}'
+      +'#pola-body{pointer-events:auto;width:84px;height:96px;background:none;border:0;padding:0;cursor:grab;touch-action:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));transition:transform .15s}'
       +'#pola-body:hover{transform:translateY(-2px)}'
-      +'#pola-menu{pointer-events:auto;position:absolute;bottom:104px;right:0;background:rgba(12,16,34,.97);border:1px solid #2a3358;border-radius:12px;padding:7px;min-width:188px;box-shadow:0 6px 20px rgba(0,0,0,.45)}'
+      +'#pola-menu{pointer-events:auto;position:absolute;bottom:104px;left:50%;transform:translateX(-50%);background:rgba(12,16,34,.97);border:1px solid #2a3358;border-radius:12px;padding:7px;min-width:188px;box-shadow:0 6px 20px rgba(0,0,0,.45)}'
       +'#pola-menu[hidden]{display:none}'
       +'#pola-menu button{display:block;width:100%;text-align:left;background:none;border:0;color:#dfe7f7;font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer}'
       +'#pola-menu button:hover{background:rgba(95,252,255,.12)}'
-      +'@media(max-width:540px){#pola-wrap{width:84px;right:10px;bottom:12px}#pola-body{width:72px;height:84px}#pola-bubble{max-width:62vw}}'
+      +'@media(max-width:540px){#pola-wrap{width:84px;left:8px;bottom:90px}#pola-body{width:72px;height:84px}#pola-bubble{max-width:62vw}}'
     document.head.appendChild(st)
 
     var wrap=document.createElement('div'); wrap.id='pola-wrap'
@@ -4131,8 +4131,43 @@ function openWelcome(){
     }
     function toggleSound(){ LS.set('mv_pola_sound', LS.get('mv_pola_sound')==='0'?'1':'0') }
 
+    // ---- ドラッグで移動（タップはメニュー開閉）＋位置の永続化 ----
+    function clampPos(left,top){
+      var r=wrap.getBoundingClientRect(), w=r.width||96, h=r.height||96
+      left=Math.max(4, Math.min(innerWidth - w - 4, left))
+      top =Math.max(4, Math.min(innerHeight - h - 4, top))
+      return [left,top]
+    }
+    function applyPos(left,top){
+      var p=clampPos(left,top)
+      wrap.style.left=p[0]+'px'; wrap.style.top=p[1]+'px'
+      wrap.style.right='auto'; wrap.style.bottom='auto'
+    }
+    ;(function(){ var s=null; try{s=JSON.parse(LS.get('mv_pola_pos')||'null')}catch(e){}
+      if(s && typeof s.left==='number'){ applyPos(s.left, s.top) } })()
+    var dragging=false, moved=false, sx=0, sy=0, ox=0, oy=0
+    body.addEventListener('pointerdown',function(e){
+      dragging=true; moved=false
+      var r=wrap.getBoundingClientRect(); ox=r.left; oy=r.top; sx=e.clientX; sy=e.clientY
+      try{body.setPointerCapture(e.pointerId)}catch(_){}
+    })
+    body.addEventListener('pointermove',function(e){
+      if(!dragging) return
+      var dx=e.clientX-sx, dy=e.clientY-sy
+      if(!moved && (Math.abs(dx)+Math.abs(dy))>6){ moved=true; body.style.cursor='grabbing'; hideBubble(); if(menu) menu.hidden=true }
+      if(moved) applyPos(ox+dx, oy+dy)
+    })
+    function endDrag(e){
+      if(!dragging) return
+      dragging=false; body.style.cursor='grab'
+      try{body.releasePointerCapture(e.pointerId)}catch(_){}
+      if(moved){ var r=wrap.getBoundingClientRect(); LS.set('mv_pola_pos', JSON.stringify({left:Math.round(r.left), top:Math.round(r.top)})) }
+    }
+    body.addEventListener('pointerup', endDrag)
+    body.addEventListener('pointercancel', endDrag)
     body.addEventListener('click',function(e){
       e.stopPropagation()
+      if(moved){ moved=false; return }   // ドラッグ直後のクリックは無視
       if(bubble.classList.contains('show')){ hideBubble() }
       buildMenu(); menu.hidden=!menu.hidden
     })
