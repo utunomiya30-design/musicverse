@@ -3037,7 +3037,7 @@ function drawStar(s){
 }
 function selStar(){ return selId>=0 ? stars[selId] : null }
 
-const BUILD='build: 2026-06-27 v29 (adsense site verify)'
+const BUILD='build: 2026-06-30 v30 (companion Pola + contextual guide)'
 console.log('%cMUSIC VERSE '+BUILD, 'color:#7df0b0')
 let perfOn=false, _fpsLast=performance.now(), _fpsCount=0, _fps=0
 let _drawErrN=0, _lastDrawErr=''   // 描画例外の捕捉（pオーバーレイに表示）
@@ -3942,6 +3942,246 @@ function openWelcome(){
   el.style.display='flex'
   requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('show')})})
 }
+
+// ════════════════ 相棒「ポラ」＋ 場面別 使い方ガイド (PRJ:ポラ v30) ════════════════
+// 球体ボディ＋ロボットアーム＋ヘッドホン＋表情スクリーン顔。文脈に応じて使い方を一言で教える。
+// 押し付けない: 自動ヒントは1セッション最大3回・既読は再提示しない・ON/OFF可・タップで手動ヘルプ。
+(function(){
+  try{
+    var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},
+            set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}}
+    var ENABLED = LS.get('mv_pola_on')!=='0'           // 既定ON
+    var seen = (function(){try{return JSON.parse(LS.get('mv_pola_seen')||'[]')}catch(e){return []}})()
+    var sessionShown = 0, MAXAUTO = 3
+    var idleTimer=null, hideTimer=null
+    var pending=null   // パネル(広告枠)表示中に発生したヒントは、閉じた後に出す
+    var firstVisit = LS.get('mv_pola_returning')!=='1'
+    LS.set('mv_pola_returning','1')
+
+    // ---- セリフ（場面→複数からランダム。変動でドーパミン） ----
+    var SCENES = {
+      onboarding:{once:true, expr:'happy', ges:'wave', lines:[
+        'ようこそ、パイロット！星をタップすると音楽が聴けるよ',
+        'ここは音楽の宇宙。気になる星に触れてみて🌌']},
+      idle:{expr:'normal', ges:'wave', lines:[
+        '迷ったら、光ってる星からどうぞ',
+        '近くの星、気になるのある？']},
+      warp:{expr:'nav', ges:'point', lines:[
+        'マンネリ？ "急上昇" や検索で未知の星へ',
+        '次はどの星へ行く？気の向くままに探検しよう']},
+      related:{once:true, expr:'nav', ges:'point', lines:[
+        '隣の星は"近い音楽"。辿ると新しい発見があるよ']},
+      rising:{expr:'surprised', ges:'cheer', lines:[
+        'これ、今アツい星🔥 みんなが見つけてるよ',
+        '急上昇の星だ！旬の音に出会えたね🔥']},
+      favFirst:{once:true, expr:'happy', ges:'cheer', lines:[
+        'いい出会い！★は"あなたの銀河"に残るよ',
+        'お気に入り登録だね✨ 銀河が育っていくよ']},
+      milestone:{expr:'happy', ges:'cheer', lines:[
+        'もう立派なパイロットだね！この調子🌟']},
+      share:{expr:'happy', ges:'thumb', lines:[
+        '見つけた星、仲間にシェアありがとう！']},
+      returning:{once:true, expr:'happy', ges:'wave', lines:[
+        'おかえり！今日も新しい星を探そう',
+        'おかえり！昨日の続き、いってみよう']},
+      help:{expr:'nav', ges:'point', lines:[]}   // 手動ヘルプは動的生成
+    }
+
+    // ---- 表情（目）SVG ----
+    function eyes(expr){
+      var s='#5ffcff'
+      if(expr==='happy')    return '<path d="M48,84 q6,-10 12,0" fill="none" stroke="'+s+'" stroke-width="4" stroke-linecap="round"/><path d="M60,84 q6,-10 12,0" fill="none" stroke="'+s+'" stroke-width="4" stroke-linecap="round"/>'
+      if(expr==='surprised')return '<circle cx="54" cy="82" r="5" fill="none" stroke="'+s+'" stroke-width="3"/><circle cx="70" cy="82" r="5" fill="none" stroke="'+s+'" stroke-width="3"/>'
+      if(expr==='nav')      return '<path d="M50,77 l6,5 l-6,5" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M64,77 l6,5 l-6,5" fill="none" stroke="'+s+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+      if(expr==='think')    return '<rect x="49" y="81" width="9" height="3.4" rx="1.7" fill="'+s+'"/><rect x="66" y="79" width="6" height="6" rx="3" fill="none" stroke="'+s+'" stroke-width="2"/>'
+      return '<rect x="49" y="80" width="9" height="4.5" rx="2.2" fill="'+s+'"/><rect x="65" y="80" width="9" height="4.5" rx="2.2" fill="'+s+'"/>' // normal
+    }
+    // ---- しぐさ（腕）SVG。肩=左(32,98)右(88,96) ----
+    function arms(ges){
+      var seg='#8593ba', seg2='#9fb0d6', hand='#aab6d8'
+      function L(x1,y1,x2,y2,w,c){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+w+'" stroke-linecap="round"/>'}
+      function claw(x,y){return '<g stroke="'+hand+'" stroke-width="3.4" stroke-linecap="round" fill="none"><path d="M'+x+','+y+' l-6,5"/><path d="M'+x+','+y+' l6,5"/></g>'}
+      var rest = L(28,100,18,126,8,seg)+claw(18,126)+L(92,98,102,126,8,seg)+claw(102,126)
+      if(ges==='wave')  return L(28,100,18,126,8,seg)+claw(18,126)+L(90,94,108,72,8,seg)+L(108,72,116,52,7,seg2)+'<g stroke="'+hand+'" stroke-width="3.2" stroke-linecap="round" fill="none"><path d="M116,52 l-6,-2"/><path d="M116,52 l2,-6"/></g>'
+      if(ges==='point') return L(28,100,18,126,8,seg)+claw(18,126)+L(90,96,110,90,8,seg)+L(110,90,128,86,7,seg2)+'<g stroke="'+hand+'" stroke-width="3.2" stroke-linecap="round" fill="none"><path d="M128,86 l-5,-3"/><path d="M128,86 l-5,3"/></g>'
+      if(ges==='cheer') return L(30,98,12,72,8,seg)+L(12,72,6,52,7,seg2)+'<circle cx="6" cy="50" r="3.2" fill="'+hand+'"/>'+L(90,96,108,72,8,seg)+L(108,72,114,52,7,seg2)+'<circle cx="114" cy="50" r="3.2" fill="'+hand+'"/>'
+      if(ges==='thumb') return L(28,100,18,126,8,seg)+claw(18,126)+L(90,94,108,74,8,seg)+'<circle cx="112" cy="68" r="5" fill="'+seg2+'"/><rect x="110" y="56" width="4.5" height="10" rx="2.2" fill="'+hand+'"/>'
+      return rest
+    }
+    function polaSVG(expr,ges){
+      return '<svg viewBox="0 0 130 150" width="100%" height="100%" aria-hidden="true">'
+        +'<defs><radialGradient id="pola_sph" cx="36%" cy="30%" r="78%"><stop offset="0" stop-color="#ffffff"/><stop offset="42%" stop-color="#c9d8f2"/><stop offset="80%" stop-color="#8ea2c6"/><stop offset="100%" stop-color="#56688e"/></radialGradient></defs>'
+        +'<ellipse cx="60" cy="132" rx="34" ry="6" fill="#3ff0c8" opacity="0.18"/>'
+        +'<path d="M22,78 A40,38 0 0 1 98,78" fill="none" stroke="#0a3b34" stroke-width="7"/>'
+        +'<g id="pola-arms">'+arms(ges)+'</g>'
+        +'<circle cx="60" cy="86" r="38" fill="url(#pola_sph)"/>'
+        +'<circle cx="60" cy="86" r="38" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.4"/>'
+        +'<ellipse cx="47" cy="72" rx="10" ry="6" fill="#fff" opacity="0.45"/>'
+        +'<rect x="16" y="78" width="11" height="24" rx="5.5" fill="#0a3b34"/><rect x="93" y="78" width="11" height="24" rx="5.5" fill="#0a3b34"/>'
+        +'<rect x="38" y="66" width="44" height="30" rx="12" fill="#06122a" stroke="#1a3f63" stroke-width="1.4"/>'
+        +'<g id="pola-eyes">'+eyes(expr)+'</g>'
+        +'</svg>'
+    }
+
+    // ---- DOM ----
+    var st=document.createElement('style')
+    st.textContent='#pola-wrap{position:fixed;right:14px;bottom:16px;z-index:1400;width:96px;display:flex;flex-direction:column;align-items:center;font-family:inherit;pointer-events:none}'
+      +'#pola-wrap.hidden{display:none}'
+      +'#pola-bubble{pointer-events:auto;max-width:230px;background:#eef4ff;color:#16223f;font-size:13px;line-height:1.5;border-radius:14px;padding:9px 12px;margin-bottom:6px;box-shadow:0 4px 16px rgba(0,0,0,.35);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;position:relative}'
+      +'#pola-bubble.show{opacity:1;transform:none}'
+      +'#pola-bubble:after{content:"";position:absolute;right:32px;bottom:-7px;border:7px solid transparent;border-top-color:#eef4ff;border-bottom:0}'
+      +'#pola-bubble .x{position:absolute;top:3px;right:7px;cursor:pointer;color:#7d89a8;font-size:13px;line-height:1}'
+      +'#pola-body{pointer-events:auto;width:84px;height:96px;background:none;border:0;padding:0;cursor:pointer;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));transition:transform .15s}'
+      +'#pola-body:hover{transform:translateY(-2px)}'
+      +'#pola-menu{pointer-events:auto;position:absolute;bottom:104px;right:0;background:rgba(12,16,34,.97);border:1px solid #2a3358;border-radius:12px;padding:7px;min-width:188px;box-shadow:0 6px 20px rgba(0,0,0,.45)}'
+      +'#pola-menu[hidden]{display:none}'
+      +'#pola-menu button{display:block;width:100%;text-align:left;background:none;border:0;color:#dfe7f7;font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer}'
+      +'#pola-menu button:hover{background:rgba(95,252,255,.12)}'
+      +'@media(max-width:540px){#pola-wrap{width:84px;right:10px;bottom:12px}#pola-body{width:72px;height:84px}#pola-bubble{max-width:62vw}}'
+    document.head.appendChild(st)
+
+    var wrap=document.createElement('div'); wrap.id='pola-wrap'
+    wrap.innerHTML='<div id="pola-bubble" role="status" aria-live="polite"><span class="x" title="閉じる">✕</span><span id="pola-bubble-text"></span></div>'
+      +'<div id="pola-menu" hidden></div>'
+      +'<button id="pola-body" aria-label="相棒ポラ・ヘルプ">'+polaSVG('normal','rest')+'</button>'
+    document.body.appendChild(wrap)
+    if(!ENABLED) wrap.classList.add('hidden')
+
+    var bubble=document.getElementById('pola-bubble')
+    var bubbleText=document.getElementById('pola-bubble-text')
+    var body=document.getElementById('pola-body')
+    var menu=document.getElementById('pola-menu')
+
+    function setFace(expr,ges){
+      var e=document.getElementById('pola-eyes'), a=document.getElementById('pola-arms')
+      if(e) e.innerHTML=eyes(expr); if(a) a.innerHTML=arms(ges)
+    }
+    // ---- やわらかいベル（合成音・設定連動） ----
+    var AC=null
+    function bell(){
+      if(LS.get('mv_pola_sound')==='0') return
+      try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)()
+        ;[0,0.12].forEach(function(d,i){ var o=AC.createGain(),s=AC.createOscillator()
+          s.type='sine'; s.frequency.value=i?1318:880; o.gain.value=0.0001
+          s.connect(o); o.connect(AC.destination); var t=AC.currentTime+d
+          o.gain.exponentialRampToValueAtTime(0.06,t+0.02); o.gain.exponentialRampToValueAtTime(0.0001,t+0.5)
+          s.start(t); s.stop(t+0.5) }) }catch(e){}
+    }
+    function buzz(){ try{ if(LS.get('mv_pola_sound')!=='0' && navigator.vibrate) navigator.vibrate(12) }catch(e){} }
+
+    function hideBubble(){ bubble.classList.remove('show'); clearTimeout(hideTimer) }
+    function say(text,expr,ges,ms){
+      if(!ENABLED) return
+      setFace(expr||'normal', ges||'rest')
+      bubbleText.textContent=text
+      bubble.classList.add('show'); bell(); buzz()
+      clearTimeout(hideTimer)
+      hideTimer=setTimeout(function(){ hideBubble(); setFace('normal','rest') }, ms||6500)
+    }
+    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+    function flushPending(){ if(pending){ var k=pending; pending=null; showScene(k) } }
+    function showScene(key,opts){
+      opts=opts||{}
+      if(!ENABLED) return
+      var sc=SCENES[key]; if(!sc) return
+      if(sc.once && seen.indexOf(key)>=0) return
+      if(!opts.manual && sessionShown>=MAXAUTO) return
+      if(sc.once){ seen.push(key); LS.set('mv_pola_seen',JSON.stringify(seen)) }
+      if(!opts.manual) sessionShown++
+      say(pick(sc.lines), sc.expr, sc.ges, opts.ms)
+    }
+
+    // ---- アイドル監視 ----
+    function resetIdle(){
+      clearTimeout(idleTimer)
+      if(!ENABLED) return
+      idleTimer=setTimeout(function(){
+        if(typeof selId!=='undefined' && selId>=0) return
+        showScene(Math.random()<0.5?'idle':'warp')
+      }, firstVisit?14000:22000)
+    }
+    ['pointerdown','keydown','wheel'].forEach(function(ev){
+      addEventListener(ev,function(){ resetIdle() }, {passive:true})
+    })
+
+    // ---- 手動ヘルプ（今できること） ----
+    function contextHelp(){
+      var tips=[]
+      if(typeof selId!=='undefined' && selId>=0){
+        tips.push('▶ 下のパネルから試聴・お気に入り・シェアができるよ')
+        tips.push('★ 「お気に入りに登録」で"あなたの銀河"に残るよ')
+      }else{
+        tips.push('★ 星をタップ→そのアーティストを試聴できるよ')
+        tips.push('🔥 「急上昇だけ」で旬の星に絞れるよ')
+        tips.push('✦ 「お気に入りの宇宙」であなた専用の星図に')
+      }
+      say(pick(tips),'nav','point',7000)
+    }
+    function buildMenu(){
+      menu.innerHTML=''
+      function add(label,fn){ var b=document.createElement('button'); b.textContent=label; b.onclick=function(){menu.hidden=true; fn()}; menu.appendChild(b) }
+      add('？ 今できること', contextHelp)
+      add('🔔 ヒント: '+(ENABLED?'ON（OFFにする）':'OFF（ONにする）'), toggleEnabled)
+      add('🔈 音/振動: '+(LS.get('mv_pola_sound')==='0'?'OFF（ONにする）':'ON（OFFにする）'), toggleSound)
+    }
+    function toggleEnabled(){
+      ENABLED=!ENABLED; LS.set('mv_pola_on',ENABLED?'1':'0')
+      wrap.classList.toggle('hidden',!ENABLED)
+      if(ENABLED){ resetIdle(); say('ヒントをONにしたよ。困ったらいつでも呼んでね','happy','wave',4000) }
+    }
+    function toggleSound(){ LS.set('mv_pola_sound', LS.get('mv_pola_sound')==='0'?'1':'0') }
+
+    body.addEventListener('click',function(e){
+      e.stopPropagation()
+      if(bubble.classList.contains('show')){ hideBubble() }
+      buildMenu(); menu.hidden=!menu.hidden
+    })
+    bubble.querySelector('.x').addEventListener('click',function(e){ e.stopPropagation(); hideBubble() })
+    addEventListener('pointerdown',function(e){ if(menu && !menu.hidden && !wrap.contains(e.target)) menu.hidden=true })
+
+    // ---- 既存関数フック（壊さない＝元を必ず呼ぶ） ----
+    function wrap_fn(name, after){
+      var orig=window[name]; if(typeof orig!=='function') return
+      window[name]=function(){ var r=orig.apply(this,arguments); try{after.apply(this,arguments)}catch(e){} return r }
+    }
+    var lastSelId=-1
+    wrap_fn('selectArtist', function(id){
+      lastSelId=id
+      var a=(typeof ARTISTS!=='undefined')?ARTISTS[id]:null
+      if(!a) return
+      if(a.rising){ pending='rising' }
+      else if(typeof getRelated==='function'){ var r=getRelated(id); if(r&&r.length>0) pending='related' }
+    })
+    wrap_fn('toggleReg', function(){
+      var a=(typeof ARTISTS!=='undefined' && typeof selId!=='undefined' && selId>=0)?ARTISTS[selId]:null
+      if(!a) return
+      if(a.fav){
+        var cnt=(typeof stars!=='undefined')?stars.filter(function(s){return s.fav}).length:0
+        if(seen.indexOf('favFirst')<0){ pending='favFirst' }
+        else if(cnt===5||cnt===10||cnt===25){ pending='milestone' }
+      }
+    })
+    wrap_fn('shareArtist', function(){ pending='share' })
+    wrap_fn('shareApp',   function(){ pending='share' })
+    wrap_fn('closeWelcome', function(){ if(ENABLED) wrap.classList.remove('hidden'); setTimeout(function(){ showScene('onboarding') }, 1200) })
+    // パネル(=広告枠を含む)表示中はポラを隠し、閉じたら再表示＋保留ヒントを出す（広告と重ねない）
+    wrap_fn('openPanel',  function(){ if(menu) menu.hidden=true; wrap.classList.add('hidden') })
+    wrap_fn('closePanel', function(){ if(ENABLED) wrap.classList.remove('hidden'); setTimeout(flushPending, 600) })
+
+    // ---- 起動時 ----
+    function boot(){
+      buildMenu()
+      resetIdle()
+      // ウェルカムモーダル表示中はポラを隠す（閉じたら closeWelcome フックで再表示）
+      var wel=document.getElementById('welcome')
+      if(wel && getComputedStyle(wel).display!=='none'){ wrap.classList.add('hidden') }
+      // 再訪あいさつ（初回はオンボーディングに任せる）
+      if(!firstVisit && LS.get('mv_welcomed')){ setTimeout(function(){ showScene('returning') }, 1500) }
+    }
+    if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(boot,300)
+    else addEventListener('load', boot)
+  }catch(e){ /* ポラは補助機能：失敗しても本体は動かす */ }
+})()
 
 // ════════════════ 旧Service Worker・キャッシュの完全除去 ════════════════
 // 以前のSWが古いHTMLをキャッシュし「更新が戻る／永久ローディング」の原因だったため除去
