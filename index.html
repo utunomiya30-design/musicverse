@@ -106,6 +106,7 @@ body {
   background:linear-gradient(135deg,#88aaff,#bb66ff,#ff88cc);
   -webkit-background-clip:text; -webkit-text-fill-color:transparent;
 }
+#tb-break { display:none; flex-basis:100%; height:0; }
 
 /* 検索バー */
 #search-wrap {
@@ -459,7 +460,13 @@ body {
   #fav-panel.open { bottom:0; left:auto !important; }
   #controls { bottom:20px; right:12px; }
   #hint { display:block; bottom:64px; font-size:10px; white-space:normal; max-width:86vw; line-height:1.5; }
-  #search-wrap { max-width:130px; }
+  /* スマホは上部メニューを2列に：1列目=ロゴ＋検索（大きく）、2列目=各ボタン */
+  #topbar { flex-wrap:wrap; gap:8px; row-gap:8px; padding:10px 12px; }
+  #tb-break { display:block; }
+  #search-wrap { flex:1 1 auto; max-width:none; min-width:0; }
+  #search-input { font-size:15px; padding:11px 16px; min-height:42px; }
+  #topbar > button { flex:0 0 auto; }
+  #fav-badge, #universe-btn, #genre-btn, #rising-btn, #share-btn { font-size:12px; padding:8px 12px; }
   #logo { font-size:13px; letter-spacing:2px; }
 }
 
@@ -535,6 +542,9 @@ body {
     <input id="search-input" type="text" placeholder="🔍 アーティスト検索..." autocomplete="off" aria-label="アーティストを検索" />
     <div id="search-results" role="listbox" aria-label="検索結果"></div>
   </div>
+
+  <!-- 改行（スマホでメニューを2列にするための区切り。PCでは非表示） -->
+  <div id="tb-break" aria-hidden="true"></div>
 
   <!-- お気に入りバッジ -->
   <button type="button" id="fav-badge" onclick="toggleFavPanel()" aria-label="お気に入り一覧を開く"><span aria-hidden="true">★</span> <span id="fav-count">0</span></button>
@@ -4037,7 +4047,9 @@ function openWelcome(){
       +'#pola-menu[hidden]{display:none}'
       +'#pola-menu button{display:block;width:100%;text-align:left;background:none;border:0;color:#dfe7f7;font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer}'
       +'#pola-menu button:hover{background:rgba(95,252,255,.12)}'
-      +'@media(max-width:540px){#pola-wrap{width:84px;left:8px;bottom:90px}#pola-body{width:72px;height:84px}#pola-bubble{max-width:62vw}}'
+      +'#pola-recall{position:fixed;left:10px;bottom:96px;z-index:1399;display:none;pointer-events:auto;width:46px;height:46px;border-radius:50%;border:1px solid rgba(120,150,255,.4);background:rgba(10,16,40,.85);color:#bcd6ff;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.4)}'
+      +'#pola-recall:hover{background:rgba(20,30,70,.95);border-color:rgba(120,150,255,.7)}'
+      +'@media(max-width:540px){#pola-wrap{width:84px;left:8px;bottom:90px}#pola-body{width:72px;height:84px}#pola-bubble{max-width:62vw}#pola-recall{left:8px;bottom:90px;width:42px;height:42px;font-size:18px}}'
     document.head.appendChild(st)
 
     var wrap=document.createElement('div'); wrap.id='pola-wrap'
@@ -4046,6 +4058,15 @@ function openWelcome(){
       +'<button id="pola-body" aria-label="相棒ポラ・ヘルプ">'+polaSVG('normal','rest')+'</button>'
     document.body.appendChild(wrap)
     if(!ENABLED) wrap.classList.add('hidden')
+
+    // OFF（非表示）のときに出る「ポラを呼ぶ」再表示ボタン
+    var recall=document.createElement('button')
+    recall.id='pola-recall'; recall.type='button'
+    recall.setAttribute('aria-label','相棒ポラを表示する')
+    recall.textContent='🤖'
+    document.body.appendChild(recall)
+    recall.style.display = ENABLED ? 'none' : 'block'
+    recall.addEventListener('click',function(e){ e.stopPropagation(); if(!ENABLED) toggleEnabled() })
 
     var bubble=document.getElementById('pola-bubble')
     var bubbleText=document.getElementById('pola-bubble-text')
@@ -4127,6 +4148,7 @@ function openWelcome(){
     function toggleEnabled(){
       ENABLED=!ENABLED; LS.set('mv_pola_on',ENABLED?'1':'0')
       wrap.classList.toggle('hidden',!ENABLED)
+      if(recall) recall.style.display = ENABLED ? 'none' : 'block'
       if(ENABLED){ resetIdle(); say('ヒントをONにしたよ。困ったらいつでも呼んでね','happy','wave',4000) }
     }
     function toggleSound(){ LS.set('mv_pola_sound', LS.get('mv_pola_sound')==='0'?'1':'0') }
@@ -4200,8 +4222,8 @@ function openWelcome(){
     wrap_fn('shareApp',   function(){ pending='share' })
     wrap_fn('closeWelcome', function(){ if(ENABLED) wrap.classList.remove('hidden'); setTimeout(function(){ showScene('onboarding') }, 1200) })
     // パネル(=広告枠を含む)表示中はポラを隠し、閉じたら再表示＋保留ヒントを出す（広告と重ねない）
-    wrap_fn('openPanel',  function(){ if(menu) menu.hidden=true; wrap.classList.add('hidden') })
-    wrap_fn('closePanel', function(){ if(ENABLED) wrap.classList.remove('hidden'); setTimeout(flushPending, 600) })
+    wrap_fn('openPanel',  function(){ if(menu) menu.hidden=true; wrap.classList.add('hidden'); if(recall) recall.style.display='none' })
+    wrap_fn('closePanel', function(){ if(ENABLED) wrap.classList.remove('hidden'); else if(recall) recall.style.display='block'; setTimeout(flushPending, 600) })
 
     // ---- 起動時 ----
     function boot(){
